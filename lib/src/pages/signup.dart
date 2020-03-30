@@ -41,19 +41,19 @@ class _SignUpPageState extends State<SignUpPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
           SizedBox(
-            height: 10,
+            height: 5.0,
           ),
           TextField(
+              keyboardType: title == "Phone Number"
+                  ? TextInputType.phone
+                  : TextInputType.text,
               obscureText: isPassword,
               decoration: InputDecoration(
                   border: InputBorder.none,
                   fillColor: Color(0xfff3f3f4),
-                  filled: true))
+                  filled: true,
+                  hintText: title))
         ],
       ),
     );
@@ -144,8 +144,10 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       children: <Widget>[
         _entryField("Username"),
-        _entryField("Email id"),
+        _entryField("Email"),
+        _entryField("Phone Number"),
         _entryField("Password", isPassword: true),
+        _entryField("Confirm Password", isPassword: true),
       ],
     );
   }
@@ -153,50 +155,51 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child:Container(
-          height: MediaQuery.of(context).size.height,
-          child:Stack(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      flex: 3,
-                      child: SizedBox(),
+        body: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                      top: -MediaQuery.of(context).size.height * .15,
+                      right: -MediaQuery.of(context).size.width * .4,
+                      child: BezierContainer()),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: SizedBox(
+                            height: 10.0,
+                          ),
+                        ),
+                        _title(),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        _emailPasswordWidget(),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        _submitButton(),
+                        Expanded(
+                          flex: 2,
+                          child: SizedBox(),
+                        )
+                      ],
                     ),
-                    _title(),
-                    SizedBox(
-                      height: 50,
-                    ),
-                    _emailPasswordWidget(),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    _submitButton(),
-                    Expanded(
-                      flex: 2,
-                      child: SizedBox(),
-                    )
-                  ],
-                ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: _loginAccountLabel(),
+                  ),
+                  Positioned(top: 30, left: 0, child: _backButton()),
+                ],
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: _loginAccountLabel(),
-              ),
-              Positioned(top: 40, left: 0, child: _backButton()),
-              Positioned(
-                  top: -MediaQuery.of(context).size.height * .15,
-                  right: -MediaQuery.of(context).size.width * .4,
-                  child: BezierContainer())
-            ],
-          ),
-        )
-      )
-    );
+            )));
   }
 }

@@ -36,14 +36,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       width: AppTheme.fullWidth(context),
-      height: 80,
+      height: 70,
       child: ListView(
           scrollDirection: Axis.horizontal,
           children: AppData.categoryList
               .map((category) => ProductIcon(
                     model: category,
                   ))
-              .toList()),
+              .toList()
+      ),
     );
   }
 
@@ -51,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       width: AppTheme.fullWidth(context),
-      height: AppTheme.fullWidth(context) * .7,
+      height: AppTheme.fullWidth(context) * .62,
       child: GridView(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
@@ -91,8 +92,8 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          SizedBox(width: 20),
-          _icon(Icons.filter_list, color: Colors.black54),
+//          SizedBox(width: 20),
+//          _icon(Icons.filter_list, color: Colors.black54),
         ],
       ),
     );
@@ -100,8 +101,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return  ListView(
+//        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[_search(), _categoryWidget(), _productWidget()],
       );
   }

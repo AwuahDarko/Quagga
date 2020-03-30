@@ -3,6 +3,7 @@ import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/wigets/title_text.dart';
+import 'package:getflutter/getflutter.dart';
 
 
 class ProductDetailPage extends StatefulWidget {
@@ -106,12 +107,13 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           TitleText(
-            text: "AIP",
-            fontSize: 160,
+            text: "IMG",
+            fontSize: 120,
             color: LightColor.lightGrey,
           ),
-          Image.asset('assets/1.jpeg')
-        ],
+      Image.network('http://placekitten.com/400/200'),
+
+      ],
       ),
     );
   }
@@ -151,7 +153,11 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             ),
             // color: Theme.of(context).backgroundColor,
           ),
-          child: Image.asset(image),
+          child:
+          GFAvatar(
+              backgroundImage:NetworkImage(image),
+              shape: GFAvatarShape.standard
+          )//Image.network(image),
         ));
   }
 
@@ -383,6 +389,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 children: <Widget>[
                   _appBar(),
                   _productImage(),
+                  SizedBox(height: 10.0,),
                   _categoryWidget(),
                 ],
               ),

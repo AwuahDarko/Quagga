@@ -49,7 +49,7 @@ class _ProductCardState extends State<ProductCard> {
           ],
         ),
         margin: EdgeInsets.symmetric(vertical: !model.isSelected ? 20 : 0),
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
@@ -73,10 +73,11 @@ class _ProductCardState extends State<ProductCard> {
                   alignment: Alignment.center,
                   children: <Widget>[
                     CircleAvatar(
-                      radius: 40,
+                      radius: 65,
                       backgroundColor: LightColor.orange.withAlpha(40),
+                      backgroundImage: NetworkImage(model.image, scale: 0.5),
                     ),
-                    Image.asset(model.image)
+//                    Image.asset(model.image)
                   ],
                 ),
                 // SizedBox(height: 5),

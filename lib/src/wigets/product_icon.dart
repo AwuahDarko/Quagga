@@ -39,7 +39,12 @@ class ProductIcon extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          model.image != null ? Image.asset(model.image) : SizedBox(),
+          CircleAvatar(
+            radius: 15,
+            backgroundColor: LightColor.orange.withAlpha(40),
+            backgroundImage: NetworkImage(model.image, scale: 1.0),
+          ),
+          SizedBox(width: 5.0),
           model.name == null ? Container()
           : Container(
             child: TitleText(
