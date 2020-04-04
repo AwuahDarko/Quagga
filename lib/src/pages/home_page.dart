@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:quagga/src/model/data.dart';
+import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
+import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/product_icon.dart';
 import 'package:quagga/src/wigets/product_card.dart';
-
+import 'package:http/http.dart' as http;
 
 
 class MyHomePage extends StatefulWidget {
@@ -17,6 +21,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   Widget _icon(IconData icon, {Color color = LightColor.iconColor}) {
     return Container(

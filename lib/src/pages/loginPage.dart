@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:quagga/src/pages/home_page.dart';
+import 'package:quagga/src/model/data.dart';
+import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/pages/signup.dart';
+import 'package:quagga/src/utils/customer.dart';
+import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/bezierContainer.dart';
-
+import 'package:http/http.dart' as http;
 import 'mainPage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,6 +21,18 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _showProgress = false;
+  String _message = "";
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.text = "mjadarko@gmail.com";
+    _passwordController.text = "natural";
+  }
+
   Widget _backButton() {
     return InkWell(
       onTap: () {
@@ -37,7 +54,8 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _entryField(String title, {bool isPassword = false}) {
+  Widget _entryField(String title,
+      {bool isPassword = false, TextEditingController controller}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -51,6 +69,7 @@ class _LoginPageState extends State<LoginPage> {
             height: 10,
           ),
           TextField(
+              controller: controller,
               obscureText: isPassword,
               decoration: InputDecoration(
                   border: InputBorder.none,
@@ -86,8 +105,31 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       onTap: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MainPage()));
+        var email = _emailController.text;
+        var password = _passwordController.text;
+
+        if (email.isNotEmpty && password.isNotEmpty) {
+          setState(() {
+            _showProgress = true;
+          });
+          _validateLogin(email.trim(), password.trim()).then((bool status) {
+
+            if (status) {
+              _fetchAllProducts().then((v) {
+                setState(() {
+                  _message = "";
+                  _showProgress = false;
+                });
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => MainPage()));
+              });
+            }
+          });
+        } else {
+          setState(() {
+            _message = "All fields are required";
+          });
+        }
       },
     );
   }
@@ -151,8 +193,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget _emailPasswordWidget() {
     return Column(
       children: <Widget>[
-        _entryField("Email"),
-        _entryField("Password", isPassword: true),
+        _entryField("Email", controller: _emailController),
+        _entryField("Password",
+            isPassword: true, controller: _passwordController),
       ],
     );
   }
@@ -181,8 +224,14 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 _title(),
                 SizedBox(
-                  height: 50,
+                  height: 20,
                 ),
+                _showProgress
+                    ? CircularProgressIndicator()
+                    : Text(
+                        _message,
+                        style: TextStyle(color: Colors.red),
+                      ),
                 _emailPasswordWidget(),
                 SizedBox(
                   height: 20,
@@ -213,4 +262,82 @@ class _LoginPageState extends State<LoginPage> {
       ),
     )));
   }
+
+  Future<bool> _validateLogin(String email, String password) async {
+    String url = Utils.url + '/api/login';
+
+    try {
+      var res =
+          await http.post(url, body: {"email": email, "password": password});
+
+      if (res.statusCode == 403) {
+        setState(() {
+          _showProgress = false;
+          _message = res.body;
+        });
+        return false;
+      } else if (res.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(res.body);
+
+        Utils.token = "Bearer " + data['token'];
+
+        Map<String, dynamic> userInfo = data['userInfo'];
+        print(Utils.token);
+
+        String name = "${userInfo['first_name']} ${userInfo['last_name']}";
+
+        Utils.customerInfo = CustomerInfo(
+            userInfo['customer_id'],
+            name,
+            userInfo['email'],
+            userInfo['type'],
+            userInfo['phone'],
+            userInfo['image_url']);
+
+        return true;
+      }
+    } catch (e) {
+      setState(() {
+        _showProgress = false;
+        _message = "Network error!";
+        print(e);
+      });
+      return false;
+    }
+    return false;
+  }
+
+  Future<void> _fetchAllProducts() async{
+    String url = Utils.url + "/api/products";
+    var res = await http.get(url, headers: {
+      "Authorization": Utils.token
+    });
+
+    if(res.statusCode == 200){
+
+      List<dynamic> productData = jsonDecode(res.body);
+
+
+      int i = 0;
+      productData.forEach((oneProduct) {
+        if(i < 20){
+          var product = oneProduct['main_product'];
+
+          List<dynamic> img = product['image_url'];
+
+          Product prod = Product(
+              id: product['product_id'],
+              name: product['product_name'],
+              price: product['price'].toDouble(),
+              image: img,
+              category: "Latest Stock"
+          );
+
+          AppData.productList.add(prod);
+        }
+        ++i;
+      });
+    }
+  }
+
 }

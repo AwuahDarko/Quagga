@@ -4,8 +4,7 @@ import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/wigets/title_text.dart';
-
-
+import 'package:getflutter/getflutter.dart';
 
 class ShopingCartPage extends StatelessWidget {
   const ShopingCartPage({Key key}) : super(key: key);
@@ -43,10 +42,17 @@ class ShopingCartPage extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  left: -15,
-                  bottom: -15,
-                  child: Image.asset(model.image, width: 90,),
-                )
+                    left: 0,
+                    bottom: 0,
+                    top: 10.0,
+                    right: 20.0,
+                    child: GFAvatar(
+                        backgroundImage: model.image.length > 0
+                            ? NetworkImage(model.image[0])
+                            : null,
+                        shape: GFAvatarShape
+                            .standard) //Image.network(model.image, width: 90,),
+                    )
               ],
             ),
           ),
@@ -145,6 +151,7 @@ class ShopingCartPage extends StatelessWidget {
             _price(),
             SizedBox(height: 30),
             _submitButton(context),
+            SizedBox(height: 50.0)
           ],
         ),
       ),

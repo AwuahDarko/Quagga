@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/bezierContainer.dart';
-
+import 'package:http/http.dart' as http;
 import 'loginPage.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -14,6 +17,15 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _confirmController = TextEditingController();
+
+  bool _showProgress = false;
+  String _message = "";
+
   Widget _backButton() {
     return InkWell(
       onTap: () {
@@ -35,7 +47,8 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _entryField(String title, {bool isPassword = false}) {
+  Widget _entryField(String title,
+      {bool isPassword = false, TextEditingController controller}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -45,6 +58,7 @@ class _SignUpPageState extends State<SignUpPage> {
             height: 5.0,
           ),
           TextField(
+              controller: controller,
               keyboardType: title == "Phone Number"
                   ? TextInputType.phone
                   : TextInputType.text,
@@ -60,28 +74,99 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget _submitButton() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.symmetric(vertical: 15),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: Colors.grey.shade200,
-                offset: Offset(2, 4),
-                blurRadius: 5,
-                spreadRadius: 2)
-          ],
-          gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Color(0xfffbb448), Color(0xfff7892b)])),
-      child: Text(
-        'Register Now',
-        style: TextStyle(fontSize: 20, color: Colors.white),
+    return GestureDetector(
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.symmetric(vertical: 15),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                  color: Colors.grey.shade200,
+                  offset: Offset(2, 4),
+                  blurRadius: 5,
+                  spreadRadius: 2)
+            ],
+            gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+        child: Text(
+          'Register Now',
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
       ),
+      onTap: () {
+        var username = _usernameController.text.trim();
+        var email = _emailController.text.trim();
+        var phone = _phoneController.text.trim();
+        var password = _passwordController.text.trim();
+        var confirm = _confirmController.text.trim();
+
+        if (username.isNotEmpty &&
+            email.isNotEmpty &&
+            phone.isNotEmpty &&
+            password.isNotEmpty &&
+            confirm.isNotEmpty) {
+          if (password != confirm) {
+            setState(() {
+              _message = "Passwords do not match";
+            });
+          } else {
+            setState(() {
+              _showProgress = true;
+            });
+            _signUpNewUser(username, email, phone, password).then((status) {
+              Utils.showStatusAndWaitForAction(context, status, _message)
+                  .then((value) {
+                setState(() {
+                  _showProgress = false;
+                });
+                if (status) {
+                  // move to login
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => LoginPage()));
+                }
+              });
+            });
+          }
+        } else {
+          setState(() {
+            _message = "All fields are required";
+          });
+        }
+      },
     );
+  }
+
+  Future<bool> _signUpNewUser(username, email, phone, password) async {
+    String url = Utils.url + '/api/sign-up';
+    var body = {
+      'first_name': username,
+      'last_name': '',
+      'email': email,
+      'phone': phone,
+      'password': password,
+      'secret': 'xNlbjAHjAH394BR09kqGuGZXqSoq54mu'
+    };
+
+    String json = jsonEncode(body);
+
+    var res = await http.post(url,
+        headers: {"Content-Type": "application/json"}, body: json);
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      setState(() {
+        _message = res.body;
+      });
+      return true;
+    } else {
+      setState(() {
+        _message = res.body;
+      });
+      return false;
+    }
   }
 
   Widget _loginAccountLabel() {
@@ -143,11 +228,13 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _emailPasswordWidget() {
     return Column(
       children: <Widget>[
-        _entryField("Username"),
-        _entryField("Email"),
-        _entryField("Phone Number"),
-        _entryField("Password", isPassword: true),
-        _entryField("Confirm Password", isPassword: true),
+        _entryField("Username", controller: _usernameController),
+        _entryField("Email", controller: _emailController),
+        _entryField("Phone Number", controller: _phoneController),
+        _entryField("Password",
+            isPassword: true, controller: _passwordController),
+        _entryField("Confirm Password",
+            isPassword: true, controller: _confirmController),
       ],
     );
   }
@@ -181,6 +268,10 @@ class _SignUpPageState extends State<SignUpPage> {
                         SizedBox(
                           height: 5,
                         ),
+                        _showProgress
+                            ? CircularProgressIndicator()
+                            : Text(_message,
+                                style: TextStyle(color: Colors.red)),
                         _emailPasswordWidget(),
                         SizedBox(
                           height: 5,
