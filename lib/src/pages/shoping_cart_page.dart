@@ -7,37 +7,45 @@ import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 import 'package:getflutter/getflutter.dart';
 
-class ShoppingCartPage extends StatefulWidget{
-  ShoppingCartPage({Key key}): super(key: key);
+class ShoppingCartPage extends StatefulWidget {
+  ShoppingCartPage({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     return ShoppingCartPageState();
   }
-
 }
 
-
-
 class ShoppingCartPageState extends State<ShoppingCartPage> {
-   ShoppingCartPageState();
+  ShoppingCartPageState();
 
-   @override
-   void initState() {
-     super.initState();
-     AppData.fetchMyCart().then((b){
-       setState(() {
+  List colors = [];
+  var myColor = Colors.white;
+  List<bool> isSelected = [];
 
-       });
-     });
-   }
+  @override
+  void initState() {
+    super.initState();
+    AppData.fetchMyCart().then((b) {
+      AppData.cartList.forEach((one) {
+        colors.add(Colors.transparent);
+        isSelected.add(false);
+      });
+      setState(() {
+
+      });
+    });
+  }
 
   Widget _cartItems() {
+
     return Column(children: AppData.cartList.map((x) => _item(x)).toList());
   }
 
   Widget _item(Product model) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 10.0),
+      color: colors[model.index],
       height: 80,
       child: Row(
         children: <Widget>[
@@ -67,11 +75,12 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                 Positioned(
                     left: 0,
                     bottom: 0,
-                    top: 10.0,
+                    top: 0.0,
                     right: 20.0,
                     child: GFAvatar(
                         backgroundImage: model.image.length > 0
-                            ? NetworkImage("${Utils.url}/api/images?url=${model.image[0]}")
+                            ? NetworkImage(
+                                "${Utils.url}/api/images?url=${model.image[0]}")
                             : null,
                         shape: GFAvatarShape
                             .standard) //Image.network(model.image, width: 90,),
@@ -81,6 +90,18 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           ),
           Expanded(
               child: ListTile(
+                  selected: isSelected[model.index],
+                  onLongPress: (){
+                    setState(() {
+                      if (isSelected[model.index]) {
+                        colors[model.index] = Colors.transparent;
+                        isSelected[model.index] = false;
+                      } else {
+                        colors[model.index] = Colors.grey[300];
+                        isSelected[model.index] = true;
+                      }
+                    });
+                  },
                   title: TitleText(
                     text: model.name,
                     fontSize: 15,
@@ -97,6 +118,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                         text: model.price.toString(),
                         fontSize: 14,
                       ),
+//                      SizedBox(width: 20.0,),
                     ],
                   ),
                   trailing: Container(
@@ -107,10 +129,11 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                         color: LightColor.lightGrey.withAlpha(150),
                         borderRadius: BorderRadius.circular(10)),
                     child: TitleText(
-                      text: 'x${model.id}',
+                      text: 'x${model.quantity}',
                       fontSize: 12,
                     ),
-                  )))
+                  )
+              ))
         ],
       ),
     );
@@ -180,4 +203,5 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
       ),
     );
   }
+
 }

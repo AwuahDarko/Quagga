@@ -50,35 +50,24 @@ class AppData {
     if(res.statusCode == 200){
       List<dynamic> cartData = jsonDecode(res.body);
 
-
+      int i = 0;
       cartData.forEach((oneCart) {
 
-        String name = "";
-        if(oneCart['product_name'] == null){
-          name = oneCart['name'];
-        }else{
-          name = oneCart['product_name'];
-        }
+        List<dynamic> img = [];
+        img.add(oneCart['image_url']);
 
-        int id;
-        if(oneCart['type_id'] != null){
-          id = oneCart['type_id'];
-        }else{
-          id = oneCart['product_id'];
-        }
-
-        List<dynamic> l = [];
-        l.add(oneCart['image_url']);
         Product prod = Product(
-            id: id,
-            name: name,
+            index: i,
+            id: oneCart['product_id'],
+            name: oneCart['product_name'],
             price: oneCart['price'].toDouble(),
-            image: l,
-            category: "Latest Stock",
+            image: img,
+            category: "",
           quantity: oneCart['quantity']
         );
 
         AppData.cartList.add(prod);
+        ++i;
       });
     }
 
