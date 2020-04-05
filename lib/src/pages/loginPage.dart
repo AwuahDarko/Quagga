@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quagga/src/model/data.dart';
-import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/pages/signup.dart';
 import 'package:quagga/src/utils/customer.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/bezierContainer.dart';
 import 'package:http/http.dart' as http;
 import 'mainPage.dart';
+
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
@@ -115,13 +115,18 @@ class _LoginPageState extends State<LoginPage> {
           _validateLogin(email.trim(), password.trim()).then((bool status) {
 
             if (status) {
-              _fetchAllProducts().then((v) {
-                setState(() {
-                  _message = "";
-                  _showProgress = false;
+              AppData.fetchAllProducts().then((v) {
+
+               AppData.fetchCategories().then((v){
+
+                  setState(() {
+                    _message = "";
+                    _showProgress = false;
+
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => MainPage()));
+                  });
                 });
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => MainPage()));
               });
             }
           });
@@ -240,7 +245,7 @@ class _LoginPageState extends State<LoginPage> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.centerRight,
-                  child: Text('Forgot Password ?',
+                  child: Text('Forgot Password?',
                       style:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                 ),
@@ -282,7 +287,6 @@ class _LoginPageState extends State<LoginPage> {
         Utils.token = "Bearer " + data['token'];
 
         Map<String, dynamic> userInfo = data['userInfo'];
-        print(Utils.token);
 
         String name = "${userInfo['first_name']} ${userInfo['last_name']}";
 
@@ -306,38 +310,4 @@ class _LoginPageState extends State<LoginPage> {
     }
     return false;
   }
-
-  Future<void> _fetchAllProducts() async{
-    String url = Utils.url + "/api/products";
-    var res = await http.get(url, headers: {
-      "Authorization": Utils.token
-    });
-
-    if(res.statusCode == 200){
-
-      List<dynamic> productData = jsonDecode(res.body);
-
-
-      int i = 0;
-      productData.forEach((oneProduct) {
-        if(i < 20){
-          var product = oneProduct['main_product'];
-
-          List<dynamic> img = product['image_url'];
-
-          Product prod = Product(
-              id: product['product_id'],
-              name: product['product_name'],
-              price: product['price'].toDouble(),
-              image: img,
-              category: "Latest Stock"
-          );
-
-          AppData.productList.add(prod);
-        }
-        ++i;
-      });
-    }
-  }
-
 }

@@ -4,5 +4,6 @@ class Product{
   String category ;
   List<dynamic> image ;
   double price ;
-  Product({this.id, this.name, this.category, this.price, this.image});
+  int quantity;
+  Product({this.id, this.name, this.category, this.price, this.image, this.quantity});
 }

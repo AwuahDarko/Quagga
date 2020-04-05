@@ -3,11 +3,34 @@ import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
+import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 import 'package:getflutter/getflutter.dart';
 
-class ShopingCartPage extends StatelessWidget {
-  const ShopingCartPage({Key key}) : super(key: key);
+class ShoppingCartPage extends StatefulWidget{
+  ShoppingCartPage({Key key}): super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return ShoppingCartPageState();
+  }
+
+}
+
+
+
+class ShoppingCartPageState extends State<ShoppingCartPage> {
+   ShoppingCartPageState();
+
+   @override
+   void initState() {
+     super.initState();
+     AppData.fetchMyCart().then((b){
+       setState(() {
+
+       });
+     });
+   }
 
   Widget _cartItems() {
     return Column(children: AppData.cartList.map((x) => _item(x)).toList());
@@ -48,7 +71,7 @@ class ShopingCartPage extends StatelessWidget {
                     right: 20.0,
                     child: GFAvatar(
                         backgroundImage: model.image.length > 0
-                            ? NetworkImage(model.image[0])
+                            ? NetworkImage("${Utils.url}/api/images?url=${model.image[0]}")
                             : null,
                         shape: GFAvatarShape
                             .standard) //Image.network(model.image, width: 90,),

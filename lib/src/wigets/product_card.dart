@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/utils/utils.dart';
@@ -15,6 +16,7 @@ class ProductCard extends StatefulWidget {
 
 class _ProductCardState extends State<ProductCard> {
   Product model;
+  ProgressDialog _progressDialog;
 
   @override
   void initState() {
@@ -24,6 +26,7 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    _progressDialog = Utils.initializeProgressDialog(context);
     return InkWell(
       onTap: () {
         Navigator.of(context).pushNamed('/detail');
@@ -54,17 +57,27 @@ class _ProductCardState extends State<ProductCard> {
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
-//            Positioned(
-//              left: 0,
-//              top: 0,
-//              child: IconButton(
-//                icon: Icon(Icons.touch_app , color: LightColor.iconColor,),
-//                 onPressed: (){
-//                   setState(() {
-////                     model.isliked = !model.isliked ;
-//                   });
-//                 })
-//            ),
+            Positioned(
+                right: -10,
+                bottom: -5,
+                child: IconButton(
+                    icon: Icon(
+                      Icons.shopping_cart,
+                      color: LightColor.orange,
+                    ),
+                    onPressed: () {
+                      _progressDialog.show();
+
+                      Utils.addToCart(
+                              model.id, Utils.customerInfo.userID, 'main')
+                          .then((status) {
+                            if(_progressDialog.isShowing()){
+                              _progressDialog.hide().then((bool value){
+                                Utils.showStatus(context, status, "Added to cart");
+                              });
+                            }
+                      });
+                    })),
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -77,10 +90,11 @@ class _ProductCardState extends State<ProductCard> {
                       radius: 70,
                       backgroundColor: LightColor.orange.withAlpha(40),
                       backgroundImage: model.image.length > 0
-                          ? NetworkImage(Utils.url +'/api/images?url='+ model.image[0], scale: 0.5)
+                          ? NetworkImage(
+                              Utils.url + '/api/images?url=' + model.image[0],
+                              scale: 0.5)
                           : null,
                     ),
-//                    Image.asset(model.image)
                   ],
                 ),
                 SizedBox(height: 5),

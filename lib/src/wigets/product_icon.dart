@@ -24,13 +24,13 @@ class ProductIcon extends StatelessWidget {
       height: 40,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(10)),
-        color: model.isSelected ? LightColor.background : Colors.transparent,
+        color: Colors.transparent,
         border: Border.all(
-            color: model.isSelected ? LightColor.orange : LightColor.grey,
-            width: model.isSelected ? 2 : 1),
+            color:  LightColor.lightGrey,
+            width: 2 ),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: model.isSelected ?  Color(0xfffbf2ef) : Colors.white,
+            color: Color(0xfffbf2ef) ,
              blurRadius: 10,
               spreadRadius: 5,
               offset: Offset(5,5)
