@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/themes/light_color.dart';
@@ -6,6 +9,7 @@ import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 import 'package:getflutter/getflutter.dart';
+import 'package:http/http.dart' as http;
 
 class ShoppingCartPage extends StatefulWidget {
   ShoppingCartPage({Key key}) : super(key: key);
@@ -20,25 +24,29 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   ShoppingCartPageState();
 
   List colors = [];
-  var myColor = Colors.white;
   List<bool> isSelected = [];
+  bool _loading = true;
+  Product _currentSelectedItem;
+  ProgressDialog _progressDialog;
 
   @override
   void initState() {
     super.initState();
+    _refreshPage();
+  }
+
+  void _refreshPage() {
     AppData.fetchMyCart().then((b) {
       AppData.cartList.forEach((one) {
         colors.add(Colors.transparent);
         isSelected.add(false);
       });
-      setState(() {
-
-      });
+      _loading = false;
+      setState(() {});
     });
   }
 
   Widget _cartItems() {
-
     return Column(children: AppData.cartList.map((x) => _item(x)).toList());
   }
 
@@ -91,14 +99,27 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           Expanded(
               child: ListTile(
                   selected: isSelected[model.index],
-                  onLongPress: (){
+                  onLongPress: () {
                     setState(() {
                       if (isSelected[model.index]) {
+                        // remove selection
+
                         colors[model.index] = Colors.transparent;
                         isSelected[model.index] = false;
+
+                        _currentSelectedItem = null;
                       } else {
+                        // remove all
+                        for (int i = 0; i < AppData.cartList.length; ++i) {
+                          colors[i] = Colors.transparent;
+                          isSelected[i] = false;
+                        }
+                        // add current
                         colors[model.index] = Colors.grey[300];
                         isSelected[model.index] = true;
+
+                        // set the selected item
+                        _currentSelectedItem = model;
                       }
                     });
                   },
@@ -132,8 +153,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                       text: 'x${model.quantity}',
                       fontSize: 12,
                     ),
-                  )
-              ))
+                  )))
         ],
       ),
     );
@@ -177,31 +197,185 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   double getPrice() {
     double price = 0;
     AppData.cartList.forEach((x) {
-      price += x.price * x.id;
+      price += x.price * x.quantity;
     });
     return price;
   }
 
   @override
   Widget build(BuildContext context) {
+    _progressDialog = Utils.initializeProgressDialog(context);
     return Container(
-      padding: AppTheme.padding,
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            _cartItems(),
-            Divider(
-              thickness: 1,
-              height: 70,
-            ),
-            _price(),
-            SizedBox(height: 30),
-            _submitButton(context),
-            SizedBox(height: 50.0)
-          ],
-        ),
-      ),
-    );
+        height: MediaQuery.of(context).size.height,
+        padding: AppTheme.padding,
+        child: SafeArea(
+          child: Stack(
+//          fit: StackFit.expand,
+            children: <Widget>[
+              Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Row(
+                    children: <Widget>[
+                      IconButton(
+                        icon: Icon(
+                          Icons.remove_circle,
+                          color: LightColor.orange,
+                          size: 15.0,
+                        ),
+                        onPressed: () {
+                          if (_currentSelectedItem != null && (_currentSelectedItem.quantity > _currentSelectedItem.minOrder)) {
+                            _progressDialog.show().then((v){
+                              _decreaseQuantity(_currentSelectedItem.cartID,
+                                  _currentSelectedItem.quantity)
+                                  .then((status) {
+                                if (_progressDialog.isShowing()) {
+                                  _progressDialog.hide().then((v) {
+                                    if (status) {
+                                      setState(() {
+                                        _currentSelectedItem.quantity -= _currentSelectedItem.minOrder;
+                                      });
+                                    }
+                                  });
+                                }
+                              });
+                            });
+
+                          }
+                        },
+                      ),
+                      SizedBox(width: 10.0),
+                      IconButton(
+                          icon: Icon(
+                            Icons.add_circle,
+                            color: LightColor.orange,
+                            size: 15.0,
+                          ),
+                          onPressed: () {
+                            if (_currentSelectedItem != null && (_currentSelectedItem.quantity < _currentSelectedItem.numberInStock)) {
+                              _progressDialog.show().then((v){
+                                _increaseQuantity(_currentSelectedItem.cartID,
+                                    _currentSelectedItem.quantity)
+                                    .then((status) {
+                                  if (_progressDialog.isShowing()) {
+                                    _progressDialog.hide().then((v) {
+                                      if (status) {
+                                        setState(() {
+                                          _currentSelectedItem.quantity += _currentSelectedItem.minOrder;
+                                        });
+                                      }
+                                    });
+                                  }
+                                });
+                              });
+                            }
+                          }),
+                      SizedBox(width: 10.0),
+                      IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: LightColor.orange,
+                            size: 17.0,
+                          ),
+                          onPressed: () {
+                            if (_currentSelectedItem != null) {
+                              Utils.deleteDialog(context, "Delete this item?")
+                                  .then((response) {
+                                if (response) {
+                                  _progressDialog.show();
+                                  _deleteCartItem(_currentSelectedItem.cartID)
+                                      .then((status) {
+                                    if (_progressDialog.isShowing()) {
+                                      _progressDialog.hide().then((v) {
+                                        _refreshPage();
+                                        Utils.showStatus(
+                                            context, status, "Item Deleted");
+                                      });
+                                    }
+                                  });
+                                }
+                              });
+                            }
+                          })
+                    ],
+                  )),
+              Positioned(
+                top: 50,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      _loading ? CircularProgressIndicator() : _cartItems(),
+                      Divider(
+                        thickness: 1,
+                        height: 70,
+                      ),
+                      _price(),
+                      SizedBox(height: 30),
+                      _submitButton(context),
+                      SizedBox(height: 50.0)
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ));
   }
 
+  Future<bool> _deleteCartItem(int cartId) async {
+    String url = Utils.url + "/api/cart?cart_id=$cartId";
+
+    var res = await http.delete(url, headers: {"Authorization": Utils.token});
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> _increaseQuantity(int cartID, int quantity) async {
+    Map<String, int> body = {"cart_id": cartID, "quantity": quantity + 1};
+
+    String json = jsonEncode(body);
+
+    String url = Utils.url + "/api/cart";
+
+    var res = await http.patch(url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": Utils.token
+        },
+        body: json);
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> _decreaseQuantity(int cartID, int quantity) async {
+    Map<String, int> body = {"cart_id": cartID, "quantity": quantity - 1};
+
+    String json = jsonEncode(body);
+
+    String url = Utils.url + "/api/cart";
+
+    var res = await http.patch(url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": Utils.token
+        },
+        body: json);
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

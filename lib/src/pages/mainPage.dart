@@ -86,12 +86,35 @@ class _MainPageState extends State<MainPage> {
               ],
             ),
             Spacer(),
-            !isHomePageSelected
-                ? Icon(
-                    Icons.delete_outline,
-                    color: LightColor.orange,
-                  )
-                : SizedBox()
+//            !isHomePageSelected
+//                ? Row(
+//              children: <Widget>[
+//                IconButton(
+//                  icon: Icon(
+//                    Icons.add,
+//                    color: LightColor.orange,
+//                  ),
+//                  onPressed: (){print("hhhh");},
+//                ),
+//                SizedBox(width: 15.0),
+//                IconButton(
+//                  icon: Icon(
+//                    Icons.remove,
+//                    color: LightColor.orange,
+//                  ),
+//                  onPressed: (){}
+//                ),
+//                SizedBox(width: 15.0),
+//                IconButton(
+//                  icon: Icon(
+//                    Icons.delete_outline,
+//                    color: LightColor.orange,
+//                  ),
+//                  onPressed: (){}
+//                )
+//              ],
+//            )
+//                : SizedBox()
           ],
         ));
   }

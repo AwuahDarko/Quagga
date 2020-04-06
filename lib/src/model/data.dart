@@ -57,13 +57,16 @@ class AppData {
         img.add(oneCart['image_url']);
 
         Product prod = Product(
-            index: i,
             id: oneCart['product_id'],
+            cartID: oneCart['cart_id'],
             name: oneCart['product_name'],
             price: oneCart['price'].toDouble(),
             image: img,
             category: "",
-          quantity: oneCart['quantity']
+          quantity: oneCart['quantity'],
+          index: i,
+          numberInStock: oneCart['number_in_stock'],
+          minOrder: oneCart['min_order']
         );
 
         AppData.cartList.add(prod);
@@ -96,7 +99,8 @@ class AppData {
               name: product['product_name'],
               price: product['price'].toDouble(),
               image: img,
-              category: "Latest Stock"
+              category: "Latest Stock",
+            minOrder: product['min_order']
           );
 
           AppData.productList.add(prod);

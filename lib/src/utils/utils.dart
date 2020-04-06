@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 class Utils {
   static const String url =
-      'http://10.0.2.2:4000'; //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000'
+      'http://192.168.43.111:4000'; //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000'
   static String token = '';
   static CustomerInfo customerInfo;
 
@@ -30,11 +30,12 @@ class Utils {
         });
   }
 
-  static Future<bool> addToCart(productID, customerID, type) async {
+  static Future<bool> addToCart(productID, customerID, type, minOrder) async {
     Map<String, dynamic> body = {
       "product_id": productID,
       "customer_id": customerID,
-      "type": type
+      "type": type,
+      "min_order": minOrder
     };
 
     String json = jsonEncode(body);
@@ -85,6 +86,30 @@ class Utils {
         context: context,
         builder: (BuildContext context) {
           return alertDialog;
+        });
+  }
+
+  static Future<bool> deleteDialog(BuildContext context, String message) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Are you sure?"),
+            content: Text(message),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Yes"),
+                color: Color(0xFFDC143C),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+              FlatButton(
+                child: Text("No"),
+                color: Color(0xFF000080),
+                onPressed: () => Navigator.pop(context, false),
+              )
+            ],
+          );
         });
   }
 

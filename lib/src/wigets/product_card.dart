@@ -66,17 +66,18 @@ class _ProductCardState extends State<ProductCard> {
                       color: LightColor.orange,
                     ),
                     onPressed: () {
-                      _progressDialog.show();
-
-                      Utils.addToCart(
-                              model.id, Utils.customerInfo.userID, 'main')
-                          .then((status) {
-                            if(_progressDialog.isShowing()){
-                              _progressDialog.hide().then((bool value){
-                                Utils.showStatus(context, status, "Added to cart");
-                              });
-                            }
+                      _progressDialog.show().then((v){
+                        Utils.addToCart(
+                            model.id, Utils.customerInfo.userID, 'main', model.minOrder)
+                            .then((status) {
+                          if(_progressDialog.isShowing()){
+                            _progressDialog.hide().then((bool value){
+                              Utils.showStatus(context, status, "Added to cart");
+                            });
+                          }
+                        });
                       });
+
                     })),
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
