@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/model/category.dart';
+import 'package:quagga/src/model/sub_product.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:http/http.dart' as http;
 
 class AppData {
-
   static List<Product> productList = [];
 
   static List<Product> cartList = [];
@@ -23,36 +23,34 @@ class AppData {
   static Future<void> fetchCategories() async {
     AppData.categoryList.clear();
     String url = Utils.url + "/api/categories";
-    var res = await http.get(url, headers: {
-      "Authorization": Utils.token
-    });
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
 
-    if(res.statusCode == 200){
+    if (res.statusCode == 200) {
       List<dynamic> categories = jsonDecode(res.body);
 
-      categories.forEach((oneCategory){
-        var category = Category(id: oneCategory['category_id'], name: oneCategory['category_name'], image: Utils.url + '/api/images?url=' + oneCategory['image']);
+      categories.forEach((oneCategory) {
+        var category = Category(
+            id: oneCategory['category_id'],
+            name: oneCategory['category_name'],
+            image: Utils.url + '/api/images?url=' + oneCategory['image']);
         AppData.categoryList.add(category);
       });
-
     }
   }
 
-  static Future<void> fetchMyCart() async{
+  static Future<void> fetchMyCart() async {
     AppData.cartList.clear();
 
-    String url = Utils.url + "/api/cart?customer_id=${Utils.customerInfo.userID}";
+    String url =
+        Utils.url + "/api/cart?customer_id=${Utils.customerInfo.userID}";
 
-    var res = await http.get(url, headers: {
-      "Authorization": Utils.token
-    });
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
 
-    if(res.statusCode == 200){
+    if (res.statusCode == 200) {
       List<dynamic> cartData = jsonDecode(res.body);
 
       int i = 0;
       cartData.forEach((oneCart) {
-
         List<dynamic> img = [];
         img.add(oneCart['image_url']);
 
@@ -63,36 +61,49 @@ class AppData {
             price: oneCart['price'].toDouble(),
             image: img,
             category: "",
-          quantity: oneCart['quantity'],
-          index: i,
-          numberInStock: oneCart['number_in_stock'],
-          minOrder: oneCart['min_order']
-        );
+            quantity: oneCart['quantity'],
+            index: i,
+            numberInStock: oneCart['number_in_stock'],
+            minOrder: oneCart['min_order']);
 
         AppData.cartList.add(prod);
         ++i;
       });
     }
-
   }
 
-  static Future<void> fetchAllProducts() async{
+  static Future<void> fetchAllProducts() async {
     AppData.productList.clear();
 
     String url = Utils.url + "/api/products";
-    var res = await http.get(url, headers: {
-      "Authorization": Utils.token
-    });
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
 
-    if(res.statusCode == 200){
+    if (res.statusCode == 200) {
       List<dynamic> productData = jsonDecode(res.body);
 
       int i = 0;
       productData.forEach((oneProduct) {
-        if(i < 20){
+        if (i < 20) {
           var product = oneProduct['main_product'];
+          var sub = oneProduct['sub_products'];
 
           List<dynamic> img = product['image_url'];
+
+          List<SubProduct> listOfSubProducts = [];
+
+          sub.forEach((oneSub) {
+
+            listOfSubProducts.add(SubProduct(
+              id: oneSub['type_id'],
+              name: oneSub['name'],
+              category: oneSub['type'],
+              description: oneSub['description'],
+              price: oneSub['price'].toDouble(),
+              numberInStock: oneSub['number_in_stock'],
+              image: oneSub['image_url'],
+              minOrder: oneSub['min_order'],
+            ));
+          });
 
           Product prod = Product(
               id: product['product_id'],
@@ -100,8 +111,9 @@ class AppData {
               price: product['price'].toDouble(),
               image: img,
               category: "Latest Stock",
-            minOrder: product['min_order']
-          );
+              minOrder: product['min_order'],
+              description: product['description'],
+              subProducts: listOfSubProducts);
 
           AppData.productList.add(prod);
         }

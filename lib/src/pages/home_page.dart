@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       width: AppTheme.fullWidth(context),
-      height: AppTheme.fullWidth(context) * .62,
+      height: AppTheme.fullWidth(context) * .7,
       child: GridView(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,

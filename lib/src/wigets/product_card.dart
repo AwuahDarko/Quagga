@@ -29,8 +29,9 @@ class _ProductCardState extends State<ProductCard> {
     _progressDialog = Utils.initializeProgressDialog(context);
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed('/detail');
-        setState(() {
+        Navigator.of(context).pushNamed('/detail', arguments: model);
+//        setState(() {
+
           // model.isSelected = !model.isSelected;
           //   AppData.productList.forEach((x) {
           //     if (x.id == model.id && x.name == model.name) {
@@ -41,7 +42,7 @@ class _ProductCardState extends State<ProductCard> {
           //   var m = AppData.productList
           //       .firstWhere((x) => x.id == model.id && x.name == model.name);
           //   m.isSelected = !m.isSelected;
-        });
+//        });
       },
       child: Container(
         decoration: BoxDecoration(
@@ -88,7 +89,7 @@ class _ProductCardState extends State<ProductCard> {
                   alignment: Alignment.center,
                   children: <Widget>[
                     CircleAvatar(
-                      radius: 70,
+                      radius: 75,
                       backgroundColor: LightColor.orange.withAlpha(40),
                       backgroundImage: model.image.length > 0
                           ? NetworkImage(
@@ -106,10 +107,15 @@ class _ProductCardState extends State<ProductCard> {
                 TitleText(
                   text: model.category,
                   fontSize: 14,
+                  color: LightColor.skyBlue,
+                ),
+                TitleText(
+                  text: "Min. Order ${model.minOrder}",
+                  fontSize: 14,
                   color: LightColor.orange,
                 ),
                 TitleText(
-                  text: model.price.toString(),
+                  text: "GH\u20B5 ${model.price}",
                   fontSize: 18,
                 ),
               ],

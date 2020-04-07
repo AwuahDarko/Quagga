@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
           Theme.of(context).textTheme,
         ),
       ),
-      debugShowCheckedModeBanner: false,
+//      debugShowCheckedModeBanner: false,
       routes: Routes.getRoute(),
       // ignore: missing_return
       onGenerateRoute: (RouteSettings settings) {

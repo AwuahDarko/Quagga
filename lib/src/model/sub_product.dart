@@ -1,10 +1,8 @@
-import 'package:quagga/src/model/sub_product.dart';
-
-class Product {
+class SubProduct {
   int id;
   String name;
   String category;
-  List<dynamic> image;
+  String image;
   double price;
   int quantity;
   int cartID;
@@ -12,9 +10,8 @@ class Product {
   int numberInStock;
   int minOrder;
   String description;
-  List<SubProduct> subProducts;
 
-  Product(
+  SubProduct(
       {this.id,
       this.name,
       this.category,
@@ -25,6 +22,5 @@ class Product {
       this.index,
       this.numberInStock,
       this.minOrder,
-      this.description,
-      this.subProducts});
+      this.description});
 }

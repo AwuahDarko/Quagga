@@ -224,23 +224,25 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                           size: 15.0,
                         ),
                         onPressed: () {
-                          if (_currentSelectedItem != null && (_currentSelectedItem.quantity > _currentSelectedItem.minOrder)) {
-                            _progressDialog.show().then((v){
+                          if (_currentSelectedItem != null &&
+                              (_currentSelectedItem.quantity >
+                                  _currentSelectedItem.minOrder)) {
+                            _progressDialog.show().then((v) {
                               _decreaseQuantity(_currentSelectedItem.cartID,
-                                  _currentSelectedItem.quantity)
+                                      _currentSelectedItem.quantity)
                                   .then((status) {
                                 if (_progressDialog.isShowing()) {
                                   _progressDialog.hide().then((v) {
                                     if (status) {
                                       setState(() {
-                                        _currentSelectedItem.quantity -= _currentSelectedItem.minOrder;
+                                        _currentSelectedItem.quantity -=
+                                            _currentSelectedItem.minOrder;
                                       });
                                     }
                                   });
                                 }
                               });
                             });
-
                           }
                         },
                       ),
@@ -252,16 +254,19 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                             size: 15.0,
                           ),
                           onPressed: () {
-                            if (_currentSelectedItem != null && (_currentSelectedItem.quantity < _currentSelectedItem.numberInStock)) {
-                              _progressDialog.show().then((v){
+                            if (_currentSelectedItem != null &&
+                                (_currentSelectedItem.quantity <
+                                    _currentSelectedItem.numberInStock)) {
+                              _progressDialog.show().then((v) {
                                 _increaseQuantity(_currentSelectedItem.cartID,
-                                    _currentSelectedItem.quantity)
+                                        _currentSelectedItem.quantity)
                                     .then((status) {
                                   if (_progressDialog.isShowing()) {
                                     _progressDialog.hide().then((v) {
                                       if (status) {
                                         setState(() {
-                                          _currentSelectedItem.quantity += _currentSelectedItem.minOrder;
+                                          _currentSelectedItem.quantity +=
+                                              _currentSelectedItem.minOrder;
                                         });
                                       }
                                     });

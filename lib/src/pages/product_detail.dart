@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:quagga/src/model/data.dart';
+import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
+import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 import 'package:getflutter/getflutter.dart';
-
 
 class ProductDetailPage extends StatefulWidget {
   ProductDetailPage({Key key}) : super(key: key);
@@ -17,13 +17,16 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     with TickerProviderStateMixin {
   AnimationController controller;
   Animation<double> animation;
+
+  static Product model;
+
   @override
   void initState() {
     super.initState();
     controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     animation = Tween<double>(begin: 0, end: 1).animate(
-         CurvedAnimation(parent: controller, curve: Curves.easeInToLinear));
+        CurvedAnimation(parent: controller, curve: Curves.easeInToLinear));
     controller.forward();
   }
 
@@ -34,6 +37,11 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   bool isLiked = true;
+
+  int imageIndex = 0;
+  List<Image> productImages = [];
+  int _counter = 0;
+
   Widget _appBar() {
     return Container(
       padding: AppTheme.padding,
@@ -107,13 +115,41 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           TitleText(
-            text: "IMG",
-            fontSize: 120,
+            text: model.name,
+            fontSize: 50,
+//            fontWeight: FontWeight.w00,
             color: LightColor.lightGrey,
           ),
-      Image.network('http://placekitten.com/400/200'),
+           Dismissible(
+            resizeDuration: null,
+            onDismissed: (DismissDirection direction) {
+              if (direction == DismissDirection.startToEnd) {
+                if (_counter > 0) {
+                  _counter--;
 
-      ],
+                } else {
+                  _counter = model.image.length - 1;
+                }
+              }
+
+              if (direction == DismissDirection.endToStart) {
+                if (_counter < model.image.length - 1) {
+                  _counter++;
+
+                } else {
+                  _counter = 0;
+                }
+              }
+
+              setState(() {});
+            },
+            key: new ValueKey(_counter),
+            child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.27,
+                child: productImages[_counter]),
+          ),
+        ],
       ),
     );
   }
@@ -126,8 +162,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
-          children:
-              AppData.showThumbnailList.map((x) => _thumbnail(x)).toList()),
+          children: model.image
+              .map((x) => _thumbnail('${Utils.url}/api/images?url=$x'))
+              .toList()),
     );
   }
 
@@ -141,24 +178,24 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               child: child,
             ),
         child: Container(
-          height: 40,
-          width: 50,
-          margin: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: LightColor.grey,
+            height: 40,
+            width: 50,
+            margin: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: LightColor.grey,
+              ),
+              borderRadius: BorderRadius.all(
+                Radius.circular(13),
+              ),
+              // color: Theme.of(context).backgroundColor,
             ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(13),
-            ),
-            // color: Theme.of(context).backgroundColor,
-          ),
-          child:
-          GFAvatar(
-              backgroundImage:NetworkImage(image),
-              shape: GFAvatarShape.standard
-          )//Image.network(image),
-        ));
+            child: GestureDetector(
+              child: GFAvatar(
+                  backgroundImage: NetworkImage(image),
+                  shape: GFAvatarShape.standard),
+            ) //Image.network(image),
+            ));
   }
 
   Widget _detailWidget() {
@@ -198,7 +235,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      TitleText(text: "FIRST AID BOX", fontSize: 25),
+                      TitleText(text: model.name, fontSize: 25),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
@@ -211,7 +248,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                                 color: LightColor.red,
                               ),
                               TitleText(
-                                text: "240",
+                                text: model.price.toString(),
                                 fontSize: 25,
                               ),
                             ],
@@ -237,11 +274,14 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 SizedBox(
                   height: 20,
                 ),
-                _availableSize(),
+                TitleText(
+                  text: "Categories",
+                ),
+                _subProducts(),
                 SizedBox(
                   height: 20,
                 ),
-                _availableColor(),
+//                _availableColor(),
                 SizedBox(
                   height: 20,
                 ),
@@ -254,32 +294,23 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  Widget _availableSize() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        TitleText(
-          text: "Available Size",
-          fontSize: 14,
-        ),
-        SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            _sizeWidget("6"),
-            _sizeWidget("7", isSelected: true),
-            _sizeWidget("8"),
-            _sizeWidget("9"),
-          ],
-        )
-      ],
-    );
+  Widget _subProducts() {
+    return Container(
+      height: 100.0,
+       width: MediaQuery.of(context).size.width,
+       child: ListView(
+          scrollDirection: Axis.horizontal,
+              children:
+                model.subProducts.map((sub) => _sizeWidget(sub.name)).toList()
+       )
+        );
   }
 
   Widget _sizeWidget(String text,
       {Color color = LightColor.iconColor, bool isSelected = false}) {
     return Container(
       padding: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
         border: Border.all(
             color: LightColor.iconColor,
@@ -354,7 +385,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           fontSize: 14,
         ),
         SizedBox(height: 20),
-        Text(AppData.description),
+        Text(model.description),
       ],
     );
   }
@@ -370,6 +401,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    final Product product = ModalRoute.of(context).settings.arguments;
+    model = product;
+    productImages = _fetchAllImages(model.image);
     return Scaffold(
       floatingActionButton: _floatingButton(),
       body: SafeArea(
@@ -389,8 +423,11 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 children: <Widget>[
                   _appBar(),
                   _productImage(),
-                  SizedBox(height: 10.0,),
+                  SizedBox(
+                    height: 10.0,
+                  ),
                   _categoryWidget(),
+
                 ],
               ),
               _detailWidget()
@@ -399,5 +436,17 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         ),
       ),
     );
+  }
+
+  List<Image> _fetchAllImages(List<dynamic> imageLinks) {
+    List<Image> images = [];
+    imageLinks.forEach((oneLink) {
+      images.add(Image.network("${Utils.url}/api/images?url=$oneLink"));
+    });
+    return images;
+  }
+
+  Image setImages() {
+    return productImages[imageIndex];
   }
 }
