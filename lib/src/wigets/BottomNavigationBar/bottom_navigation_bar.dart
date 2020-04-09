@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quagga/src/themes/light_color.dart';
+import 'package:quagga/src/utils/utils.dart';
 
 import 'bottom_curved_Painter.dart';
 
@@ -123,6 +124,11 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
   void _handlePressed(int index) {
     if (_selectedIndex == index || _xController.isAnimating) return;
     widget.onIconPressedCallback(index);
+
+    if(index == 1){
+      Utils.categoryToSearch = 0;
+    }
+
     setState(() {
       _selectedIndex = index;
     });

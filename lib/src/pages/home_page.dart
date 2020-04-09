@@ -8,8 +8,8 @@ import 'package:quagga/src/wigets/product_card.dart';
 
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
+  MyHomePage({Key key, this.title, this.onIconPressedCallback}) : super(key: key);
+  final Function(int) onIconPressedCallback;
   final String title;
 
   @override
@@ -49,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: AppData.categoryList
               .map((category) => ProductIcon(
                     model: category,
+            onIconPressedCallback: widget.onIconPressedCallback,
                   ))
               .toList()
       ),
@@ -110,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return  ListView(
 //        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[_search(), _categoryWidget(), _productWidget()],
+        children: <Widget>[/*_search(),*/ _categoryWidget(), _productWidget()],
       );
   }
 }

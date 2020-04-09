@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/product.dart';
+import 'package:quagga/src/model/sub_product.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
@@ -20,6 +22,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   static Product model;
 
+  bool _describeMainProduct = true;
+  String _subProductDescription = "";
+  ProgressDialog _progressDialog;
+
   @override
   void initState() {
     super.initState();
@@ -36,7 +42,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     super.dispose();
   }
 
-  bool isLiked = true;
+  bool isLiked = false;
 
   int imageIndex = 0;
   List<Image> productImages = [];
@@ -57,8 +63,21 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           ),
           InkWell(
             onTap: () {
-              setState(() {
-                isLiked = !isLiked;
+              _progressDialog.show().then((v){
+                Utils.addToFavorites(
+                    model.id, Utils.customerInfo.userID, 'main')
+                    .then((status) {
+                  if(_progressDialog.isShowing()){
+                    _progressDialog.hide().then((bool value){
+                      Utils.showStatus(context, status, "Added to your wish list");
+                      if(value){
+                        setState(() {
+                          isLiked = !isLiked;
+                        });
+                      }
+                    });
+                  }
+                });
               });
             },
             child: _icon(isLiked ? Icons.favorite : Icons.favorite_border,
@@ -102,54 +121,58 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   Widget _productImage() {
-    return AnimatedBuilder(
-      builder: (context, child) {
-        return AnimatedOpacity(
-          duration: Duration(milliseconds: 500),
-          opacity: animation.value,
-          child: child,
-        );
+    return GestureDetector(
+      onTap: () {
+        _subProductDescription = model.description;
+        _describeMainProduct = true;
+        setState(() {});
       },
-      animation: animation,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-          TitleText(
-            text: model.name,
-            fontSize: 50,
-//            fontWeight: FontWeight.w00,
-            color: LightColor.lightGrey,
-          ),
-           Dismissible(
-            resizeDuration: null,
-            onDismissed: (DismissDirection direction) {
-              if (direction == DismissDirection.startToEnd) {
-                if (_counter > 0) {
-                  _counter--;
-
-                } else {
-                  _counter = model.image.length - 1;
+      child: AnimatedBuilder(
+        builder: (context, child) {
+          return AnimatedOpacity(
+            duration: Duration(milliseconds: 500),
+            opacity: animation.value,
+            child: child,
+          );
+        },
+        animation: animation,
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            TitleText(
+              text: model.name,
+              fontSize: 50,
+              color: LightColor.lightGrey,
+            ),
+            Dismissible(
+              resizeDuration: null,
+              onDismissed: (DismissDirection direction) {
+                if (direction == DismissDirection.startToEnd) {
+                  if (_counter > 0) {
+                    _counter--;
+                  } else {
+                    _counter = model.image.length - 1;
+                  }
                 }
-              }
 
-              if (direction == DismissDirection.endToStart) {
-                if (_counter < model.image.length - 1) {
-                  _counter++;
-
-                } else {
-                  _counter = 0;
+                if (direction == DismissDirection.endToStart) {
+                  if (_counter < model.image.length - 1) {
+                    _counter++;
+                  } else {
+                    _counter = 0;
+                  }
                 }
-              }
 
-              setState(() {});
-            },
-            key: new ValueKey(_counter),
-            child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.27,
-                child: productImages[_counter]),
-          ),
-        ],
+                setState(() {});
+              },
+              key: new ValueKey(_counter),
+              child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.27,
+                  child: productImages[_counter]),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -169,33 +192,42 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   Widget _thumbnail(String image) {
-    return AnimatedBuilder(
-        animation: animation,
-        //  builder: null,
-        builder: (context, child) => AnimatedOpacity(
-              opacity: animation.value,
-              duration: Duration(milliseconds: 500),
-              child: child,
-            ),
-        child: Container(
-            height: 40,
-            width: 50,
-            margin: EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: LightColor.grey,
+    return GestureDetector(
+      onTap: () {
+        _subProductDescription = model.description;
+        _describeMainProduct = true;
+        setState(() {});
+      },
+      child: AnimatedBuilder(
+          animation: animation,
+          //  builder: null,
+          builder: (context, child) => AnimatedOpacity(
+            opacity: animation.value,
+            duration: Duration(milliseconds: 500),
+            child: child,
+          ),
+          child: Container(
+              height: 40,
+              width: 50,
+              margin: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: LightColor.grey,
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(13),
+                ),
+//                 color: Theme.of(context).backgroundColor,
               ),
-              borderRadius: BorderRadius.all(
-                Radius.circular(13),
-              ),
-              // color: Theme.of(context).backgroundColor,
-            ),
-            child: GestureDetector(
-              child: GFAvatar(
-                  backgroundImage: NetworkImage(image),
-                  shape: GFAvatarShape.standard),
-            ) //Image.network(image),
-            ));
+              child: GestureDetector(
+                child: GFAvatar(
+                  backgroundColor: Colors.transparent,
+                    backgroundImage: NetworkImage(image),
+                    shape: GFAvatarShape.standard),
+              ) //Image.network(image),
+          )),
+    );
+
   }
 
   Widget _detailWidget() {
@@ -253,19 +285,19 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                               ),
                             ],
                           ),
-                          Row(
-                            children: <Widget>[
-                              Icon(Icons.star,
-                                  color: LightColor.yellowColor, size: 17),
-                              Icon(Icons.star,
-                                  color: LightColor.yellowColor, size: 17),
-                              Icon(Icons.star,
-                                  color: LightColor.yellowColor, size: 17),
-                              Icon(Icons.star,
-                                  color: LightColor.yellowColor, size: 17),
-                              Icon(Icons.star_border, size: 17),
-                            ],
-                          ),
+//                          Row(
+//                            children: <Widget>[
+//                              Icon(Icons.star,
+//                                  color: LightColor.yellowColor, size: 17),
+//                              Icon(Icons.star,
+//                                  color: LightColor.yellowColor, size: 17),
+//                              Icon(Icons.star,
+//                                  color: LightColor.yellowColor, size: 17),
+//                              Icon(Icons.star,
+//                                  color: LightColor.yellowColor, size: 17),
+//                              Icon(Icons.star_border, size: 17),
+//                            ],
+//                          ),
                         ],
                       ),
                     ],
@@ -296,33 +328,83 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   Widget _subProducts() {
     return Container(
-      height: 100.0,
-       width: MediaQuery.of(context).size.width,
-       child: ListView(
-          scrollDirection: Axis.horizontal,
-              children:
-                model.subProducts.map((sub) => _sizeWidget(sub.name)).toList()
-       )
-        );
+        height: 140.0,
+        width: MediaQuery.of(context).size.width,
+        child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: model.subProducts
+                .map((sub) => _subCategoryWidget(sub))
+                .toList()));
   }
 
-  Widget _sizeWidget(String text,
+  Widget _subCategoryWidget(SubProduct sub,
       {Color color = LightColor.iconColor, bool isSelected = false}) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      margin: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: LightColor.iconColor,
-            style: !isSelected ? BorderStyle.solid : BorderStyle.none),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        color:
-            isSelected ? LightColor.orange : Theme.of(context).backgroundColor,
-      ),
-      child: TitleText(
-        text: text,
-        fontSize: 16,
-        color: isSelected ? LightColor.background : LightColor.titleTextColor,
+    return GestureDetector(
+      onTap: () {
+        _subProductDescription = sub.description;
+        _describeMainProduct = false;
+        setState(() {});
+      },
+      child: Container(
+        padding: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10.0),
+        width: 140.0,
+        decoration: BoxDecoration(
+          border: Border.all(
+              color: LightColor.iconColor,
+              style: !isSelected ? BorderStyle.solid : BorderStyle.none),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          color: isSelected
+              ? LightColor.orange
+              : Theme.of(context).backgroundColor,
+        ),
+        child: Stack(
+          children: <Widget>[
+            TitleText(
+              text: sub.name,
+              fontSize: 12,
+              color: isSelected
+                  ? LightColor.background
+                  : LightColor.titleTextColor,
+            ),
+            Positioned(
+              top: 17,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: GFAvatar(
+                backgroundColor: Colors.transparent,
+                backgroundImage: sub.image.length > 0
+                    ? NetworkImage("${Utils.url}/api/images?url=${sub.image}")
+                    : null,
+                shape: GFAvatarShape.standard,
+              ),
+            ),
+            Positioned(
+              right: -10,
+              top: 5,
+              child: IconButton(
+                  iconSize: 30,
+                  icon: Icon(
+                    Icons.shopping_cart,
+                    color: LightColor.orange,
+                  ),
+                  onPressed: () {
+                _progressDialog.show().then((v){
+                  Utils.addToCart(
+                      sub.id, Utils.customerInfo.userID, 'sub', sub.minOrder)
+                      .then((status) {
+                    if(_progressDialog.isShowing()){
+                      _progressDialog.hide().then((bool value){
+                        Utils.showStatus(context, status, "Added to cart");
+                      });
+                    }
+                  });
+                });
+                  }),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -385,22 +467,37 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           fontSize: 14,
         ),
         SizedBox(height: 20),
-        Text(model.description),
+        _describeMainProduct
+            ? Text(model.description)
+            : Text(_subProductDescription),
       ],
     );
   }
 
   FloatingActionButton _floatingButton() {
     return FloatingActionButton(
-      onPressed: () {},
+      onPressed: () {
+        _progressDialog.show().then((v){
+            Utils.addToCart(
+                model.id, Utils.customerInfo.userID, 'main', model.minOrder)
+                .then((status) {
+              if(_progressDialog.isShowing()){
+                _progressDialog.hide().then((bool value){
+                  Utils.showStatus(context, status, "Added to cart");
+                });
+              }
+            });
+          });
+      },
       backgroundColor: LightColor.orange,
-      child: Icon(Icons.shopping_basket,
+      child: Icon(Icons.shopping_cart,
           color: Theme.of(context).floatingActionButtonTheme.backgroundColor),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    _progressDialog = Utils.initializeProgressDialog(context);
     final Product product = ModalRoute.of(context).settings.arguments;
     model = product;
     productImages = _fetchAllImages(model.image);
@@ -427,7 +524,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     height: 10.0,
                   ),
                   _categoryWidget(),
-
                 ],
               ),
               _detailWidget()

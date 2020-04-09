@@ -78,7 +78,13 @@ class Utils {
 
   static void showStatus(BuildContext context, bool status, String message) {
     var alertDialog = AlertDialog(
-      title: status ? Text("Success") : Text("Error"),
+      title: status ? Text("Success", style: TextStyle(
+        fontSize: 20,
+        color: Colors.green
+      ),) : Text("Error", style: TextStyle(
+        fontSize: 20,
+        color: Colors.red
+      ),),
       content: status ? Text(message) : Text("An Error Occurred"),
     );
 
@@ -113,4 +119,32 @@ class Utils {
         });
   }
 
+  static Future<bool> addToFavorites(productID, customerID, type) async{
+    Map<String, dynamic> body = {
+      "product_id": productID,
+      "customer_id": customerID,
+      "type": type,
+    };
+
+    String json = jsonEncode(body);
+
+    String url = Utils.url + '/api/favorites';
+
+    var res = await http.post(url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": Utils.token
+        },
+        body: json);
+
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  static int categoryToSearch = 0;
 }

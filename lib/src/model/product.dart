@@ -13,6 +13,9 @@ class Product {
   int minOrder;
   String description;
   List<SubProduct> subProducts;
+  String type;
+  int favoriteID;
+  int categoryID;
 
   Product(
       {this.id,
@@ -26,5 +29,8 @@ class Product {
       this.numberInStock,
       this.minOrder,
       this.description,
-      this.subProducts});
+      this.subProducts,
+      this.type,
+      this.favoriteID,
+      this.categoryID});
 }

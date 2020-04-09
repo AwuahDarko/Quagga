@@ -10,6 +10,7 @@ class AppData {
   static List<Product> productList = [];
 
   static List<Product> cartList = [];
+  static List<Product> wishList = [];
   static List<Category> categoryList = [];
   static List<String> showThumbnailList = [
     "http://placekitten.com/90/60",
@@ -81,44 +82,84 @@ class AppData {
     if (res.statusCode == 200) {
       List<dynamic> productData = jsonDecode(res.body);
 
-      int i = 0;
       productData.forEach((oneProduct) {
-        if (i < 20) {
-          var product = oneProduct['main_product'];
-          var sub = oneProduct['sub_products'];
+        var product = oneProduct['main_product'];
+        var sub = oneProduct['sub_products'];
 
-          List<dynamic> img = product['image_url'];
+        List<dynamic> img = product['image_url'];
 
-          List<SubProduct> listOfSubProducts = [];
+        List<SubProduct> listOfSubProducts = [];
 
-          sub.forEach((oneSub) {
+        sub.forEach((oneSub) {
+          listOfSubProducts.add(SubProduct(
+            id: oneSub['type_id'],
+            name: oneSub['name'],
+            category: oneSub['type'],
+            description: oneSub['description'],
+            price: oneSub['price'].toDouble(),
+            numberInStock: oneSub['number_in_stock'],
+            image: oneSub['image_url'],
+            minOrder: oneSub['min_order'],
+          ));
+        });
 
-            listOfSubProducts.add(SubProduct(
-              id: oneSub['type_id'],
-              name: oneSub['name'],
-              category: oneSub['type'],
-              description: oneSub['description'],
-              price: oneSub['price'].toDouble(),
-              numberInStock: oneSub['number_in_stock'],
-              image: oneSub['image_url'],
-              minOrder: oneSub['min_order'],
-            ));
-          });
+        Product prod = Product(
+            id: product['product_id'],
+            name: product['product_name'],
+            price: product['price'].toDouble(),
+            image: img,
+            category: "Latest Stock",
+            minOrder: product['min_order'],
+            description: product['description'],
+            subProducts: listOfSubProducts,
+            categoryID: product['category_id']);
 
-          Product prod = Product(
-              id: product['product_id'],
-              name: product['product_name'],
-              price: product['price'].toDouble(),
-              image: img,
-              category: "Latest Stock",
-              minOrder: product['min_order'],
-              description: product['description'],
-              subProducts: listOfSubProducts);
+        AppData.productList.add(prod);
+      });
+    }
+  }
 
-          AppData.productList.add(prod);
-        }
+  static Future<void> fetchMyFavorites() async {
+    AppData.wishList.clear();
+
+    String url =
+        Utils.url + "/api/favorites?customer_id=${Utils.customerInfo.userID}";
+
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
+
+    if (res.statusCode == 200) {
+      List<dynamic> favData = jsonDecode(res.body);
+
+      int i = 0;
+      favData.forEach((oneFav) {
+        List<dynamic> img = [];
+        img.add(oneFav['image_url']);
+
+        Product prod = Product(
+            id: oneFav['product_id'],
+            favoriteID: oneFav['favorite_id'],
+            name: oneFav['product_name'],
+            price: oneFav['price'].toDouble(),
+            image: img,
+            index: i,
+            type: oneFav['type'],
+            minOrder: oneFav['min_order']);
+
+        AppData.wishList.add(prod);
         ++i;
       });
     }
   }
+
+  static List<Product> sortProductsByCategory(int categoryID/*, List<Product> productList*/) {
+    List<Product> mList = [];
+    productList.forEach((oneProduct) {
+      if (oneProduct.categoryID == categoryID) {
+        mList.add(oneProduct);
+      }
+    });
+
+    return mList;
+  }
+
 }

@@ -37,6 +37,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
   void _refreshPage() {
     AppData.fetchMyCart().then((b) {
+      colors = [];
+      isSelected =[];
       AppData.cartList.forEach((one) {
         colors.add(Colors.transparent);
         isSelected.add(false);
@@ -139,7 +141,6 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                         text: model.price.toString(),
                         fontSize: 14,
                       ),
-//                      SizedBox(width: 20.0,),
                     ],
                   ),
                   trailing: Container(
@@ -287,17 +288,19 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                               Utils.deleteDialog(context, "Delete this item?")
                                   .then((response) {
                                 if (response) {
-                                  _progressDialog.show();
-                                  _deleteCartItem(_currentSelectedItem.cartID)
-                                      .then((status) {
-                                    if (_progressDialog.isShowing()) {
-                                      _progressDialog.hide().then((v) {
-                                        _refreshPage();
-                                        Utils.showStatus(
-                                            context, status, "Item Deleted");
-                                      });
-                                    }
+                                  _progressDialog.show().then((v){
+                                    _deleteCartItem(_currentSelectedItem.cartID)
+                                        .then((status) {
+                                      if (_progressDialog.isShowing()) {
+                                        _progressDialog.hide().then((v) {
+                                          _refreshPage();
+                                          Utils.showStatus(
+                                              context, status, "Item Deleted");
+                                        });
+                                      }
+                                    });
                                   });
+
                                 }
                               });
                             }

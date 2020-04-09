@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:quagga/src/pages/search_page.dart';
 import 'package:quagga/src/pages/shoping_cart_page.dart';
+import 'package:quagga/src/pages/wish_list_page.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
+import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/BottomNavigationBar/bottom_navigation_bar.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 
 import 'home_page.dart';
-
-
 
 class MainPage extends StatefulWidget {
   MainPage({Key key, this.title}) : super(key: key);
@@ -20,6 +21,10 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   bool isHomePageSelected = true;
+  bool isShoppingCartSelected = false;
+  bool isSearchPageSelected = false;
+  bool isWishPageSelected = false;
+
   Widget _appBar() {
     return Container(
       padding: AppTheme.padding,
@@ -74,58 +79,51 @@ class _MainPageState extends State<MainPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 TitleText(
-                  text: isHomePageSelected ? 'Our' : 'Shopping',
+                  text: _topHeader(),
                   fontSize: 27,
                   fontWeight: FontWeight.w400,
                 ),
                 TitleText(
-                  text: isHomePageSelected ? 'Products' : 'Cart',
+                  text: _subHeader(),
                   fontSize: 27,
                   fontWeight: FontWeight.w700,
                 ),
+
               ],
             ),
             Spacer(),
-//            !isHomePageSelected
-//                ? Row(
-//              children: <Widget>[
-//                IconButton(
-//                  icon: Icon(
-//                    Icons.add,
-//                    color: LightColor.orange,
-//                  ),
-//                  onPressed: (){print("hhhh");},
-//                ),
-//                SizedBox(width: 15.0),
-//                IconButton(
-//                  icon: Icon(
-//                    Icons.remove,
-//                    color: LightColor.orange,
-//                  ),
-//                  onPressed: (){}
-//                ),
-//                SizedBox(width: 15.0),
-//                IconButton(
-//                  icon: Icon(
-//                    Icons.delete_outline,
-//                    color: LightColor.orange,
-//                  ),
-//                  onPressed: (){}
-//                )
-//              ],
-//            )
-//                : SizedBox()
           ],
         ));
   }
 
   void onBottomIconPressed(int index) {
-    if (index == 0 || index == 1) {
+    if (index == 0 /*|| index == 1*/) {
       setState(() {
         isHomePageSelected = true;
+        isShoppingCartSelected = false;
+        isWishPageSelected = false;
+        isSearchPageSelected = false;
       });
-    } else {
+    } else if (index == 2) {
       setState(() {
+        isShoppingCartSelected = true;
+        isHomePageSelected = false;
+        isWishPageSelected = false;
+        isSearchPageSelected = false;
+      });
+    } else if (index == 3) {
+      setState(() {
+        isWishPageSelected = true;
+        isShoppingCartSelected = false;
+        isHomePageSelected = false;
+        isSearchPageSelected = false;
+      });
+    } else if (index == 1) {
+
+      setState(() {
+        isSearchPageSelected = true;
+        isWishPageSelected = false;
+        isShoppingCartSelected = false;
         isHomePageSelected = false;
       });
     }
@@ -156,17 +154,11 @@ class _MainPageState extends State<MainPage> {
                     _appBar(),
                     _title(),
                     Expanded(
-                        child:AnimatedSwitcher(
-                          duration: Duration(milliseconds: 300),
-                          switchInCurve: Curves.easeInToLinear,
-                          switchOutCurve: Curves.easeOutBack,
-                          child:  isHomePageSelected
-                            ? MyHomePage()
-                            : Align(
-                              alignment: Alignment.topCenter,
-                              child: ShoppingCartPage(),
-                            )
-                        ))
+                        child: AnimatedSwitcher(
+                            duration: Duration(milliseconds: 300),
+                            switchInCurve: Curves.easeInToLinear,
+                            switchOutCurve: Curves.easeOutBack,
+                            child: _screenToShow()))
                   ],
                 ),
               ),
@@ -181,5 +173,58 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
     );
+  }
+
+
+
+  Widget _screenToShow() {
+    if (isHomePageSelected) {
+      return MyHomePage(onIconPressedCallback: onBottomIconPressed,);
+    } else if (isShoppingCartSelected) {
+      return Align(
+        alignment: Alignment.topCenter,
+        child: ShoppingCartPage(),
+      );
+    } else if (isSearchPageSelected) {
+      return Align(
+        alignment: Alignment.topCenter,
+        child: SearchPage(),
+      );
+    } else if (isWishPageSelected) {
+      return Align(
+        alignment: Alignment.topCenter,
+        child: WishListPage(),
+      );
+    } else {
+      return MyHomePage();
+    }
+  }
+
+  String _topHeader() {
+    if (isHomePageSelected) {
+      return "Our";
+    } else if (isSearchPageSelected) {
+      return "Search";
+    } else if (isWishPageSelected) {
+      return "My";
+    } else if (isShoppingCartSelected) {
+      return "Shopping";
+    } else {
+      return "";
+    }
+  }
+
+  String _subHeader() {
+    if (isHomePageSelected) {
+      return "Products";
+    } else if (isSearchPageSelected) {
+      return "Products";
+    } else if (isWishPageSelected) {
+      return "Wish List";
+    } else if (isShoppingCartSelected) {
+      return "Cart";
+    } else {
+      return "";
+    }
   }
 }
