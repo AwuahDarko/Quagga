@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 class Utils {
   static const String url =
-      'http://10.0.2.2:4000'; //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000'
+      'http://192.168.43.111:4000'; //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000'
   static String token = '';
   static CustomerInfo customerInfo;
 

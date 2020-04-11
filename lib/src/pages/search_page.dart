@@ -21,7 +21,7 @@ class SearchPage extends StatefulWidget {
 
 class SearchPageState extends State<SearchPage> {
 
-  bool _searching = false;
+  int _index = 0;
 
   ProgressDialog _progressDialog;
 
@@ -39,7 +39,7 @@ class SearchPageState extends State<SearchPage> {
       searchList = AppData.sortProductsByCategory(
           Utils.categoryToSearch);
     }
-    _searching = false;
+    _index = 1;
     setState(() {});
 
   }
@@ -159,7 +159,7 @@ class SearchPageState extends State<SearchPage> {
 
   Future<List<Product>> search(String search) async {
     setState(() {
-      _searching = true;
+      _index = 0;
     });
     List<Product> list = [];
 
@@ -180,13 +180,22 @@ class SearchPageState extends State<SearchPage> {
         height: MediaQuery.of(context).size.height,
         padding: AppTheme.padding,
         child: SafeArea(
-          child: Stack(
+          child: IndexedStack(
+            index: _index,
             children: <Widget>[
-              SearchBar<Product>(
-                hintText: "Search products",
-                onSearch: search,
-                onItemFound: (Product product, int index) {
-                  return _item(product);
+              GestureDetector(
+                child: SearchBar<Product>(
+                  minimumChars: 2,
+                  hintText: "Search products",
+                  onSearch: search,
+                  onItemFound: (Product product, int index) {
+                    return _item(product);
+                  },
+                ),
+                onTap: (){
+                  setState(() {
+                    _index = 0;
+                  });
                 },
               ),
               Positioned(
@@ -197,7 +206,7 @@ class SearchPageState extends State<SearchPage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      _showAllProducts(),
+                      _productItemWidget(),
                       Divider(
                         thickness: 1,
                         height: 70,
@@ -212,11 +221,4 @@ class SearchPageState extends State<SearchPage> {
         ));
   }
   
-  Widget _showAllProducts(){
-    if(_searching){
-      return Container(height: MediaQuery.of(context).size.height,);
-    }else{
-      return _productItemWidget();
-    }
-  }
 }

@@ -37,18 +37,25 @@ class _MainPageState extends State<MainPage> {
           ),
           ClipRRect(
             borderRadius: BorderRadius.all(Radius.circular(13)),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).backgroundColor,
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                      color: Color(0xfff8f8f8),
-                      blurRadius: 10,
-                      spreadRadius: 10),
-                ],
+            child: GestureDetector(
+              child: Container(
+                width: 35,
+                height: 35,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).backgroundColor,
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                        color: Color(0xfff8f8f8),
+                        blurRadius: 10,
+                        spreadRadius: 10),
+                  ],
+                ),
+                child: Image.asset("assets/avatar.jpeg"),
               ),
-              child: Image.asset("assets/user.png"),
-            ),
+              onTap: (){
+                Navigator.of(context).pushNamed('/profile', /*arguments: model*/);
+              },
+            )
           )
         ],
       ),
