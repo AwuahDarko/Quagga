@@ -1,13 +1,17 @@
+import 'package:quagga/src/utils/utils.dart';
 
-class CustomerInfo{
-  String fullName;
+class CustomerInfo {
+  String fName;
+  String sName;
   int userID;
   String role;
   String email;
   String phone;
   String image;
+  String location;
 
-
-  CustomerInfo(this.userID, this.fullName, this.email, this.role, this.phone, this.image);
-
+  CustomerInfo(this.userID, this.fName, this.sName, this.email, this.role,
+      this.phone, String image, this.location) {
+    this.image = "${Utils.url}/api/images?url=$image";
+  }
 }

@@ -288,15 +288,15 @@ class _LoginPageState extends State<LoginPage> {
 
         Map<String, dynamic> userInfo = data['userInfo'];
 
-        String name = "${userInfo['first_name']} ${userInfo['last_name']}";
-
         Utils.customerInfo = CustomerInfo(
             userInfo['customer_id'],
-            name,
+            userInfo['first_name'],
+            userInfo['last_name'],
             userInfo['email'],
             userInfo['type'],
             userInfo['phone'],
-            userInfo['image_url']);
+            userInfo['image_url'],
+            userInfo['location']);
 
         return true;
       }

@@ -36,27 +36,30 @@ class _MainPageState extends State<MainPage> {
             child: _icon(Icons.sort, color: Colors.black54),
           ),
           ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(13)),
-            child: GestureDetector(
-              child: Container(
-                width: 35,
-                height: 35,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).backgroundColor,
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                        color: Color(0xfff8f8f8),
-                        blurRadius: 10,
-                        spreadRadius: 10),
-                  ],
+              borderRadius: BorderRadius.all(Radius.circular(13)),
+              child: GestureDetector(
+                child: Container(
+                  width: 35,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).backgroundColor,
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                          color: Color(0xfff8f8f8),
+                          blurRadius: 10,
+                          spreadRadius: 10),
+                    ],
+                  ),
+                  child: Utils.customerInfo.image.isEmpty
+                      ? Image.asset("assets/avatar.jpeg")
+                      : Image.network(Utils.customerInfo.image),
                 ),
-                child: Image.asset("assets/avatar.jpeg"),
-              ),
-              onTap: (){
-                Navigator.of(context).pushNamed('/profile', /*arguments: model*/);
-              },
-            )
-          )
+                onTap: () {
+                  Navigator.of(context).pushNamed(
+                    '/profile', /*arguments: model*/
+                  );
+                },
+              ))
         ],
       ),
     );
@@ -95,7 +98,6 @@ class _MainPageState extends State<MainPage> {
                   fontSize: 27,
                   fontWeight: FontWeight.w700,
                 ),
-
               ],
             ),
             Spacer(),
@@ -126,7 +128,6 @@ class _MainPageState extends State<MainPage> {
         isSearchPageSelected = false;
       });
     } else if (index == 1) {
-
       setState(() {
         isSearchPageSelected = true;
         isWishPageSelected = false;
@@ -182,11 +183,11 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-
-
   Widget _screenToShow() {
     if (isHomePageSelected) {
-      return MyHomePage(onIconPressedCallback: onBottomIconPressed,);
+      return MyHomePage(
+        onIconPressedCallback: onBottomIconPressed,
+      );
     } else if (isShoppingCartSelected) {
       return Align(
         alignment: Alignment.topCenter,

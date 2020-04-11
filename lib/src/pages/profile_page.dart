@@ -1,9 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:masked_text/masked_text.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:quagga/src/utils/utils.dart';
+import 'package:dio/dio.dart';
+import 'package:quagga/src/utils/customer.dart';
+
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -17,18 +24,24 @@ class _ProfilePageState extends State<ProfilePage> {
   final _cLocation = TextEditingController();
   final _cPhoneNumber = TextEditingController();
   final _cEmail = TextEditingController();
-  final _cWebSite = TextEditingController();
 
   File _image;
   bool _phoneError = false;
+  ProgressDialog _progressDialog;
 
   @override
   void initState() {
     super.initState();
+    _fName.text = Utils.customerInfo.fName;
+    _lName.text = Utils.customerInfo.sName;
+    _cLocation.text = Utils.customerInfo.location;
+    _cPhoneNumber.text = Utils.customerInfo.phone;
+    _cEmail.text = Utils.customerInfo.email;
   }
 
   @override
   Widget build(BuildContext context) {
+    _progressDialog = Utils.initializeProgressDialog(context);
     TextFormField inputName = TextFormField(
       controller: _fName,
       autofocus: false,
@@ -66,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    TextFormField inputWork = TextFormField(
+    TextFormField inputLocation = TextFormField(
       controller: _cLocation,
       inputFormatters: [
         LengthLimitingTextInputFormatter(45),
@@ -84,21 +97,28 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    MaskedTextField inputPhoneNumber = new MaskedTextField(
-      maskedTextFieldController: _cPhoneNumber,
-      mask: "(xxx) xxx-xxx-xxx",
-      maxLength: 16,
+    TextFormField inputPhoneNumber = TextFormField(
+      controller: _cPhoneNumber,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(45),
+      ],
       keyboardType: TextInputType.phone,
-      inputDecoration: new InputDecoration(
-          labelText: "Phone",
-          icon: Icon(
-            Icons.phone,
-            color: LightColor.orange,
-          ),
+      decoration: InputDecoration(
+          labelText: 'Phone',
+          icon: Icon(Icons.phone, color: LightColor.orange),
           labelStyle: TextStyle(color: Colors.grey)),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter a phone number';
+        }
+        return null;
+      },
     );
 
-    TextFormField inputEmail = TextFormField(
+    TextField inputEmail = TextField(
+      enabled: false,
+      enableInteractiveSelection: false,
+      focusNode: FocusNode(),
       controller: _cEmail,
       inputFormatters: [
         LengthLimitingTextInputFormatter(50),
@@ -107,24 +127,6 @@ class _ProfilePageState extends State<ProfilePage> {
       decoration: InputDecoration(
           labelText: 'E-mail',
           icon: Icon(Icons.email, color: LightColor.orange),
-          labelStyle: TextStyle(color: Colors.grey)),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'Please enter your e-mail';
-        }
-        return null;
-      },
-    );
-
-    TextFormField inputWebSite = TextFormField(
-      controller: _cWebSite,
-      inputFormatters: [
-        LengthLimitingTextInputFormatter(50),
-      ],
-      keyboardType: TextInputType.text,
-      decoration: InputDecoration(
-          labelText: 'Website',
-          icon: Icon(Icons.web, color: LightColor.orange),
           labelStyle: TextStyle(color: Colors.grey)),
     );
 
@@ -137,17 +139,17 @@ class _ProfilePageState extends State<ProfilePage> {
             radius: 80,
             child: Icon(
               Icons.camera_alt,
+              color: Colors.orange,
             ),
-            backgroundColor: LightColor.orange,
-            backgroundImage: _image == null
-                ? ExactAssetImage('assets/avatar.jpeg')
-                : Image.file(_image).image,
+            backgroundColor: LightColor.lightGrey,
+            backgroundImage:
+                _image == null ? _loadProfileImage() : Image.file(_image).image,
           ),
           onTap: () {
             _photoOptionDialog(context).then((int value) {
               if (value == 2) {
                 _getImageFromCamera();
-              }else if(value == 1){
+              } else if (value == 1) {
                 _getImageFromGallery();
               }
             });
@@ -167,17 +169,20 @@ class _ProfilePageState extends State<ProfilePage> {
             children: <Widget>[
               inputName,
               inputNickName,
-              inputWork,
+              inputLocation,
               inputPhoneNumber,
-              _phoneError ? Align(
-                alignment: Alignment.lerp(Alignment.center, Alignment.topLeft, 0.6),
-                child: Text("Please enter a valid phone number", style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.red
-                )),
-              ): SizedBox(height: 0.5,),
+              _phoneError
+                  ? Align(
+                      alignment: Alignment.lerp(
+                          Alignment.center, Alignment.topLeft, 0.6),
+                      child: Text("Please enter a valid phone number",
+                          style: TextStyle(fontSize: 12, color: Colors.red)),
+                    )
+                  : SizedBox(
+                      height: 0.5,
+                    ),
               inputEmail,
-              inputWebSite,
+//              inputWebSite,
             ],
           ),
         ),
@@ -203,11 +208,34 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
-                  if(_cPhoneNumber.text.isEmpty){
-                    _phoneError = true;
-                    setState((){});
-                    return;
-                  }
+                  Map<String, dynamic> body = {
+                    "location": _cLocation.text,
+                    "first_name": _fName.text,
+                    "last_name": _lName.text,
+                    "phone": _cPhoneNumber.text,
+                    "customer_id": Utils.customerInfo.userID
+                  };
+
+                  _progressDialog.show();
+                  _updateProfile(body).then((status) {
+                    if (status) {
+                      _updateProfileImage(_image, Utils.customerInfo.userID).then((state) {
+                        // show dialog here
+                        if (_progressDialog.isShowing()) {
+                          _progressDialog.hide().then((v) {
+                            Utils.showStatus(context, state, "Profile updated");
+                          });
+                        }
+                      });
+                    } else {
+                      // show error dialog
+                      if (_progressDialog.isShowing()) {
+                        _progressDialog.hide().then((v) {
+                          Utils.showStatus(context, status, "");
+                        });
+                      }
+                    }
+                  });
                 }
               },
             ),
@@ -273,5 +301,69 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _image = image;
     });
+  }
+
+  ImageProvider<dynamic> _loadProfileImage() {
+    if (Utils.customerInfo.image.isEmpty) {
+      return ExactAssetImage('assets/avatar.jpeg');
+    } else {
+      return NetworkImage(Utils.customerInfo.image);
+    }
+  }
+
+  Future<bool> _updateProfile(Map<String, dynamic> body) async {
+    String url = Utils.url + "/api/profile";
+
+    String json = jsonEncode(body);
+
+    var res = await http.put(url,
+        headers: {
+          "Authorization": Utils.token,
+          "Content-Type": "application/json"
+        },
+        body: json);
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> _updateProfileImage(File file, int customerID) async {
+    String url = Utils.url + "/api/profile";
+
+    if (file == null) {
+      return true;
+    }
+
+    FormData formData = FormData.fromMap({
+      "image": await MultipartFile.fromFile(file.path,
+          filename: file.path.split("/").last),
+      "customer_id": customerID
+    });
+
+    Dio dio = Dio();
+    dio.options.headers["Authorization"] = Utils.token;
+    var res = await dio.post(url,data: formData);
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      Map<String, dynamic> data = jsonDecode(res.body);
+
+      Map<String, dynamic> userInfo = data['userInfo'];
+
+      Utils.customerInfo = CustomerInfo(
+          userInfo['customer_id'],
+          userInfo['first_name'],
+          userInfo['last_name'],
+          userInfo['email'],
+          userInfo['type'],
+          userInfo['phone'],
+          userInfo['image_url'],
+          userInfo['location']);
+      return true;
+    } else {
+      return false;
+    }
   }
 }
