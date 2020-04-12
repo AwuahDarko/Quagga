@@ -348,9 +348,10 @@ class _ProfilePageState extends State<ProfilePage> {
     var res = await dio.post(url,data: formData);
 
     if (res.statusCode == 200 || res.statusCode == 201) {
-      Map<String, dynamic> data = jsonDecode(res.body);
 
-      Map<String, dynamic> userInfo = data['userInfo'];
+      List< dynamic> data = jsonDecode(res.data);
+
+      Map<String, dynamic> userInfo = data[0];
 
       Utils.customerInfo = CustomerInfo(
           userInfo['customer_id'],

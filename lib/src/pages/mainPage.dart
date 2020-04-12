@@ -31,9 +31,16 @@ class _MainPageState extends State<MainPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          RotatedBox(
-            quarterTurns: 4,
-            child: _icon(Icons.sort, color: Colors.black54),
+          GestureDetector(
+            child: RotatedBox(
+              quarterTurns: 4,
+              child: _icon(Icons.sort, color: Colors.black54),
+            ),
+            onTap: (){
+              Navigator.of(context).pushNamed(
+                '/menu'
+              );
+            },
           ),
           ClipRRect(
               borderRadius: BorderRadius.all(Radius.circular(13)),
@@ -42,7 +49,9 @@ class _MainPageState extends State<MainPage> {
                   width: 35,
                   height: 35,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).backgroundColor,
+                    color: Theme
+                        .of(context)
+                        .backgroundColor,
                     boxShadow: <BoxShadow>[
                       BoxShadow(
                           color: Color(0xfff8f8f8),
@@ -51,12 +60,22 @@ class _MainPageState extends State<MainPage> {
                     ],
                   ),
                   child: Utils.customerInfo.image.isEmpty
-                      ? Image.asset("assets/avatar.jpeg")
-                      : Image.network(Utils.customerInfo.image),
+                      ? CircleAvatar(
+                    backgroundImage:
+                    Image
+                        .asset("assets/avatar.jpeg")
+                        .image,
+                  )
+                      : CircleAvatar(
+                    backgroundImage:
+                    Image
+                        .network(Utils.customerInfo.image)
+                        .image,
+                  ),
                 ),
                 onTap: () {
                   Navigator.of(context).pushNamed(
-                    '/profile', /*arguments: model*/
+                      '/profile'
                   );
                 },
               ))
@@ -70,7 +89,9 @@ class _MainPageState extends State<MainPage> {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(13)),
-          color: Theme.of(context).backgroundColor,
+          color: Theme
+              .of(context)
+              .backgroundColor,
           boxShadow: AppTheme.shadow),
       child: Icon(
         icon,
@@ -149,13 +170,13 @@ class _MainPageState extends State<MainPage> {
                 height: AppTheme.fullHeight(context) - 50,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
-                  colors: [
-                    Color(0xfffbfbfb),
-                    Color(0xfff7f7f7),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )),
+                      colors: [
+                        Color(0xfffbfbfb),
+                        Color(0xfff7f7f7),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    )),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[

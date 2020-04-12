@@ -87,17 +87,18 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 40,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: LightColor.lightGrey.withAlpha(100),
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.all(Radius.circular(10))),
-              child: TextField(
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Search Products",
-                    hintStyle: TextStyle(fontSize: 12),
-                    contentPadding:
-                        EdgeInsets.only(left: 10, right: 10, bottom: 0, top: 5),
-                    prefixIcon: Icon(Icons.search, color: Colors.black54)),
-              ),
+              child: SizedBox(height: 40,)
+//              TextField(
+//                decoration: InputDecoration(
+//                    border: InputBorder.none,
+//                    hintText: "Search Products",
+//                    hintStyle: TextStyle(fontSize: 12),
+//                    contentPadding:
+//                        EdgeInsets.only(left: 10, right: 10, bottom: 0, top: 5),
+//                    prefixIcon: Icon(Icons.search, color: Colors.black54)),
+//              ),
             ),
           ),
 //          SizedBox(width: 20),
@@ -111,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return  ListView(
 //        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[/*_search(),*/ _categoryWidget(), _productWidget()],
+        children: <Widget>[_search(), _categoryWidget(), _productWidget()],
       );
   }
 }

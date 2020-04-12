@@ -1,9 +1,10 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/utils/customer.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 
 class Utils {
   static const String url =
@@ -147,4 +148,62 @@ class Utils {
 
 
   static int categoryToSearch = 0;
+
+
+  static Future<File> getImageFromCamera(context) async {
+    var image = await ImagePickerGC.pickImage(
+      context: context,
+      source: ImgSource.Camera,
+      cameraIcon: Icon(
+        Icons.add,
+        color: Colors.red,
+      ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
+    );
+    return image;
+  }
+
+  static Future<File> getImageFromGallery(context) async {
+    var image = await ImagePickerGC.pickImage(
+      context: context,
+      source: ImgSource.Gallery,
+      cameraIcon: Icon(
+        Icons.add,
+        color: Colors.red,
+      ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
+    );
+  return image;
+  }
+
+
+
+  static Future<int> photoOptionDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text("Get image from..."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Camera"),
+                color: Colors.deepPurpleAccent,
+                onPressed: () => Navigator.pop(context, 2),
+              ),
+              FlatButton(
+                child: Text("Gallery"),
+                color: Colors.blue,
+                onPressed: () => Navigator.pop(context, 1),
+              ),
+              FlatButton(
+                child: Text("Cancel"),
+                color: Color(0xFFDC143C),
+                onPressed: () => Navigator.pop(context, 0),
+              )
+            ],
+          );
+        });
+  }
+
+
+
 }

@@ -30,10 +30,17 @@ class AppData {
       List<dynamic> categories = jsonDecode(res.body);
 
       categories.forEach((oneCategory) {
+        String w;
+        if(oneCategory['image'] == null){
+         w = "";
+        }else{
+          w = oneCategory['image'];
+        }
+
         var category = Category(
             id: oneCategory['category_id'],
             name: oneCategory['category_name'],
-            image: Utils.url + '/api/images?url=' + oneCategory['image']);
+            image: Utils.url + '/api/images?url=' + w);
         AppData.categoryList.add(category);
       });
     }
