@@ -33,13 +33,14 @@ class SearchPageState extends State<SearchPage> {
     super.initState();
 
     if (Utils.categoryToSearch == 0) {
-
+      _index = 1;
       searchList = List.from(AppData.productList);
     } else{
       searchList = AppData.sortProductsByCategory(
           Utils.categoryToSearch);
+      _index = 1;
     }
-    _index = 1;
+
     setState(() {});
 
   }
@@ -172,53 +173,83 @@ class SearchPageState extends State<SearchPage> {
   }
 
 
+  Widget setFloatingActionButton(){
+    if(_index == 0){
+      return FloatingActionButton(
+        child: Icon(Icons.select_all),
+        onPressed: () {setState(() {
+          _index = 1;
+        });},
+      );
+    }else{
+     return FloatingActionButton(
+        child: Icon(Icons.search),
+        onPressed: () {
+          setState(() {
+            _index = 0;
+          });
+        } ,
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     _progressDialog = Utils.initializeProgressDialog(context);
-    return Container(
-        height: MediaQuery.of(context).size.height,
-        padding: AppTheme.padding,
-        child: SafeArea(
-          child: IndexedStack(
-            index: _index,
-            children: <Widget>[
-              GestureDetector(
-                child: SearchBar<Product>(
-                  minimumChars: 2,
-                  hintText: "Search products",
-                  onSearch: search,
-                  onItemFound: (Product product, int index) {
-                    return _item(product);
+    return Scaffold(
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 50.0),
+        child: setFloatingActionButton()
+      ),
+      body: Container(
+          height: MediaQuery.of(context).size.height,
+          padding: AppTheme.padding,
+          child: SafeArea(
+            child: IndexedStack(
+              index: _index,
+              children: <Widget>[
+                GestureDetector( //1.4.1
+                  child: SearchBar<Product>(
+                    minimumChars: 2,
+                    emptyWidget: ListTile(
+                      leading: Icon(Icons.warning, color: LightColor.orange,),
+                      title: Text("No product found", style: TextStyle(color: Colors.deepOrange),),
+                    ),
+                    hintText: "Search products",
+                    onSearch: search,
+                    onItemFound: (Product product, int index) {
+                      return _item(product);
+                    },
+                  ),
+                  onTap: (){
+                    setState(() {
+                      _index = 0;
+                    });
                   },
                 ),
-                onTap: (){
-                  setState(() {
-                    _index = 0;
-                  });
-                },
-              ),
-              Positioned(
-                top: 80,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      _productItemWidget(),
-                      Divider(
-                        thickness: 1,
-                        height: 70,
-                      ),
-                    ],
+                Positioned(
+                  top: 80,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        _productItemWidget(),
+                        Divider(
+                          thickness: 1,
+                          height: 70,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
 
-            ],
-          ),
-        ));
+              ],
+            ),
+          )),
+    );
   }
   
 }

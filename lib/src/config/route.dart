@@ -4,6 +4,7 @@ import 'package:quagga/src/pages/new_category.dart';
 import 'package:quagga/src/pages/new_product.dart';
 import 'package:quagga/src/pages/product_detail.dart';
 import 'package:quagga/src/pages/profile_page.dart';
+import 'package:quagga/src/pages/sub_product.dart';
 import 'package:quagga/src/pages/welcomePage.dart';
 
 class Routes {
@@ -14,7 +15,8 @@ class Routes {
       '/profile': (_) => ProfilePage(),
       '/menu': (_) => MenuPage(),
       '/newcategory': (_) => NewCategory(),
-      '/newproduct': (_) => NewProduct()
+      '/newproduct': (_) => NewProduct(),
+      '/subproduct': (_) => AddSubProduct()
     };
   }
 }

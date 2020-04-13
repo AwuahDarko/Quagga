@@ -64,7 +64,11 @@ class MenuPage extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 color: btnColor,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                      '/subproduct'
+                  );
+                },
               ),
             ),
             SizedBox(height: 20,),

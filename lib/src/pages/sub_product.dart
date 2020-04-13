@@ -7,6 +7,7 @@ import 'package:getflutter/shape/gf_avatar_shape.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/category.dart';
 import 'package:quagga/src/model/data.dart';
+import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'dart:io';
@@ -14,29 +15,31 @@ import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 
 
-class NewProduct extends StatefulWidget {
+class AddSubProduct extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return NewProductState();
+    return AddSubProductState();
   }
 }
 
-class NewProductState extends State<NewProduct> {
+class AddSubProductState extends State<AddSubProduct> {
   final _formKey = GlobalKey<FormState>();
   final _pName = TextEditingController();
   final _description = TextEditingController();
   final _minOrder = TextEditingController();
   final _numStock = TextEditingController();
   final _price = TextEditingController();
+  final _type = TextEditingController();
 
   File _image_1;
   File _image_2;
   File _image_3;
   File _image_4;
   ProgressDialog _progressDialog;
-  Category _category;
 
   List<int> _loadedImages = [];
+
+  Product _product;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +61,20 @@ class NewProductState extends State<NewProduct> {
         return null;
       },
     );
+
+    TextFormField typeName = TextFormField(
+      controller: _type,
+      autofocus: false,
+      keyboardType: TextInputType.text,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(45),
+      ],
+      decoration: InputDecoration(
+          labelText: 'Type',
+          labelStyle: TextStyle(color: Colors.grey)),
+    );
+
+
 
     Card productDescription = Card(
         color: Colors.white70,
@@ -136,22 +153,21 @@ class NewProductState extends State<NewProduct> {
       },
     );
 
-    DropdownButton categoryMenu = DropdownButton(
-      hint: Text('Select product category'), // Not necessary for Option 1
-      value: _category,
+    DropdownButton productMenu = DropdownButton(
+      hint: Text('Select main product'), // Not necessary for Option 1
+      value: _product,
       onChanged: (newValue) {
         setState(() {
-          _category = newValue;
+          _product = newValue;
         });
       },
-      items: AppData.categoryList.map((category) {
+      items: AppData.productList.map((product) {
         return DropdownMenuItem(
-          child: new Text(category.name),
-          value: category,
+          child: new Text(product.name),
+          value: product,
         );
       }).toList(),
     );
-
 
     StaggeredGridView content = StaggeredGridView.count(
       crossAxisCount: 2,
@@ -164,12 +180,13 @@ class NewProductState extends State<NewProduct> {
           child: Column(
             children: <Widget>[
               SizedBox(height: 10.0),
+              productMenu,
               productName,
+              typeName,
               minOrder,
               numberInStock,
               _inputPrice,
               productDescription,
-              categoryMenu,
               SizedBox(height: 15.0),
             ],
           ),
@@ -208,115 +225,11 @@ class NewProductState extends State<NewProduct> {
             });
           },
         ),
-        GestureDetector(
-          child: GFAvatar(
-              child: Icon(Icons.camera),
-              backgroundImage:
-              _image_2 != null ? Image
-                  .file(_image_2)
-                  .image : null,
-              shape: GFAvatarShape.standard),
-          onTap: () {
-            Utils.photoOptionDialog(context).then((value) {
-              if (value == 2) {
-                Utils.getImageFromCamera(context).then((file) {
-                  _image_2 = file;
-                  if (_image_2 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
-
-                  });
-                });
-              } else if (value == 1) {
-                Utils.getImageFromGallery(context).then((file) {
-                  _image_2 = file;
-                  if (_image_2 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
-
-                  });
-                });
-              }
-            });
-          },
-        ),
-        GestureDetector(
-          child: GFAvatar(
-              child: Icon(Icons.camera),
-              backgroundImage:
-              _image_3 != null ? Image
-                  .file(_image_3)
-                  .image : null,
-              shape: GFAvatarShape.standard),
-          onTap: () {
-            Utils.photoOptionDialog(context).then((value) {
-              if (value == 2) {
-                Utils.getImageFromCamera(context).then((file) {
-                  _image_3 = file;
-                  if (_image_3 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
-
-                  });
-                });
-              } else if (value == 1) {
-                Utils.getImageFromGallery(context).then((file) {
-                  _image_3 = file;
-                  if (_image_3 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
-
-                  });
-                });
-              }
-            });
-          },
-        ),
-        GestureDetector(
-          child: GFAvatar(
-              child: Icon(Icons.camera),
-              backgroundImage:
-              _image_4 != null ? Image
-                  .file(_image_4)
-                  .image : null,
-              shape: GFAvatarShape.standard),
-          onTap: () {
-            Utils.photoOptionDialog(context).then((value) {
-              if (value == 2) {
-                Utils.getImageFromCamera(context).then((file) {
-                  _image_4 = file;
-                  if (_image_4 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
-
-                  });
-                });
-              } else if (value == 1) {
-                Utils.getImageFromGallery(context).then((file) {
-                  _image_4 = file;
-                  if (_image_4 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
-
-                  });
-                });
-              }
-            });
-          },
-        ),
       ],
       staggeredTiles: [
         StaggeredTile.fit(2),
-        StaggeredTile.extent(1, 130.0),
-        StaggeredTile.extent(1, 130.0),
-        StaggeredTile.extent(1, 130.0),
-        StaggeredTile.extent(1, 130.0),
+        StaggeredTile.extent(2, 130.0),
+
       ],
     );
 
@@ -328,7 +241,7 @@ class NewProductState extends State<NewProduct> {
             Navigator.of(context).pop();
           },
         ),
-        title: Text("New Product"),
+        title: Text("Sub Product"),
         actions: <Widget>[
           Container(
             width: 80,
@@ -339,29 +252,32 @@ class NewProductState extends State<NewProduct> {
               ),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
-                  if (_category == null) {
-                    showInvalid(context, "Select Category");
+                  if (_product == null) {
+                    showInvalid(context, "Sub-product must be under a main product");
                     return;
                   }
 
-                  if (_loadedImages.length == 0) {
+                  if (_image_1 == null) {
                     showInvalid(
-                        context, "Product must have at least one image");
+                        context, "Product must have an image");
                     return;
                   }
 
                   Map<String, dynamic> body = {
-                    "product_name": _pName.text,
-                    "category_id": _category.id,
+                    "name": _pName.text,
                     "description": _description.text,
                     "price": _price.text,
                     "min_order": _minOrder.text,
                     "number_in_stock": _numStock.text,
-                    "discount": 0.0
+                    "discount": 0.0,
+                    "image_url": "",
+                    "type": _type.text,
+                    "product_id": _product.id
                   };
 
+
                   _progressDialog.show().then((v){
-                    _addNewProduct(body).then((result){
+                    _addSubProduct(body).then((result){
                       if(result == false){
                         if(_progressDialog.isShowing()){
                           _progressDialog.hide().then((v){
@@ -372,7 +288,7 @@ class NewProductState extends State<NewProduct> {
                         _uploadImages(result).then((status){
                           if(_progressDialog.isShowing()){
                             _progressDialog.hide().then((v){
-                              Utils.showStatus(context, status, "New product added");
+                              Utils.showStatus(context, status, "New sub-product added to ${_product.name}");
                             });
                           }
                         });
@@ -406,8 +322,8 @@ class NewProductState extends State<NewProduct> {
         });
   }
 
-  Future<dynamic> _addNewProduct(Map<String, dynamic> body) async {
-    String url = Utils.url + "/api/products";
+  Future<dynamic> _addSubProduct(Map<String, dynamic> body) async {
+    String url = Utils.url + "/api/sub-products";
 
     String json = jsonEncode(body);
 
@@ -422,37 +338,23 @@ class NewProductState extends State<NewProduct> {
 
     if (res.statusCode == 200 || res.statusCode == 201) {
       Map<String, dynamic> result = jsonDecode(res.body);
-      return result['product_id'];
+      return result['type_id'];
     } else {
       return false;
     }
   }
 
-  Future<bool> _uploadImages(int productID) async {
-    String url = Utils.url + "/api/product-image";
+  Future<bool> _uploadImages(int typeID) async {
+    String url = Utils.url + "/api/sub-product-image";
 
-    List<File> allFiles = [];
-    if (_image_1 != null) {
-      allFiles.add(_image_1);
-    }
-    if (_image_2 != null) {
-      allFiles.add(_image_2);
-    }
-    if (_image_3 != null) {
-      allFiles.add(_image_3);
-    }
-    if (_image_4 != null) {
-      allFiles.add(_image_4);
-    }
-    
     FormData formData = FormData.fromMap({
-      "product_image": allFiles.map((oneFile)  => MultipartFile.fromFileSync(oneFile.path, filename: oneFile.path.split("/").last)).toList(),
-      "product_id": productID
+      "product_image": MultipartFile.fromFileSync(_image_1.path, filename: _image_1.path.split("/").last),
+      "type_id": typeID
     });
 
     Dio dio = Dio();
     dio.options.headers["Authorization"] = Utils.token;
-    var res = await dio.post(url, data: formData);
+    var res = await dio.put(url, data: formData);
 
     if (res.statusCode == 200 || res.statusCode == 201) {
       return true;

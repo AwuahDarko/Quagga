@@ -188,7 +188,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           padding: EdgeInsets.symmetric(vertical: 12),
           width: AppTheme.fullWidth(context) * .7,
           child: TitleText(
-            text: 'Next',
+            text: 'Place Order',
             color: LightColor.background,
             fontWeight: FontWeight.w500,
           ),
