@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:quagga/src/model/order_summary.dart';
 import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/model/category.dart';
 import 'package:quagga/src/model/sub_product.dart';
@@ -18,8 +19,6 @@ class AppData {
     "http://placekitten.com/90/60",
     "http://placekitten.com/90/60",
   ];
-  static String description =
-      "The Most Extensive Range of First Aid Kit available in a single Kit. Known for their transparent packaging which provides quick identification and ...Check website for latest pricing and availability. Learn More";
 
   static Future<void> fetchCategories() async {
     AppData.categoryList.clear();
@@ -31,9 +30,9 @@ class AppData {
 
       categories.forEach((oneCategory) {
         String w;
-        if(oneCategory['image'] == null){
-         w = "";
-        }else{
+        if (oneCategory['image'] == null) {
+          w = "";
+        } else {
           w = oneCategory['image'];
         }
 
@@ -158,7 +157,7 @@ class AppData {
     }
   }
 
-  static List<Product> sortProductsByCategory(int categoryID/*, List<Product> productList*/) {
+  static List<Product> sortProductsByCategory(int categoryID) {
     List<Product> mList = [];
     productList.forEach((oneProduct) {
       if (oneProduct.categoryID == categoryID) {
@@ -169,4 +168,33 @@ class AppData {
     return mList;
   }
 
+  static Future<List<OrderSummary>> getOrderSummary(int id) async {
+    String url = Utils.url + "/api/store-orders?customer_id=$id";
+
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
+
+    List<OrderSummary> mList = [];
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      List<dynamic> dataList = jsonDecode(res.body);
+
+      dataList.forEach((oneData) {
+        String publicID = oneData['public_id'];
+        Map<String, dynamic> userInfo = oneData['user_info'];
+
+        print(userInfo);
+
+        mList.add(OrderSummary(
+            publicID: publicID,
+            customerID: userInfo['customer_id'],
+            name: '${userInfo['first_name']} ${userInfo['last_name']}',
+            email: userInfo['email'],
+            image: userInfo['image_url'],
+            phone: userInfo['phone'],
+            username: userInfo['username'],
+            location: userInfo['location']));
+      });
+    }
+
+    return mList;
+  }
 }

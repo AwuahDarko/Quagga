@@ -84,12 +84,12 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Expanded(
             child: Container(
-              height: 40,
+              height: 10,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.all(Radius.circular(10))),
-              child: SizedBox(height: 40,)
+              child: SizedBox(height: 10,)
 //              TextField(
 //                decoration: InputDecoration(
 //                    border: InputBorder.none,
