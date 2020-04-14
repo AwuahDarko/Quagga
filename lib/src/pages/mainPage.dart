@@ -122,7 +122,19 @@ class _MainPageState extends State<MainPage> {
               ],
             ),
             Spacer(),
+            Container(
+              child: RaisedButton(
+                color: LightColor.orange,
+                child: Text("Orders"),
+                onPressed: (){
+                  Navigator.of(context).pushNamed(
+                      '/customerorders'
+                  );
+                },
+              ),
+            )
           ],
+
         ));
   }
 

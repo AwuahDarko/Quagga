@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:quagga/src/model/order_details_model.dart';
 import 'package:quagga/src/model/order_summary.dart';
 import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/model/category.dart';
@@ -71,7 +72,8 @@ class AppData {
             quantity: oneCart['quantity'],
             index: i,
             numberInStock: oneCart['number_in_stock'],
-            minOrder: oneCart['min_order']);
+            minOrder: oneCart['min_order'],
+            type: oneCart['type']);
 
         AppData.cartList.add(prod);
         ++i;
@@ -181,8 +183,6 @@ class AppData {
         String publicID = oneData['public_id'];
         Map<String, dynamic> userInfo = oneData['user_info'];
 
-        print(userInfo);
-
         mList.add(OrderSummary(
             publicID: publicID,
             customerID: userInfo['customer_id'],
@@ -192,6 +192,77 @@ class AppData {
             phone: userInfo['phone'],
             username: userInfo['username'],
             location: userInfo['location']));
+      });
+    }
+
+    return mList;
+  }
+
+  static Future<List<OrderDetailsModel>> fetchOrderDetails(String key) async {
+    String url = Utils.url + "/api/store-order-details?public_id=$key";
+
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
+
+    List<OrderDetailsModel> mList = [];
+
+    if (res.statusCode == 200) {
+      List<dynamic> dataList = jsonDecode(res.body);
+
+      dataList.forEach((oneData) {
+        mList.add(OrderDetailsModel(
+            productName: oneData['product_name'],
+            image: oneData['image_url'],
+            quantity: oneData['quantity'],
+            orderID: oneData['order_id'],
+            orderKey: oneData['order_key'],
+            status: oneData['status'],
+            price: oneData['price'].toDouble()));
+      });
+    }
+
+    return mList;
+  }
+
+  static Future<bool> placeOrder(Map<dynamic, dynamic> body) async {
+    String json = jsonEncode(body);
+
+    print(json);
+
+    String url = Utils.url + '/api/orders';
+
+    var res = await http.post(url,
+        headers: {
+          "Authorization": Utils.token,
+          "Content-Type": "application/json"
+        },
+        body: json);
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<List<OrderDetailsModel>> fetchCustomerOrderDetails(id) async{
+    String url = Utils.url + "/api/orders?customer_id=$id";
+
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
+
+    List<OrderDetailsModel> mList = [];
+
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      List<dynamic> dataList = jsonDecode(res.body);
+
+      dataList.forEach((oneData) {
+        mList.add(OrderDetailsModel(
+            productName: oneData['product_name'],
+            image: oneData['image_url'],
+            quantity: oneData['quantity'],
+            orderID: oneData['order_id'],
+            orderKey: oneData['order_key'],
+            status: oneData['status'],
+            price: oneData['price'].toDouble()));
       });
     }
 

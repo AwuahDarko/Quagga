@@ -45,21 +45,6 @@ class SearchPageState extends State<SearchPage> {
 
   }
 
-//  void _refreshPage() {
-//    AppData.fetchMyCart().then((b) {
-//      colors = [];
-//      isSelected = [];
-//      AppData.cartList.forEach((one) {
-//        colors.add(Colors.transparent);
-//        isSelected.add(false);
-//      });
-//      _loading = false;
-//      setState(() {});
-//    });
-//
-//
-//  }
-
   Widget _productItemWidget() {
     return Column(children: searchList.map((x) => _item(x)).toList());
   }
@@ -229,7 +214,7 @@ class SearchPageState extends State<SearchPage> {
                   },
                 ),
                 Positioned(
-                  top: 80,
+                  top: 20,
                   left: 0,
                   right: 0,
                   bottom: 0,

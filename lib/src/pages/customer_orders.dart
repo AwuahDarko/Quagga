@@ -1,29 +1,30 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/order_details_model.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/utils/utils.dart';
+import 'package:quagga/src/wigets/circularContainer.dart';
 import 'package:quagga/src/wigets/quad_clipper.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 
-class OrderDetailsPage extends StatefulWidget {
-  OrderDetailsPage(this.publicKey, {Key key}) : super(key: key);
+class CustomerOrderDetailsPage extends StatefulWidget {
+  CustomerOrderDetailsPage( {Key key}) : super(key: key);
 
-  final String publicKey;
 
   @override
   State<StatefulWidget> createState() {
-    return OrderDetailsPageState(this.publicKey, key: key);
+    return CustomerOrderDetailsPageState(key: key);
   }
 }
 
-class OrderDetailsPageState extends State<OrderDetailsPage> {
-  OrderDetailsPageState(this._publicKey, {Key key});
+class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
+  CustomerOrderDetailsPageState({Key key});
 
   double width;
   List<OrderDetailsModel> _list = [];
-  final String _publicKey;
   bool _loading = true;
 
   double _total = 0.00;
@@ -32,7 +33,7 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
   void initState() {
     super.initState();
 
-    AppData.fetchOrderDetails(_publicKey).then((list) {
+    AppData.fetchCustomerOrderDetails(Utils.customerInfo.userID).then((list) {
       _list = list;
       _loading = false;
       _list.forEach((oneList){
@@ -41,6 +42,8 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
       setState(() {});
     });
   }
+
+
 
   Widget _featuredRowB(context) {
     return SingleChildScrollView(
@@ -52,20 +55,20 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: _list
                 .map((oneList) => _card(context,
-                    primary: Colors.white,
-                    chipColor: LightColor.lightpurple,
-                    backWidget: _decorationContainerE(
-                      LightColor.lightpurple,
-                      90,
-                      -40,
-                      secondary: LightColor.lightseeBlue,
-                    ),
-                    name: oneList.productName,
-                    qty: oneList.quantity.toString(),
-                    price: oneList.price.toString(),
-                    status: oneList.status,
-                    pub: oneList.orderKey,
-                    imgPath: "${Utils.url}/api/images?url=${oneList.image}"))
+                primary: Colors.white,
+                chipColor: LightColor.lightpurple,
+                backWidget: _decorationContainerE(
+                  LightColor.lightpurple,
+                  90,
+                  -40,
+                  secondary: LightColor.lightseeBlue,
+                ),
+                name: oneList.productName,
+                qty: oneList.quantity.toString(),
+                price: oneList.price.toString(),
+                status: oneList.status,
+                pub: oneList.orderKey,
+                imgPath: "${Utils.url}/api/images?url=${oneList.image}"))
                 .toList()),
       ),
     );
@@ -74,15 +77,15 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
 // String name, String qty, String price, String status,String pub
   Widget _card(context,
       {Color primary = Colors.redAccent,
-      String imgPath,
-      String name = '',
-      String qty = '',
-      String price = '',
-      String status = '',
-      String pub = '',
-      Widget backWidget,
-      Color chipColor = LightColor.orange,
-      bool isPrimaryCard = false}) {
+        String imgPath,
+        String name = '',
+        String qty = '',
+        String price = '',
+        String status = '',
+        String pub = '',
+        Widget backWidget,
+        Color chipColor = LightColor.orange,
+        bool isPrimaryCard = false}) {
     return Container(
         height: isPrimaryCard ? 190 : 180,
         width: MediaQuery.of(context).size.width * 0.85,
@@ -246,25 +249,29 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
     width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-        persistentFooterButtons: <Widget>[
-          Row(
-            children: <Widget>[
-              TitleText(
-                text: "Total:",
-              ),
-              SizedBox(width: 10,),
-              TitleText(
-                text: "GH\u20B5",
-              ),
-              SizedBox(width: 5,),
-              TitleText(
-                text: "$_total",
-                color: LightColor.orange,
-              ),
-              SizedBox(width: 20,),
-            ],
-          )
-        ],
+      persistentFooterButtons: <Widget>[
+        Row(
+          children: <Widget>[
+            TitleText(
+              text: "Total:",
+            ),
+            SizedBox(width: 10,),
+            TitleText(
+              text: "GH\u20B5",
+            ),
+            SizedBox(width: 5,),
+            TitleText(
+              text: "$_total",
+              color: LightColor.orange,
+            ),
+            SizedBox(width: 20,),
+          ],
+        )
+      ],
+      floatingActionButton: FloatingActionButton(
+        child: Text("Pay", style: TextStyle(fontWeight: FontWeight.bold),),
+        onPressed: (){},
+      ),
         appBar: AppBar(
           title: Text("Order details"),
         ),
@@ -276,4 +283,8 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
           ),
         ));
   }
+
+
+
 }
+

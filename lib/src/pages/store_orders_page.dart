@@ -7,6 +7,8 @@ import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/circularContainer.dart';
 
+import 'order_details.dart';
+
 class StoreOrdersPage extends StatefulWidget {
   StoreOrdersPage({Key key}) : super(key: key);
 
@@ -103,8 +105,7 @@ class StoreOrdersPageState extends State<StoreOrdersPage> {
                 .map(
                   (oneSum) => _orderInfo(
                       oneSum,
-                      _decorationContainerB(
-                          '${Utils.url}/api/images?url=${oneSum.image}'),
+                      _decorationContainerB(oneSum.image),
                       background: LightColor.darkOrange),
                 )
                 .toList()),
@@ -207,46 +208,46 @@ class StoreOrdersPageState extends State<StoreOrdersPage> {
                         ),
                       ),
                       SizedBox(height: 15),
-                      Row(
-                        children: <Widget>[
-                          _chip(model.email, LightColor.darkOrange, height: 5),
-                          SizedBox(
-                            width: 10,
+                      Container(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: <Widget>[
+                              _chip(model.email, LightColor.darkOrange, height: 5),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              _chip(model.phone, LightColor.darkBlue, height: 5),
+                            ],
                           ),
-                          _chip(model.phone, LightColor.darkBlue, height: 5),
-                        ],
+                        ),
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       Container(
-                        height: 20,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: <Widget>[
-                              Text("Order ID:"),
+                              Text("Order ID:",style: TextStyle(color: Colors.green),),
                               SizedBox(
-                                width: 10,
+                                width: 5,
                               ),
                               Text(model.publicID)
                             ],
                           ),
                         ),
                       ),
-                      Divider(
-                        thickness: 1,
-                        endIndent: 20,
-                        indent: 20,
-                      )
                     ],
                   ))
             ],
           )),
       onTap: (){
-        Navigator.of(context).pushNamed(
-            '/orderdetails'
-        );
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) {
+              return OrderDetailsPage(model.publicID);
+            }));
       },
     );
   }
@@ -299,7 +300,8 @@ class StoreOrdersPageState extends State<StoreOrdersPage> {
             child: CircleAvatar(
               backgroundColor: LightColor.yellow,
               radius: 45,
-              backgroundImage: NetworkImage(imageUrl),
+              backgroundImage: imageUrl.isEmpty ? Image.asset("assets/avatar.jpeg").image:
+              NetworkImage('${Utils.url}/api/images?url=$imageUrl'),
             )),
       ],
     );

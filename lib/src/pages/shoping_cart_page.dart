@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/product.dart';
+import 'package:quagga/src/pages/customer_orders.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
@@ -28,6 +30,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   bool _loading = true;
   Product _currentSelectedItem;
   ProgressDialog _progressDialog;
+  var newFormat = DateFormat('yyyy-MM-dd');
 
   @override
   void initState() {
@@ -38,7 +41,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   void _refreshPage() {
     AppData.fetchMyCart().then((b) {
       colors = [];
-      isSelected =[];
+      isSelected = [];
       AppData.cartList.forEach((one) {
         colors.add(Colors.transparent);
         isSelected.add(false);
@@ -180,7 +183,54 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
   Widget _submitButton(BuildContext context) {
     return FlatButton(
-        onPressed: () {},
+        onPressed: () {
+
+          if(AppData.cartList.length > 0){
+            placeOrderDialog(context).then((bool answer){
+              if(answer){
+                var dt = DateTime.now();
+                var nt = dt.add(Duration(days: 30));
+
+                print(newFormat.format(nt));
+
+                Map<String, dynamic> body = Map();
+                body['customer_id'] = Utils.customerInfo.userID;
+                body['expiry_date'] = nt.toString();
+
+                List<Map<String, dynamic>> productsList = [];
+
+                AppData.cartList.forEach((oneCartItem){
+                  Map<String, dynamic> w  = {
+                    "product_id": oneCartItem.id,
+                    "quantity": oneCartItem.quantity,
+                    "price": oneCartItem.price,
+                    "type": oneCartItem.type
+                  };
+
+                  productsList.add(w);
+                });
+
+                body['products'] = productsList;
+
+                _progressDialog.show().then((v){
+                  AppData.placeOrder(body).then((status){
+
+                    if(_progressDialog.isShowing()){
+                      _progressDialog.hide().then((v){
+                        Utils.showStatus(context, status, "Your order was successful");
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return CustomerOrderDetailsPage();
+                            }));
+                      });
+                    }
+
+                  });
+                });
+              }
+            });
+          }
+        },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         color: LightColor.orange,
         child: Container(
@@ -211,7 +261,6 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
         padding: AppTheme.padding,
         child: SafeArea(
           child: Stack(
-//          fit: StackFit.expand,
             children: <Widget>[
               Positioned(
                   right: 0,
@@ -288,7 +337,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                               Utils.deleteDialog(context, "Delete this item?")
                                   .then((response) {
                                 if (response) {
-                                  _progressDialog.show().then((v){
+                                  _progressDialog.show().then((v) {
                                     _deleteCartItem(_currentSelectedItem.cartID)
                                         .then((status) {
                                       if (_progressDialog.isShowing()) {
@@ -300,7 +349,6 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                                       }
                                     });
                                   });
-
                                 }
                               });
                             }
@@ -385,5 +433,28 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     } else {
       return false;
     }
+  }
+
+  Future<bool> placeOrderDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text("Place order ?"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Yes"),
+                color: Colors.deepPurpleAccent,
+                onPressed: () => Navigator.pop(context, true),
+              ),
+              FlatButton(
+                child: Text("No"),
+                color: Color(0xFFDC143C),
+                onPressed: () => Navigator.pop(context, false),
+              )
+            ],
+          );
+        });
   }
 }

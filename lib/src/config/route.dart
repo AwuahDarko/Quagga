@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quagga/src/pages/customer_orders.dart';
 import 'package:quagga/src/pages/menu_page.dart';
 import 'package:quagga/src/pages/new_category.dart';
 import 'package:quagga/src/pages/new_product.dart';
@@ -20,7 +21,7 @@ class Routes {
       '/newproduct': (_) => NewProduct(),
       '/subproduct': (_) => AddSubProduct(),
       '/ordersummary': (_) => StoreOrdersPage(),
-      '/orderdetails': (_) => OrderDetailsPage()
+      '/customerorders': (_) => CustomerOrderDetailsPage()
     };
   }
 }
