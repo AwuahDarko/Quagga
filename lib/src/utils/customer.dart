@@ -12,6 +12,6 @@ class CustomerInfo {
 
   CustomerInfo(this.userID, this.fName, this.sName, this.email, this.role,
       this.phone, String image, this.location) {
-    this.image = "${Utils.url}/api/images?url=$image";
+    this.image = image.isEmpty ? "" : "${Utils.url}/api/images?url=$image";
   }
 }
