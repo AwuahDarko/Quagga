@@ -148,7 +148,8 @@ class _SignUpPageState extends State<SignUpPage> {
       'email': email,
       'phone': phone,
       'password': password,
-      'secret': 'xNlbjAHjAH394BR09kqGuGZXqSoq54mu'
+      'secret': 'xNlbjAHjAH394BR09kqGuGZXqSoq54mu',
+      'username': ''
     };
 
     String json = jsonEncode(body);
@@ -205,7 +206,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-          text: 'Q',
+          text: 'F',
           style: GoogleFonts.portLligatSans(
             textStyle: Theme.of(context).textTheme.display1,
             fontSize: 30,
@@ -214,11 +215,11 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
           children: [
             TextSpan(
-              text: 'ua',
+              text: 'al',
               style: TextStyle(color: Colors.black, fontSize: 30),
             ),
             TextSpan(
-              text: 'gga',
+              text: 'con',
               style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
             ),
           ]),

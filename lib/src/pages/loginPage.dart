@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _emailController.text = "mjadarko@gmail.com";
+    _emailController.text = "falcon@gmail.com";
     _passwordController.text = "natural";
   }
 
@@ -175,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-          text: 'Q',
+          text: 'F',
           style: GoogleFonts.portLligatSans(
             textStyle: Theme.of(context).textTheme.display1,
             fontSize: 30,
@@ -184,11 +184,11 @@ class _LoginPageState extends State<LoginPage> {
           ),
           children: [
             TextSpan(
-              text: 'ua',
+              text: 'al',
               style: TextStyle(color: Colors.black, fontSize: 30),
             ),
             TextSpan(
-              text: 'gga',
+              text: 'con',
               style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
             ),
           ]),
@@ -271,9 +271,18 @@ class _LoginPageState extends State<LoginPage> {
   Future<bool> _validateLogin(String email, String password) async {
     String url = Utils.url + '/api/login';
 
+    var body = {"email": email, "password": password};
+
+    String json = jsonEncode(body);
+    print(json);
+
     try {
       var res =
-          await http.post(url, body: {"email": email, "password": password});
+          await http.post(url, headers: {
+            "Content-Type": "application/json"
+          }, body: json);
+
+      print(res.statusCode);
 
       if (res.statusCode == 403) {
         setState(() {

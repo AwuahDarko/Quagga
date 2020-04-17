@@ -8,7 +8,7 @@ import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 
 class Utils {
   static const String url =
-      'http://192.168.43.111:4000'; //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000'
+      'http://api.piuniversal.com:4000'; //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000' http://api.piuniversal.com:4000
   static String token = '';
   static CustomerInfo customerInfo;
 
@@ -23,7 +23,7 @@ class Utils {
             content: Text(message),
             actions: <Widget>[
               FlatButton(
-                child: Text("Ok"),
+                child: Text("Ok", style: TextStyle(color: Colors.blue),),
                 onPressed: () => Navigator.pop(context, true),
               ),
             ],
