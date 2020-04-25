@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:quagga/src/pages/search_page.dart';
+import 'package:flutter_launch/flutter_launch.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:quagga/src/pages/customer_orders.dart';
 import 'package:quagga/src/pages/shoping_cart_page.dart';
 import 'package:quagga/src/pages/wish_list_page.dart';
 import 'package:quagga/src/themes/light_color.dart';
@@ -7,6 +9,8 @@ import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/BottomNavigationBar/bottom_navigation_bar.dart';
 import 'package:quagga/src/wigets/title_text.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 import 'home_page.dart';
 
@@ -22,8 +26,9 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   bool isHomePageSelected = true;
   bool isShoppingCartSelected = false;
-  bool isSearchPageSelected = false;
+  bool isCustomerOrderPageSelected = false;
   bool isWishPageSelected = false;
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
 
   Widget _appBar() {
     return Container(
@@ -36,49 +41,10 @@ class _MainPageState extends State<MainPage> {
               quarterTurns: 4,
               child: _icon(Icons.sort, color: Colors.black54),
             ),
-            onTap: (){
-              Navigator.of(context).pushNamed(
-                '/menu'
-              );
+            onTap: () {
+              _globalKey.currentState.openDrawer();
             },
           ),
-          ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(13)),
-              child: GestureDetector(
-                child: Container(
-                  width: 35,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    color: Theme
-                        .of(context)
-                        .backgroundColor,
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                          color: Color(0xfff8f8f8),
-                          blurRadius: 10,
-                          spreadRadius: 10),
-                    ],
-                  ),
-                  child: Utils.customerInfo.image.isEmpty
-                      ? CircleAvatar(
-                    backgroundImage:
-                    Image
-                        .asset("assets/avatar.jpeg")
-                        .image,
-                  )
-                      : CircleAvatar(
-                    backgroundImage:
-                    Image
-                        .network(Utils.customerInfo.image)
-                        .image,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed(
-                      '/profile'
-                  );
-                },
-              ))
         ],
       ),
     );
@@ -89,9 +55,7 @@ class _MainPageState extends State<MainPage> {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(13)),
-          color: Theme
-              .of(context)
-              .backgroundColor,
+          color: Theme.of(context).backgroundColor,
           boxShadow: AppTheme.shadow),
       child: Icon(
         icon,
@@ -122,19 +86,7 @@ class _MainPageState extends State<MainPage> {
               ],
             ),
             Spacer(),
-            Container(
-              child: RaisedButton(
-                color: LightColor.orange,
-                child: Text("Orders"),
-                onPressed: (){
-                  Navigator.of(context).pushNamed(
-                      '/customerorders'
-                  );
-                },
-              ),
-            )
           ],
-
         ));
   }
 
@@ -144,25 +96,25 @@ class _MainPageState extends State<MainPage> {
         isHomePageSelected = true;
         isShoppingCartSelected = false;
         isWishPageSelected = false;
-        isSearchPageSelected = false;
+        isCustomerOrderPageSelected = false;
       });
     } else if (index == 2) {
       setState(() {
         isShoppingCartSelected = true;
         isHomePageSelected = false;
         isWishPageSelected = false;
-        isSearchPageSelected = false;
+        isCustomerOrderPageSelected = false;
       });
     } else if (index == 3) {
       setState(() {
         isWishPageSelected = true;
         isShoppingCartSelected = false;
         isHomePageSelected = false;
-        isSearchPageSelected = false;
+        isCustomerOrderPageSelected = false;
       });
     } else if (index == 1) {
       setState(() {
-        isSearchPageSelected = true;
+        isCustomerOrderPageSelected = true;
         isWishPageSelected = false;
         isShoppingCartSelected = false;
         isHomePageSelected = false;
@@ -173,22 +125,45 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _globalKey,
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text(
+                  '${Utils.customerInfo.fName} ${Utils.customerInfo.sName}'),
+              accountEmail: Text(Utils.customerInfo.email),
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: Utils.customerInfo.image == ''
+                    ? Image.asset('assets/avatar.jpeg').image
+                    : NetworkImage(Utils.customerInfo.image),
+                backgroundColor:
+                    Theme.of(context).platform == TargetPlatform.iOS
+                        ? Colors.blue
+                        : Colors.white,
+              ),
+            ),
+//            _distributorMenu(),
+            _customerMenu(),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
             SingleChildScrollView(
               child: Container(
-                height: AppTheme.fullHeight(context) - 50,
+                height: AppTheme.fullHeight(context) - 100,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        Color(0xfffbfbfb),
-                        Color(0xfff7f7f7),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    )),
+                  colors: [
+                    Color(0xfffbfbfb),
+                    Color(0xfff7f7f7),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                )),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -226,10 +201,10 @@ class _MainPageState extends State<MainPage> {
         alignment: Alignment.topCenter,
         child: ShoppingCartPage(),
       );
-    } else if (isSearchPageSelected) {
+    } else if (isCustomerOrderPageSelected) {
       return Align(
         alignment: Alignment.topCenter,
-        child: SearchPage(),
+        child: CustomerOrderDetailsPage(),
       );
     } else if (isWishPageSelected) {
       return Align(
@@ -244,8 +219,8 @@ class _MainPageState extends State<MainPage> {
   String _topHeader() {
     if (isHomePageSelected) {
       return "Our";
-    } else if (isSearchPageSelected) {
-      return "Search";
+    } else if (isCustomerOrderPageSelected) {
+      return "My";
     } else if (isWishPageSelected) {
       return "My";
     } else if (isShoppingCartSelected) {
@@ -257,9 +232,9 @@ class _MainPageState extends State<MainPage> {
 
   String _subHeader() {
     if (isHomePageSelected) {
-      return "Products";
-    } else if (isSearchPageSelected) {
-      return "Products";
+      return "Distributors";
+    } else if (isCustomerOrderPageSelected) {
+      return "Orders";
     } else if (isWishPageSelected) {
       return "Wish List";
     } else if (isShoppingCartSelected) {
@@ -267,5 +242,202 @@ class _MainPageState extends State<MainPage> {
     } else {
       return "";
     }
+  }
+
+  Widget _distributorMenu() {
+    return Column(
+      children: <Widget>[
+        ListTile(
+          title: Text("My Store"),
+        ),
+        ListTile(
+          leading: Icon(Icons.local_shipping, color: LightColor.orange),
+          title: Text("Orders"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/ordersummary');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.shop, color: LightColor.orange),
+          title: Text("New product"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/newproduct');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.update, color: LightColor.orange),
+          title: Text("Update product"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/subproduct');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.archive, color: LightColor.orange),
+          title: Text("Sub product"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/subproduct');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.update, color: LightColor.orange),
+          title: Text("Update sub-product"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/subproduct');
+          },
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.person,
+            color: LightColor.orange,
+          ),
+          title: Text("Profile"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/profile');
+          },
+        ),
+        Divider(),
+        ListTile(
+          title: Text("Feedback & Questions"),
+        ),
+        ListTile(
+          leading: Icon(Icons.phone_android, color: LightColor.orange),
+          title: Text("Call Us"),
+          onTap: () => launch('tel:+233553567136'),
+        ),
+        ListTile(
+          leading: Icon(Icons.feedback, color: LightColor.orange),
+          title: Text("By Email"),
+          onTap: () => launch('mailto:mjadarko@gmail.com'),
+        ),
+        ListTile(
+          leading: Icon(Icons.feedback, color: LightColor.orange),
+          title: Text("By SMS"),
+          onTap: () => launch('sms:+233553567136'),
+        ),
+        ListTile(
+          leading: Icon(Icons.feedback, color: LightColor.orange),
+          title: Text("WhatsApp"),
+          onTap: () async => await FlutterLaunch.launchWathsApp(phone: '+233553567136', message: ''),
+        ),
+        Divider(),
+        ListTile(
+          title: Text("Legal"),
+        ),
+        ListTile(
+          leading: Icon(Icons.book, color: LightColor.orange),
+          title: Text("Terms & Conditions"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/privacy',
+                arguments: {'head': 'Terms & Conditions', 'file': 'terms.pdf'});
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.poll, color: LightColor.orange),
+          title: Text("Privacy Policy"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/privacy',
+                arguments: {'head': 'Privacy Policy', 'file': 'privacy.pdf'});
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.business, color: LightColor.orange),
+          title: Text("About Us"),
+          onTap: () => Navigator.of(context).pushNamed('/privacy',
+              arguments: {'head': 'About Us', 'file': 'about.pdf'})
+        ),
+        Divider(),
+        ListTile(
+          title: Text("App"),
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.exit_to_app,
+            color: LightColor.orange,
+          ),
+          title: Text("Logout"),
+        ),
+      ],
+    );
+  }
+
+  Widget _customerMenu() {
+    return Column(
+      children: <Widget>[
+        ListTile(
+          title: Text("Manage"),
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.person,
+            color: LightColor.orange,
+          ),
+          title: Text("Profile"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/profile');
+          },
+        ),
+        Divider(),
+        ListTile(
+          title: Text("Feedback & Questions"),
+        ),
+        ListTile(
+          leading: Icon(Icons.phone_android, color: LightColor.orange),
+          title: Text("Call Us"),
+          onTap: () => launch('tel:+233553567136'),
+        ),
+        ListTile(
+          leading: Icon(Icons.email, color: LightColor.orange),
+          title: Text("By Email"),
+          onTap: () => launch('mailto:mjadarko@gmail.com'),
+        ),
+        ListTile(
+          leading: Icon(Icons.message, color: LightColor.orange),
+          title: Text("By SMS"),
+          onTap: () => launch('sms:+233553567136'),
+        ),
+        ListTile(
+          leading: FaIcon(FontAwesomeIcons.whatsapp, color: Colors.lightGreen,),
+          title: Text("WhatsApp"),
+          onTap: () async => await FlutterLaunch.launchWathsApp(phone: '+233553567136', message: ''),
+        ),
+        Divider(),
+        ListTile(
+          title: Text("Legal"),
+        ),
+        ListTile(
+          leading: Icon(Icons.book, color: LightColor.orange),
+          title: Text("Terms & Conditions"),
+          onTap: (){
+            Navigator.of(context).pushNamed('/privacy',
+              arguments: {'head': 'Terms & Conditions', 'file': 'terms.pdf'});
+            },
+        ),
+        ListTile(
+          leading: Icon(Icons.poll, color: LightColor.orange),
+          title: Text("Privacy Policy"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/privacy',
+                arguments: {'head': 'Privacy Policy', 'file': 'privacy.pdf'});
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.business, color: LightColor.orange),
+          title: Text("About Us"),
+            onTap: () => Navigator.of(context).pushNamed('/privacy',
+                arguments: {'head': 'About Us', 'file': 'about.pdf'})
+        ),
+        Divider(),
+        ListTile(
+          title: Text("App"),
+        ),
+        ListTile(
+          leading: Icon(
+            Icons.exit_to_app,
+            color: LightColor.orange,
+          ),
+          title: Text("Logout"),
+        ),
+      ],
+    );
   }
 }

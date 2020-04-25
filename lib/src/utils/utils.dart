@@ -5,10 +5,11 @@ import 'package:quagga/src/utils/customer.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
+import 'package:quagga/src/wigets/item_quantity.dart';
 
 class Utils {
-  static const String url =
-      'http://api.piuniversal.com:4000'; //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000' http://api.piuniversal.com:4000
+  static String url = 'http://10.0.2.2:4000';
+  //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000' http://api.piuniversal.com:4000
   static String token = '';
   static CustomerInfo customerInfo;
 
@@ -31,12 +32,35 @@ class Utils {
         });
   }
 
-  static Future<bool> addToCart(productID, customerID, type, minOrder) async {
+  static Future<bool> requestAndWaitForAction(
+      BuildContext context, String message) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+//            title:Text("Confirm"),
+            content: Text(message),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Yes", style: TextStyle(color: Colors.green),),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+              FlatButton(
+                child: Text("No", style: TextStyle(color: Colors.red[300]),),
+                onPressed: () => Navigator.pop(context, true),
+              )
+            ],
+          );
+        });
+  }
+
+  static Future<bool> addToCart(productID, customerID, type, qty) async {
     Map<String, dynamic> body = {
       "product_id": productID,
       "customer_id": customerID,
       "type": type,
-      "min_order": minOrder
+      "quantity": qty
     };
 
     String json = jsonEncode(body);
@@ -204,6 +228,13 @@ class Utils {
         });
   }
 
-
+  static Future<Map<String, dynamic>> setCartQuantity(BuildContext context, int min, int num){
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return ItemQuantity(min, num);
+        });
+  }
 
 }

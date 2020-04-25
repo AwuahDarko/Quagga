@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _emailController.text = "falcon@gmail.com";
-    _passwordController.text = "natural";
+    _passwordController.text = "nature";
   }
 
   Widget _backButton() {
@@ -115,17 +115,13 @@ class _LoginPageState extends State<LoginPage> {
           _validateLogin(email.trim(), password.trim()).then((bool status) {
 
             if (status) {
-              AppData.fetchAllProducts().then((v) {
+              AppData.fetchAllStores().then((v) {
+                setState(() {
+                  _message = "";
+                  _showProgress = false;
 
-               AppData.fetchCategories().then((v){
-
-                  setState(() {
-                    _message = "";
-                    _showProgress = false;
-
-                    Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => MainPage()));
-                  });
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => MainPage()));
                 });
               });
             }
@@ -274,7 +270,7 @@ class _LoginPageState extends State<LoginPage> {
     var body = {"email": email, "password": password};
 
     String json = jsonEncode(body);
-    print(json);
+
 
     try {
       var res =
@@ -308,6 +304,11 @@ class _LoginPageState extends State<LoginPage> {
             userInfo['location']);
 
         return true;
+      }else{
+        setState(() {
+          _showProgress = false;
+          _message = res.body;
+        });
       }
     } catch (e) {
       setState(() {

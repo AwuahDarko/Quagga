@@ -63,14 +63,15 @@ class _ProductDetailPageState extends State<ProductDetailPage>
           ),
           InkWell(
             onTap: () {
-              _progressDialog.show().then((v){
+              _progressDialog.show().then((v) {
                 Utils.addToFavorites(
-                    model.id, Utils.customerInfo.userID, 'main')
+                        model.id, Utils.customerInfo.userID, 'main')
                     .then((status) {
-                  if(_progressDialog.isShowing()){
-                    _progressDialog.hide().then((bool value){
-                      Utils.showStatus(context, status, "Added to your wish list");
-                      if(value){
+                  if (_progressDialog.isShowing()) {
+                    _progressDialog.hide().then((bool value) {
+                      Utils.showStatus(
+                          context, status, "Added to your wish list");
+                      if (value) {
                         setState(() {
                           isLiked = !isLiked;
                         });
@@ -200,12 +201,11 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       },
       child: AnimatedBuilder(
           animation: animation,
-          //  builder: null,
           builder: (context, child) => AnimatedOpacity(
-            opacity: animation.value,
-            duration: Duration(milliseconds: 500),
-            child: child,
-          ),
+                opacity: animation.value,
+                duration: Duration(milliseconds: 500),
+                child: child,
+              ),
           child: Container(
               height: 40,
               width: 50,
@@ -217,17 +217,15 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 borderRadius: BorderRadius.all(
                   Radius.circular(13),
                 ),
-//                 color: Theme.of(context).backgroundColor,
               ),
               child: GestureDetector(
                 child: GFAvatar(
-                  backgroundColor: Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     backgroundImage: NetworkImage(image),
                     shape: GFAvatarShape.standard),
               ) //Image.network(image),
-          )),
+              )),
     );
-
   }
 
   Widget _detailWidget() {
@@ -285,35 +283,22 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                               ),
                             ],
                           ),
-//                          Row(
-//                            children: <Widget>[
-//                              Icon(Icons.star,
-//                                  color: LightColor.yellowColor, size: 17),
-//                              Icon(Icons.star,
-//                                  color: LightColor.yellowColor, size: 17),
-//                              Icon(Icons.star,
-//                                  color: LightColor.yellowColor, size: 17),
-//                              Icon(Icons.star,
-//                                  color: LightColor.yellowColor, size: 17),
-//                              Icon(Icons.star_border, size: 17),
-//                            ],
-//                          ),
                         ],
                       ),
                     ],
                   ),
                 ),
                 SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
-                TitleText(
-                  text: "Categories",
-                ),
+                model.subProducts.length == 0
+                    ? SizedBox(
+                        height: 1,
+                      )
+                    : TitleText(
+                        text: "Categories",
+                      ),
                 _subProducts(),
-                SizedBox(
-                  height: 20,
-                ),
-//                _availableColor(),
                 SizedBox(
                   height: 20,
                 ),
@@ -328,7 +313,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   Widget _subProducts() {
     return Container(
-        height: 140.0,
+        height: model.subProducts.length == 0 ? 1.0 : 140.0,
         width: MediaQuery.of(context).size.width,
         child: ListView(
             scrollDirection: Axis.horizontal,
@@ -389,58 +374,41 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     Icons.shopping_cart,
                     color: LightColor.orange,
                   ),
-                  onPressed: () {
-                _progressDialog.show().then((v){
-                  Utils.addToCart(
-                      sub.id, Utils.customerInfo.userID, 'sub', sub.minOrder)
-                      .then((status) {
-                    if(_progressDialog.isShowing()){
-                      _progressDialog.hide().then((bool value){
-                        Utils.showStatus(context, status, "Added to cart");
+                  onPressed: () async {
+
+                    Map<String, dynamic> qty = await Utils.setCartQuantity(
+                        context, sub.minOrder, sub.numberInStock);
+                    if (qty['res'] == true) {
+                      _progressDialog.show().then((v) {
+                        Utils.addToCart(sub.id, Utils.customerInfo.userID,
+                            'sub', qty['val'])
+                            .then((status) {
+                          if (_progressDialog.isShowing()) {
+                            _progressDialog.hide().then((bool value) {
+                              Utils.showStatus(
+                                  context, status, "Added to cart");
+                            });
+                          }
+                        });
                       });
                     }
-                  });
-                });
+
+//                    _progressDialog.show().then((v) {
+//                      Utils.addToCart(sub.id, Utils.customerInfo.userID, 'sub',
+//                              sub.minOrder)
+//                          .then((status) {
+//                        if (_progressDialog.isShowing()) {
+//                          _progressDialog.hide().then((bool value) {
+//                            Utils.showStatus(context, status, "Added to cart");
+//                          });
+//                        }
+//                      });
+//                    });
                   }),
             )
           ],
         ),
       ),
-    );
-  }
-
-  Widget _availableColor() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        TitleText(
-          text: "Available Colors",
-          fontSize: 14,
-        ),
-        SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            _colorWidget(LightColor.yellowColor, isSelected: true),
-            SizedBox(
-              width: 30,
-            ),
-            _colorWidget(LightColor.lightBlue),
-            SizedBox(
-              width: 30,
-            ),
-            _colorWidget(LightColor.black),
-            SizedBox(
-              width: 30,
-            ),
-            _colorWidget(LightColor.red),
-            SizedBox(
-              width: 30,
-            ),
-            _colorWidget(LightColor.skyBlue),
-          ],
-        )
-      ],
     );
   }
 
@@ -476,18 +444,37 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   FloatingActionButton _floatingButton() {
     return FloatingActionButton(
-      onPressed: () {
-        _progressDialog.show().then((v){
-            Utils.addToCart(
-                model.id, Utils.customerInfo.userID, 'main', model.minOrder)
+      onPressed: () async {
+
+        Map<String, dynamic> qty = await Utils.setCartQuantity(
+            context, model.minOrder, model.numberInStock);
+        if (qty['res'] == true) {
+          _progressDialog.show().then((v) {
+            Utils.addToCart(model.id, Utils.customerInfo.userID,
+                'main', qty['val'])
                 .then((status) {
-              if(_progressDialog.isShowing()){
-                _progressDialog.hide().then((bool value){
-                  Utils.showStatus(context, status, "Added to cart");
+              if (_progressDialog.isShowing()) {
+                _progressDialog.hide().then((bool value) {
+                  Utils.showStatus(
+                      context, status, "Added to cart");
                 });
               }
             });
           });
+        }
+
+
+//        _progressDialog.show().then((v) {
+//          Utils.addToCart(
+//                  model.id, Utils.customerInfo.userID, 'main', model.minOrder)
+//              .then((status) {
+//            if (_progressDialog.isShowing()) {
+//              _progressDialog.hide().then((bool value) {
+//                Utils.showStatus(context, status, "Added to cart");
+//              });
+//            }
+//          });
+//        });
       },
       backgroundColor: LightColor.orange,
       child: Icon(Icons.shopping_cart,

@@ -31,6 +31,9 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   Product _currentSelectedItem;
   ProgressDialog _progressDialog;
   var newFormat = DateFormat('yyyy-MM-dd');
+  bool _showBtn = false;
+
+
 
   @override
   void initState() {
@@ -104,8 +107,9 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           Expanded(
               child: ListTile(
                   selected: isSelected[model.index],
-                  onLongPress: () {
+                  onTap: () {
                     setState(() {
+                      _showBtn = false;
                       if (isSelected[model.index]) {
                         // remove selection
 
@@ -114,6 +118,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
                         _currentSelectedItem = null;
                       } else {
+                        _showBtn = true;
                         // remove all
                         for (int i = 0; i < AppData.cartList.length; ++i) {
                           colors[i] = Colors.transparent;
@@ -267,7 +272,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                   top: 0,
                   child: Row(
                     children: <Widget>[
-                      IconButton(
+                     _showBtn ? IconButton(
                         icon: Icon(
                           Icons.remove_circle,
                           color: LightColor.orange,
@@ -295,9 +300,9 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                             });
                           }
                         },
-                      ),
+                      ) : Text(""),
                       SizedBox(width: 10.0),
-                      IconButton(
+                      _showBtn ? IconButton(
                           icon: Icon(
                             Icons.add_circle,
                             color: LightColor.orange,
@@ -324,9 +329,9 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                                 });
                               });
                             }
-                          }),
+                          }): Text(""),
                       SizedBox(width: 10.0),
-                      IconButton(
+                     _showBtn ? IconButton(
                           icon: Icon(
                             Icons.delete,
                             color: LightColor.orange,
@@ -352,7 +357,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                                 }
                               });
                             }
-                          })
+                          }) : Text("")
                     ],
                   )),
               Positioned(

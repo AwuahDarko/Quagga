@@ -1,18 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/order_details_model.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/utils/utils.dart';
-import 'package:quagga/src/wigets/circularContainer.dart';
 import 'package:quagga/src/wigets/quad_clipper.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 
 class CustomerOrderDetailsPage extends StatefulWidget {
-  CustomerOrderDetailsPage( {Key key}) : super(key: key);
-
+  CustomerOrderDetailsPage({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -27,7 +23,6 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
   List<OrderDetailsModel> _list = [];
   bool _loading = true;
 
-  double _total = 0.00;
 
   @override
   void initState() {
@@ -36,14 +31,11 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
     AppData.fetchCustomerOrderDetails(Utils.customerInfo.userID).then((list) {
       _list = list;
       _loading = false;
-      _list.forEach((oneList){
-        _total += oneList.price;
+      _list.forEach((oneList) {
       });
       setState(() {});
     });
   }
-
-
 
   Widget _featuredRowB(context) {
     return SingleChildScrollView(
@@ -55,20 +47,20 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: _list
                 .map((oneList) => _card(context,
-                primary: Colors.white,
-                chipColor: LightColor.lightpurple,
-                backWidget: _decorationContainerE(
-                  LightColor.lightpurple,
-                  90,
-                  -40,
-                  secondary: LightColor.lightseeBlue,
-                ),
-                name: oneList.productName,
-                qty: oneList.quantity.toString(),
-                price: oneList.price.toString(),
-                status: oneList.status,
-                pub: oneList.orderKey,
-                imgPath: "${Utils.url}/api/images?url=${oneList.image}"))
+                    primary: Colors.white,
+                    chipColor: LightColor.lightpurple,
+                    backWidget: _decorationContainerE(
+                      LightColor.lightpurple,
+                      90,
+                      -40,
+                      secondary: LightColor.lightseeBlue,
+                    ),
+                    name: oneList.productName,
+                    qty: oneList.quantity.toString(),
+                    price: oneList.price.toString(),
+                    status: oneList.status,
+                    pub: oneList.orderKey,
+                    imgPath: "${Utils.url}/api/images?url=${oneList.image}"))
                 .toList()),
       ),
     );
@@ -77,17 +69,17 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
 // String name, String qty, String price, String status,String pub
   Widget _card(context,
       {Color primary = Colors.redAccent,
-        String imgPath,
-        String name = '',
-        String qty = '',
-        String price = '',
-        String status = '',
-        String pub = '',
-        Widget backWidget,
-        Color chipColor = LightColor.orange,
-        bool isPrimaryCard = false}) {
+      String imgPath,
+      String name = '',
+      String qty = '',
+      String price = '',
+      String status = '',
+      String pub = '',
+      Widget backWidget,
+      Color chipColor = LightColor.orange,
+      bool isPrimaryCard = false}) {
     return Container(
-        height: isPrimaryCard ? 190 : 180,
+        height: 120,
         width: MediaQuery.of(context).size.width * 0.85,
         margin: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         decoration: BoxDecoration(
@@ -106,19 +98,24 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
               children: <Widget>[
                 backWidget,
                 Positioned(
-                    top: 20,
+                    top: 5,
                     left: 10,
                     child: CircleAvatar(
-                      radius: 60,
+                      radius: 40,
                       backgroundColor: Colors.grey.shade300,
                       backgroundImage: NetworkImage(imgPath),
                     )),
                 Positioned(
                   top: 10,
-                  right: 70,
+                  right: 50,
                   child: _cardInfo(name, qty, price, status, pub,
                       LightColor.titleTextColor, chipColor,
                       isPrimaryCard: isPrimaryCard),
+                ),
+                Positioned(
+                  top: 80,
+                  right: 5,
+                  child: _chip(status, primary, height: 5, isPrimaryCard: isPrimaryCard)
                 )
               ],
             ),
@@ -132,55 +129,60 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
     return Align(
       alignment: Alignment.bottomLeft,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 15),
+          SizedBox(height: 1),
           Container(
-            padding: EdgeInsets.only(right: 0),
-            width: width * .32,
-            alignment: Alignment.topCenter,
-            child: Text(
-              name,
-              style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: isPrimaryCard ? Colors.white : textColor),
-            ),
-          ),
+              width: width * .32,
+              alignment: Alignment.topCenter,
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    name,
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: isPrimaryCard ? Colors.white : textColor),
+                  ),
+                ],
+              )),
+          SizedBox(height: 5),
+          Container(
+              padding: EdgeInsets.only(right: 0),
+              width: width * .32,
+              alignment: Alignment.topCenter,
+              child: Row(
+                children: <Widget>[
+                  Text('Qty:  '),
+                  Text(
+                    "$qty",
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange),
+                  ),
+                ],
+              )),
           SizedBox(height: 5),
           Container(
             padding: EdgeInsets.only(right: 0),
             width: width * .32,
             alignment: Alignment.topCenter,
-            child: Text(
-              "Quantity:  $qty",
-              style: TextStyle(
-                  fontSize: 14,
-                  color: isPrimaryCard ? Colors.white : textColor),
+            child: Row(
+              children: <Widget>[
+                Text('GH\u20B5 '),
+                Text(
+                  price,
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange),
+                )
+              ],
             ),
           ),
-          SizedBox(height: 5),
-          Container(
-            padding: EdgeInsets.only(right: 0),
-            width: width * .32,
-            alignment: Alignment.topCenter,
-            child: Text(
-              "GH\u20B5  $price",
-              style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.orange),
-            ),
-          ),
-          SizedBox(height: 25),
-          Row(
-            children: <Widget>[
-              SizedBox(
-                width: 80,
-              ),
-              _chip(status, primary, height: 5, isPrimaryCard: isPrimaryCard)
-            ],
-          )
+          SizedBox(height: 10),
+//          _chip(status, primary, height: 5, isPrimaryCard: isPrimaryCard)
         ],
       ),
     );
@@ -197,10 +199,18 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
             ? Colors.green.withAlpha(150)
             : Colors.orange.withAlpha(150),
       ),
-      child: Text(
-        text,
-        style: TextStyle(color: Colors.white, fontSize: 14),
-      ),
+      child: text != 'paid'
+          ? GestureDetector(
+        child: Text(
+          "Confirm order received",
+          style: TextStyle(color: Colors.white, fontSize: 14),
+        ),
+        onTap: () async{
+         await Utils.requestAndWaitForAction(context,'Did you receive this order ?');
+        },
+      )
+          : Text('pending payment',
+              style: TextStyle(color: Colors.white, fontSize: 14)),
     );
   }
 
@@ -249,42 +259,17 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
     width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      persistentFooterButtons: <Widget>[
-        Row(
-          children: <Widget>[
-            TitleText(
-              text: "Total:",
-            ),
-            SizedBox(width: 10,),
-            TitleText(
-              text: "GH\u20B5",
-            ),
-            SizedBox(width: 5,),
-            TitleText(
-              text: "$_total",
-              color: LightColor.orange,
-            ),
-            SizedBox(width: 20,),
-          ],
-        )
-      ],
-      floatingActionButton: FloatingActionButton(
-        child: Text("Pay", style: TextStyle(fontWeight: FontWeight.bold),),
-        onPressed: (){},
-      ),
-        appBar: AppBar(
-          title: Text("Order details"),
-        ),
         body: SingleChildScrollView(
-          child: _loading ? Center(
-            child: CircularProgressIndicator(),
-          ): Column(
-            children: <Widget>[SizedBox(height: 0), _featuredRowB(context)],
-          ),
+          child: _loading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Column(
+                  children: <Widget>[
+                    SizedBox(height: 5),
+                    _featuredRowB(context)
+                  ],
+                ),
         ));
   }
-
-
-
 }
-

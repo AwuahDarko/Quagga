@@ -14,24 +14,24 @@ class MenuPage extends StatelessWidget {
           children: <Widget>[
             _header(context),
             SizedBox(height: 40,),
-            Container(
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              width: MediaQuery.of(context).size.width,
-              height: btnHeight,
-              child: RaisedButton(
-                color: btnColor,
-                child: Text(
-                  "Add New Category",
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                      '/newcategory'
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 20,),
+//            Container(
+//              padding: const EdgeInsets.only(left: 10, right: 10),
+//              width: MediaQuery.of(context).size.width,
+//              height: btnHeight,
+//              child: RaisedButton(
+//                color: btnColor,
+//                child: Text(
+//                  "Add New Category",
+//                  style: TextStyle(color: Colors.white),
+//                ),
+//                onPressed: () {
+//                  Navigator.of(context).pushNamed(
+//                      '/newcategory'
+//                  );
+//                },
+//              ),
+//            ),
+//            SizedBox(height: 20,),
             Container(
               padding: const EdgeInsets.only(left: 10, right: 10),
               width: MediaQuery.of(context).size.width,

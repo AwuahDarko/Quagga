@@ -4,6 +4,7 @@ import 'package:quagga/src/model/order_details_model.dart';
 import 'package:quagga/src/model/order_summary.dart';
 import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/model/category.dart';
+import 'package:quagga/src/model/store.dart';
 import 'package:quagga/src/model/sub_product.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,7 @@ class AppData {
   static List<Product> cartList = [];
   static List<Product> wishList = [];
   static List<Category> categoryList = [];
+  static List<Store> storeList = [];
   static List<String> showThumbnailList = [
     "http://placekitten.com/90/60",
     "http://placekitten.com/90/60",
@@ -120,9 +122,33 @@ class AppData {
             minOrder: product['min_order'],
             description: product['description'],
             subProducts: listOfSubProducts,
+            numberInStock: product['number_in_stock'],
             categoryID: product['category_id']);
 
         AppData.productList.add(prod);
+      });
+    }
+  }
+
+  static Future<void> fetchAllStores() async{
+    storeList.clear();
+
+    String url = Utils.url + "/api/store";
+
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
+
+    if(res.statusCode == 200){
+      List<dynamic> storeData = jsonDecode(res.body);
+
+      storeData.forEach((oneStore){
+        storeList.add(new Store(
+          name: oneStore['name'],
+          streetName: oneStore['street_name'],
+          image: oneStore['image_url'],
+          id: oneStore['store_id'],
+          email: oneStore['email'],
+          phone: oneStore['cell_number']
+        ));
       });
     }
   }
