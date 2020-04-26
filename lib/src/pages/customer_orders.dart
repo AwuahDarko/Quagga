@@ -264,12 +264,18 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
               ? Center(
                   child: CircularProgressIndicator(),
                 )
-              : Column(
-                  children: <Widget>[
-                    SizedBox(height: 5),
-                    _featuredRowB(context)
-                  ],
-                ),
+              : _list.isEmpty ? Center(
+            child: Text('No orders yet' ,style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: LightColor.orange
+            ),),
+          ) : Column(
+            children: <Widget>[
+              SizedBox(height: 5),
+              _featuredRowB(context)
+            ],
+          ),
         ));
   }
 }

@@ -7,6 +7,7 @@ import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/store_card.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:quagga/src/pages/store_products.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.onIconPressedCallback})
@@ -138,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: TextStyle(color: Colors.deepOrange),
                       ),
                       subtitle: Text(item.streetName),
-                      onTap: (){Navigator.of(context).pushNamed('/storeproduct', arguments: item);},
+                      onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context) => StoreProductsPage(item)));},
                     );
                   },
                 ),

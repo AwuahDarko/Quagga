@@ -143,8 +143,8 @@ class _MainPageState extends State<MainPage> {
                         : Colors.white,
               ),
             ),
-//            _distributorMenu(),
-            _customerMenu(),
+            _distributorMenu(),
+//            _customerMenu(),
           ],
         ),
       ),
@@ -268,23 +268,23 @@ class _MainPageState extends State<MainPage> {
           leading: Icon(Icons.update, color: LightColor.orange),
           title: Text("Update product"),
           onTap: () {
-            Navigator.of(context).pushNamed('/subproduct');
+            Navigator.of(context).pushNamed('/updateproduct');
           },
         ),
         ListTile(
-          leading: Icon(Icons.archive, color: LightColor.orange),
-          title: Text("Sub product"),
+          leading: Icon(Icons.delete_outline, color: LightColor.orange),
+          title: Text("Remove product"),
           onTap: () {
-            Navigator.of(context).pushNamed('/subproduct');
+            Navigator.of(context).pushNamed('/removeproduct');
           },
         ),
-        ListTile(
-          leading: Icon(Icons.update, color: LightColor.orange),
-          title: Text("Update sub-product"),
-          onTap: () {
-            Navigator.of(context).pushNamed('/subproduct');
-          },
-        ),
+//        ListTile(
+//          leading: Icon(Icons.update, color: LightColor.orange),
+//          title: Text("Update sub-product"),
+//          onTap: () {
+//            Navigator.of(context).pushNamed('/subproduct');
+//          },
+//        ),
         ListTile(
           leading: Icon(
             Icons.person,

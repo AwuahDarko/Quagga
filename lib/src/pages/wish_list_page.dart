@@ -228,7 +228,7 @@ class WishListPageState extends State<WishListPage> {
                         thickness: 1,
                         height: 70,
                       ),
-
+                      _price(),
                     ],
                   ),
                 ),
@@ -236,6 +236,20 @@ class WishListPageState extends State<WishListPage> {
             ],
           ),
         ));
+  }
+
+  Widget _price() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        TitleText(
+          text: '${AppData.wishList.length} Items',
+          color: LightColor.grey,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ],
+    );
   }
 
   Future<bool> _deleteWishItem(int favoriteID) async {

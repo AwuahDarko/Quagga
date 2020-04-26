@@ -11,7 +11,6 @@ import 'package:quagga/src/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:quagga/src/utils/customer.dart';
 
-
 class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -219,13 +218,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   _progressDialog.show();
                   _updateProfile(body).then((status) {
                     if (status) {
-                      _updateProfileImage(_image, Utils.customerInfo.userID).then((state) {
+                      _updateProfileImage(_image, Utils.customerInfo.userID)
+                          .then((state) {
                         // show dialog here
-                        if (_progressDialog.isShowing()) {
-                          _progressDialog.hide().then((v) {
+
+                        Future.delayed(Duration(seconds: 1)).then((value){
+                          _progressDialog.hide().whenComplete((){
                             Utils.showStatus(context, state, "Profile updated");
                           });
-                        }
+                        });
                       });
                     } else {
                       // show error dialog
@@ -323,6 +324,8 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         body: json);
 
+    print(res.statusCode);
+
     if (res.statusCode == 200 || res.statusCode == 201) {
       return true;
     } else {
@@ -345,11 +348,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     Dio dio = Dio();
     dio.options.headers["Authorization"] = Utils.token;
-    var res = await dio.post(url,data: formData);
+    var res = await dio.post(url, data: formData);
 
     if (res.statusCode == 200 || res.statusCode == 201) {
-
-      List< dynamic> data = jsonDecode(res.data);
+      List<dynamic> data = jsonDecode(res.data);
 
       Map<String, dynamic> userInfo = data[0];
 

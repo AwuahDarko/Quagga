@@ -4,7 +4,8 @@ import 'package:getflutter/getflutter.dart';
 import 'package:getflutter/shape/gf_avatar_shape.dart';
 import 'package:quagga/src/model/store.dart';
 import 'package:quagga/src/utils/utils.dart';
-import 'package:quagga/src/wigets/title_text.dart';
+import 'package:quagga/src/pages/store_products.dart';
+
 
 class StoreCardMini extends StatelessWidget {
   StoreCardMini({Key key, this.model}) : super(key: key);
@@ -14,7 +15,7 @@ class StoreCardMini extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed('/storeproduct', arguments: model);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => StoreProductsPage(model)));
       },
       child: Container(
         decoration: BoxDecoration(

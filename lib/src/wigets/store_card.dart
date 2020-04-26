@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quagga/src/model/store.dart';
+import 'package:quagga/src/pages/store_products.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/title_text.dart';
@@ -12,7 +13,7 @@ class StoreCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed('/storeproduct', arguments: model);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => StoreProductsPage(model)));
       },
       child: Container(
         decoration: BoxDecoration(

@@ -4,7 +4,7 @@ class Product {
   int id;
   String name;
   String category;
-  List<dynamic> image;
+  List<dynamic> image = [];
   double price;
   int quantity;
   int cartID;

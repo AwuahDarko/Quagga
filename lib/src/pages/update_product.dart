@@ -5,23 +5,23 @@ import 'package:flutter/services.dart';
 import 'package:getflutter/components/avatar/gf_avatar.dart';
 import 'package:getflutter/shape/gf_avatar_shape.dart';
 import 'package:progress_dialog/progress_dialog.dart';
-import 'package:quagga/src/model/category.dart';
 import 'package:quagga/src/model/data.dart';
+import 'package:quagga/src/model/product.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-
-class NewProduct extends StatefulWidget {
+class ProductUpdate extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return NewProductState();
+    return ProductUpdateState();
   }
 }
 
-class NewProductState extends State<NewProduct> {
+class ProductUpdateState extends State<ProductUpdate> {
   final _formKey = GlobalKey<FormState>();
   final _pName = TextEditingController();
   final _description = TextEditingController();
@@ -29,14 +29,73 @@ class NewProductState extends State<NewProduct> {
   final _numStock = TextEditingController();
   final _price = TextEditingController();
 
+  String name = '';
+  String des = '';
+  String min = '';
+  String num = '';
+  String pri = '';
+
   File _image_1;
   File _image_2;
   File _image_3;
   File _image_4;
   ProgressDialog _progressDialog;
-  Category _category;
+  Product _product;
 
-  List<int> _loadedImages = [];
+  int _productId;
+
+  bool _textChange = false;
+  bool _imageChange = false;
+
+  List<Product> _productList = [];
+
+  bool _newImage1 = false;
+  bool _newImage2 = false;
+  bool _newImage3 = false;
+  bool _newImage4 = false;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    // listeners
+    _pName.addListener(() {
+      if (name != _pName.text) {
+        _textChange = true;
+      }
+    });
+
+    _description.addListener(() {
+      if (des != _description.text) {
+        _textChange = true;
+      }
+    });
+
+    _minOrder.addListener(() {
+      if (min != _minOrder.text) {
+        _textChange = true;
+      }
+    });
+
+    _numStock.addListener(() {
+      if (num != _numStock.text) {
+        _textChange = true;
+      }
+    });
+
+    _price.addListener(() {
+      if (pri != _price.text) {
+        _textChange = true;
+      }
+    });
+
+    AppData.fetchAllStoreProducts('').then((list) {
+      _productList.clear();
+      _productList = List.from(list);
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +108,7 @@ class NewProductState extends State<NewProduct> {
         LengthLimitingTextInputFormatter(45),
       ],
       decoration: InputDecoration(
-          labelText: 'Product Name',
-          labelStyle: TextStyle(color: Colors.grey)),
+          labelText: 'Product Name', labelStyle: TextStyle(color: Colors.grey)),
       validator: (value) {
         if (value.isEmpty) {
           return 'Product must have a name';
@@ -60,7 +118,7 @@ class NewProductState extends State<NewProduct> {
     );
 
     Card productDescription = Card(
-        color: Colors.white70,
+        color: Colors.white,
         child: TextFormField(
           autofocus: false,
           controller: _description,
@@ -70,6 +128,7 @@ class NewProductState extends State<NewProduct> {
             LengthLimitingTextInputFormatter(500),
           ],
           decoration: InputDecoration(
+              labelText: 'Enter product description here',
               hintText: "Enter product description here",
               labelStyle: TextStyle(color: Colors.grey)),
           validator: (value) {
@@ -88,9 +147,9 @@ class NewProductState extends State<NewProduct> {
       ],
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
+          labelText: 'Min. Order',
           hintText: 'Min. Order',
-          labelStyle: TextStyle(color: Colors.grey)
-      ),
+          labelStyle: TextStyle(color: Colors.grey)),
       validator: (value) {
         if (value.isEmpty) {
           return 'Please enter a minimum order';
@@ -107,6 +166,7 @@ class NewProductState extends State<NewProduct> {
       ],
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
+          labelText: 'Quantity in stock',
           hintText: 'Quantity in stock',
           labelStyle: TextStyle(color: Colors.grey)),
       validator: (value) {
@@ -125,9 +185,9 @@ class NewProductState extends State<NewProduct> {
       ],
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
+          labelText: 'Price',
           hintText: 'Price',
-          labelStyle: TextStyle(color: Colors.grey)
-      ),
+          labelStyle: TextStyle(color: Colors.grey)),
       validator: (value) {
         if (value.isEmpty) {
           return 'What is the price?';
@@ -136,22 +196,27 @@ class NewProductState extends State<NewProduct> {
       },
     );
 
-    DropdownButton categoryMenu = DropdownButton(
-      hint: Text('Select product category'), // Not necessary for Option 1
-      value: _category,
+    DropdownButton productMenu = DropdownButton(
+      hint: Text('Select product'), // Not necessary for Option 1
+      value: _product,
       onChanged: (newValue) {
         setState(() {
-          _category = newValue;
+          _product = newValue;
+          name = _pName.text = _product.name;
+          des = _description.text = _product.description;
+          min = _minOrder.text = _product.minOrder.toString();
+          num = _numStock.text = _product.numberInStock.toString();
+          pri = _price.text = _product.price.toString();
+          _productId = _product.id;
         });
       },
-      items: AppData.categoryList.map((category) {
+      items: _productList.map((prod) {
         return DropdownMenuItem(
-          child: new Text(category.name),
-          value: category,
+          child: new Text(prod.name),
+          value: prod,
         );
       }).toList(),
     );
-
 
     StaggeredGridView content = StaggeredGridView.count(
       crossAxisCount: 2,
@@ -164,12 +229,12 @@ class NewProductState extends State<NewProduct> {
           child: Column(
             children: <Widget>[
               SizedBox(height: 10.0),
+              productMenu,
               productName,
               minOrder,
               numberInStock,
               _inputPrice,
               productDescription,
-//              categoryMenu,
               SizedBox(height: 15.0),
             ],
           ),
@@ -177,10 +242,7 @@ class NewProductState extends State<NewProduct> {
         GestureDetector(
           child: GFAvatar(
               child: Icon(Icons.camera),
-              backgroundImage:
-              _image_1 != null ? Image
-                  .file(_image_1)
-                  .image : null,
+              backgroundImage: imageOne(),
               shape: GFAvatarShape.standard),
           onTap: () {
             Utils.photoOptionDialog(context).then((value) {
@@ -188,21 +250,21 @@ class NewProductState extends State<NewProduct> {
                 Utils.getImageFromCamera(context).then((file) {
                   _image_1 = file;
                   if (_image_1 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
+                    _newImage1 = true;
+                    _imageChange = true;
 
-                  });
+                  }
+                  setState(() {});
                 });
               } else if (value == 1) {
                 Utils.getImageFromGallery(context).then((file) {
                   _image_1 = file;
                   if (_image_1 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
+                    _newImage1 = true;
+                    _imageChange = true;
 
-                  });
+                  }
+                  setState(() {});
                 });
               }
             });
@@ -211,10 +273,7 @@ class NewProductState extends State<NewProduct> {
         GestureDetector(
           child: GFAvatar(
               child: Icon(Icons.camera),
-              backgroundImage:
-              _image_2 != null ? Image
-                  .file(_image_2)
-                  .image : null,
+              backgroundImage: imageTwo(),
               shape: GFAvatarShape.standard),
           onTap: () {
             Utils.photoOptionDialog(context).then((value) {
@@ -222,21 +281,21 @@ class NewProductState extends State<NewProduct> {
                 Utils.getImageFromCamera(context).then((file) {
                   _image_2 = file;
                   if (_image_2 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
+                    _newImage2 = true;
+                    _imageChange = true;
 
-                  });
+                  }
+                  setState(() {});
                 });
               } else if (value == 1) {
                 Utils.getImageFromGallery(context).then((file) {
                   _image_2 = file;
                   if (_image_2 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
+                    _newImage2 = true;
+                    _imageChange = true;
 
-                  });
+                  }
+                  setState(() {});
                 });
               }
             });
@@ -245,10 +304,7 @@ class NewProductState extends State<NewProduct> {
         GestureDetector(
           child: GFAvatar(
               child: Icon(Icons.camera),
-              backgroundImage:
-              _image_3 != null ? Image
-                  .file(_image_3)
-                  .image : null,
+              backgroundImage: imageThree(),
               shape: GFAvatarShape.standard),
           onTap: () {
             Utils.photoOptionDialog(context).then((value) {
@@ -256,21 +312,21 @@ class NewProductState extends State<NewProduct> {
                 Utils.getImageFromCamera(context).then((file) {
                   _image_3 = file;
                   if (_image_3 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
+                    _newImage3 = true;
+                    _imageChange = true;
 
-                  });
+                  }
+                  setState(() {});
                 });
               } else if (value == 1) {
                 Utils.getImageFromGallery(context).then((file) {
                   _image_3 = file;
                   if (_image_3 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
+                    _newImage3 = true;
+                    _imageChange = true;
 
-                  });
+                  }
+                  setState(() {});
                 });
               }
             });
@@ -279,10 +335,7 @@ class NewProductState extends State<NewProduct> {
         GestureDetector(
           child: GFAvatar(
               child: Icon(Icons.camera),
-              backgroundImage:
-              _image_4 != null ? Image
-                  .file(_image_4)
-                  .image : null,
+              backgroundImage: imageFour(),
               shape: GFAvatarShape.standard),
           onTap: () {
             Utils.photoOptionDialog(context).then((value) {
@@ -290,21 +343,21 @@ class NewProductState extends State<NewProduct> {
                 Utils.getImageFromCamera(context).then((file) {
                   _image_4 = file;
                   if (_image_4 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
+                    _newImage4 = true;
+                    _imageChange = true;
 
-                  });
+                  }
+                  setState(() {});
                 });
               } else if (value == 1) {
                 Utils.getImageFromGallery(context).then((file) {
                   _image_4 = file;
                   if (_image_4 != null) {
-                    _loadedImages.add(1);
-                  }
-                  setState(() {
+                    _newImage4 = true;
+                    _imageChange = true;
 
-                  });
+                  }
+                  setState(() {});
                 });
               }
             });
@@ -338,21 +391,21 @@ class NewProductState extends State<NewProduct> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                if (_formKey.currentState.validate()) {
-//                  if (_category == null) {
-//                    showInvalid(context, "Select Category");
-//                    return;
-//                  }
+                if (!_textChange && !_imageChange) {
+                  Fluttertoast.showToast(
+                      msg: 'No changes detected',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white);
+                  return;
+                }
 
-                  if (_loadedImages.length == 0) {
-                    showInvalid(
-                        context, "Product must have at least one image");
-                    return;
-                  }
+                if (_formKey.currentState.validate()) {
 
                   Map<String, dynamic> body = {
                     "product_name": _pName.text,
-                    "category_id": _category.id,
+                    "category_id": _product.id,
                     "description": _description.text,
                     "price": _price.text,
                     "min_order": _minOrder.text,
@@ -360,21 +413,22 @@ class NewProductState extends State<NewProduct> {
                     "discount": 0.0
                   };
 
-                  _progressDialog.show().then((v){
-                    _addNewProduct(body).then((result){
-                      if(result == false){
-                        if(_progressDialog.isShowing()){
-                          _progressDialog.hide().then((v){
+                  _progressDialog.show().then((v) {
+                    _updateNewProduct(body).then((result) {
+                      if (result == false) {
+                        Future.delayed(Duration(seconds: 1)).then((value) {
+                          _progressDialog.hide().whenComplete(() {
                             Utils.showStatus(context, result, "");
                           });
-                        }
-                      }else{
-                        _uploadImages(result).then((status){
-                          if(_progressDialog.isShowing()){
-                            _progressDialog.hide().then((v){
-                              Utils.showStatus(context, status, "New product added");
+                        });
+                      } else {
+                        _uploadImages(_productId).then((status) {
+                          Future.delayed(Duration(seconds: 1)).then((value) {
+                            _progressDialog.hide().whenComplete(() {
+                              Utils.showStatus(
+                                  context, status, "Product updated");
                             });
-                          }
+                          });
                         });
                       }
                     });
@@ -389,15 +443,13 @@ class NewProductState extends State<NewProduct> {
     );
   }
 
-
   void showInvalid(BuildContext context, String message) {
     var alertDialog = AlertDialog(
-        title: Text("Invalid", style: TextStyle(
-            fontSize: 20,
-            color: Colors.green
-        ),),
-        content: Text(message)
-    );
+        title: Text(
+          "Invalid",
+          style: TextStyle(fontSize: 20, color: Colors.green),
+        ),
+        content: Text(message));
 
     showDialog(
         context: context,
@@ -406,23 +458,21 @@ class NewProductState extends State<NewProduct> {
         });
   }
 
-  Future<dynamic> _addNewProduct(Map<String, dynamic> body) async {
+  Future<bool> _updateNewProduct(Map<String, dynamic> body) async {
     String url = Utils.url + "/api/products";
 
     String json = jsonEncode(body);
 
-    var res = await http.post(
-        url,
+    var res = await http.put(url,
         headers: {
           "Authorization": Utils.token,
           "Content-Type": "application/json"
         },
-        body: json
-    );
+        body: json);
 
     if (res.statusCode == 200 || res.statusCode == 201) {
-      Map<String, dynamic> result = jsonDecode(res.body);
-      return result['product_id'];
+
+      return true;
     } else {
       return false;
     }
@@ -444,9 +494,16 @@ class NewProductState extends State<NewProduct> {
     if (_image_4 != null) {
       allFiles.add(_image_4);
     }
-    
+
+    if(allFiles.length == 0){
+      return true;
+    }
+
     FormData formData = FormData.fromMap({
-      "product_image": allFiles.map((oneFile)  => MultipartFile.fromFileSync(oneFile.path, filename: oneFile.path.split("/").last)).toList(),
+      "product_image": allFiles
+          .map((oneFile) => MultipartFile.fromFileSync(oneFile.path,
+              filename: oneFile.path.split("/").last))
+          .toList(),
       "product_id": productID
     });
 
@@ -458,6 +515,62 @@ class NewProductState extends State<NewProduct> {
       return true;
     } else {
       return false;
+    }
+  }
+
+  ImageProvider imageOne(){
+    if(!_newImage1){
+      if(_product == null){
+        return null;
+      }else if(_product.image.length >= 1){
+        return  NetworkImage('${Utils.url}/api/images?url=${_product.image[0]}');
+      }else{
+        return null;
+      }
+    }else{
+      return Image.file(_image_1).image;
+    }
+  }
+
+  ImageProvider imageTwo(){
+    if(!_newImage2){
+      if(_product == null){
+        return null;
+      }else if(_product.image.length >= 2){
+        return  NetworkImage('${Utils.url}/api/images?url=${_product.image[1]}');
+      }else{
+        return null;
+      }
+    }else{
+      return Image.file(_image_2).image;
+    }
+  }
+
+  ImageProvider imageThree(){
+    if(!_newImage3){
+      if(_product == null){
+        return null;
+      }else if(_product.image.length >= 3){
+        return  NetworkImage('${Utils.url}/api/images?url=${_product.image[2]}');
+      }else{
+        return null;
+      }
+    }else{
+      return Image.file(_image_3).image;
+    }
+  }
+
+  ImageProvider imageFour(){
+    if(!_newImage4){
+      if(_product == null){
+        return null;
+      }else if(_product.image.length >= 4){
+        return  NetworkImage('${Utils.url}/api/images?url=${_product.image[3]}');
+      }else{
+        return null;
+      }
+    }else{
+      return Image.file(_image_4).image;
     }
   }
 }

@@ -69,8 +69,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     .then((status) {
                   if (_progressDialog.isShowing()) {
                     _progressDialog.hide().then((bool value) {
-                      Utils.showStatus(
-                          context, status, "Added to your wish list");
+                      Utils.showStatus(context, status,
+                          "${model.name} is added your wish list");
                       if (value) {
                         setState(() {
                           isLiked = !isLiked;
@@ -170,7 +170,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               child: Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height * 0.27,
-                  child: productImages[_counter]),
+                  child: model.image.length > 0
+                      ? productImages[_counter]
+                      : Text("")),
             ),
           ],
         ),
@@ -375,13 +377,12 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     color: LightColor.orange,
                   ),
                   onPressed: () async {
-
                     Map<String, dynamic> qty = await Utils.setCartQuantity(
                         context, sub.minOrder, sub.numberInStock);
                     if (qty['res'] == true) {
                       _progressDialog.show().then((v) {
                         Utils.addToCart(sub.id, Utils.customerInfo.userID,
-                            'sub', qty['val'])
+                                'sub', qty['val'])
                             .then((status) {
                           if (_progressDialog.isShowing()) {
                             _progressDialog.hide().then((bool value) {
@@ -392,18 +393,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                         });
                       });
                     }
-
-//                    _progressDialog.show().then((v) {
-//                      Utils.addToCart(sub.id, Utils.customerInfo.userID, 'sub',
-//                              sub.minOrder)
-//                          .then((status) {
-//                        if (_progressDialog.isShowing()) {
-//                          _progressDialog.hide().then((bool value) {
-//                            Utils.showStatus(context, status, "Added to cart");
-//                          });
-//                        }
-//                      });
-//                    });
                   }),
             )
           ],
@@ -445,24 +434,21 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   FloatingActionButton _floatingButton() {
     return FloatingActionButton(
       onPressed: () async {
-
         Map<String, dynamic> qty = await Utils.setCartQuantity(
             context, model.minOrder, model.numberInStock);
         if (qty['res'] == true) {
           _progressDialog.show().then((v) {
-            Utils.addToCart(model.id, Utils.customerInfo.userID,
-                'main', qty['val'])
+            Utils.addToCart(
+                    model.id, Utils.customerInfo.userID, 'main', qty['val'])
                 .then((status) {
               if (_progressDialog.isShowing()) {
                 _progressDialog.hide().then((bool value) {
-                  Utils.showStatus(
-                      context, status, "Added to cart");
+                  Utils.showStatus(context, status, "Added to cart");
                 });
               }
             });
           });
         }
-
 
 //        _progressDialog.show().then((v) {
 //          Utils.addToCart(

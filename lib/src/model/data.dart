@@ -83,10 +83,11 @@ class AppData {
     }
   }
 
-  static Future<void> fetchAllProducts() async {
-    AppData.productList.clear();
+  static Future<List<Product>> fetchAllStoreProducts(storeId) async {
+    List<Product> mList = [];
 
-    String url = Utils.url + "/api/products";
+    String url = Utils.url + "/api/products?store_id=$storeId";
+
     var res = await http.get(url, headers: {"Authorization": Utils.token});
 
     if (res.statusCode == 200) {
@@ -125,9 +126,11 @@ class AppData {
             numberInStock: product['number_in_stock'],
             categoryID: product['category_id']);
 
-        AppData.productList.add(prod);
+        mList.add(prod);
       });
     }
+
+    return mList;
   }
 
   static Future<void> fetchAllStores() async{

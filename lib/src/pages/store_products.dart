@@ -9,29 +9,42 @@ import 'package:getflutter/shape/gf_avatar_shape.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/product.dart';
+import 'package:quagga/src/model/store.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/store_card_mini.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 
 class StoreProductsPage extends StatefulWidget {
+  final store;
+
+  StoreProductsPage(this.store);
+
   @override
-  _StoreProductsPageState createState() => _StoreProductsPageState();
+  _StoreProductsPageState createState() => _StoreProductsPageState(this.store);
 }
 
 class _StoreProductsPageState extends State<StoreProductsPage> {
+  _StoreProductsPageState(this.store);
+
   var width;
   var height;
   ProgressDialog _progressDialog;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  var _searchList;
+  var _searchList = [];
   bool _searching = false;
+  bool _loading = true;
+  final Store store;
 
   @override
   void initState() {
     super.initState();
-    _searchList = AppData.productList;
+    AppData.fetchAllStoreProducts(store.id).then((list) {
+      _searchList = list;
+      _loading = false;
+      setState(() {});
+    });
   }
 
   Future<List<Product>> search(String search) async {
@@ -49,7 +62,7 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
   }
 
   Widget _storeItems() {
-    return Column(children: AppData.productList.map((x) => _item(x)).toList());
+    return Column(children: _searchList.map((x) => _item(x)).toList());
   }
 
   Widget _item(Product model) {
@@ -160,7 +173,6 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
-
     _progressDialog = Utils.initializeProgressDialog(context);
 
     return Scaffold(
@@ -191,7 +203,7 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
                 top: width * 0.18, //70
                 left: width * 0.07, //30,
                 child: Text(
-                  "FinaCash",
+                  store.name,
                   style: TextStyle(
                       color: Colors.white, fontSize: width * 0.074 //30
                       ),
@@ -202,31 +214,31 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
                 left: width * 0.05, // 30,
                 right: width * 0.05, // 30,
                 child: Container(
-                  height: height * 0.15, //150,
-                  width: width * 0.1, // 70,
+                    height: height * 0.15,
+                    //150,
+                    width: width * 0.1,
+                    // 70,
                     padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.blue[100],
-                            blurRadius: 5,
-                            offset: Offset(0, 2)),
-                        BoxShadow(
-                            color: Colors.blueAccent,
-                            blurRadius: 5,
-                            offset: Offset(0, 2))
-                      ]),
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: AppData.storeList
-                        .map((store) => StoreCardMini(
-                      model: store,
-                    ))
-                        .toList()
-                  )
-                ),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.blue[100],
+                              blurRadius: 5,
+                              offset: Offset(0, 2)),
+                          BoxShadow(
+                              color: Colors.blueAccent,
+                              blurRadius: 5,
+                              offset: Offset(0, 2))
+                        ]),
+                    child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: AppData.storeList
+                            .map((store) => StoreCardMini(
+                                  model: store,
+                                ))
+                            .toList())),
               ),
               Positioned(
                 top: 255,
@@ -272,9 +284,13 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
                         child: Container(
                           width: width,
                           height: height * 0.9,
-                          child: ListView(
-                            children: <Widget>[_storeItems()],
-                          ),
+                          child: _loading
+                              ? Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : ListView(
+                                  children: <Widget>[_storeItems()],
+                                ),
                         ),
                       ),
                     )
@@ -289,77 +305,3 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
     );
   }
 }
-
-
-/*
-Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: width * 0.05,
-                          top: width * 0.04,
-                          bottom: width * 0.02,
-                        ),
-                        child: Text(
-                          "Total Orders",
-                          style: TextStyle(
-                              color: Colors.grey[600], fontSize: width * 0.04),
-                        ),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(left: width * 0.05),
-                            child: Container(
-                              width: width * 0.6,
-                              child: Text(
-                                "800",
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors
-                                      .lightBlue[700], //Colors.indigo[400],
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(right: width * 0.04),
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                width: width * 0.12,
-                                height: width * 0.11, //65,
-                                decoration: BoxDecoration(
-                                    color: Colors
-                                        .lightBlue[700], //Colors.indigo[400],
-                                    borderRadius: BorderRadius.circular(50),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey,
-                                        blurRadius: 7,
-                                        offset: Offset(2, 2),
-                                      )
-                                    ]),
-                                child: Icon(
-                                  Icons.description,
-                                  size: width * 0.06,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(
-                        height: height * 0.008,
-                      )
-                    ],
-                  ),
-                  */

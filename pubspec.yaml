@@ -36,6 +36,7 @@ dependencies:
   pdf_render: ^0.57.2
   flutter_launch: ^0.2.0
   font_awesome_flutter: ^8.8.1
+  fluttertoast: ^4.0.1
 
 dev_dependencies:
   flutter_test:
