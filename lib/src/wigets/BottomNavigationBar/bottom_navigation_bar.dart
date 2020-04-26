@@ -170,10 +170,18 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
+//                _icon(Icons.home, _selectedIndex == 0, 0),
+//                _icon(Icons.local_shipping, _selectedIndex == 1, 1),
+//                _icon(Icons.shopping_cart, _selectedIndex == 2, 2),
+//                _icon(Icons.favorite_border, _selectedIndex == 3, 3),
+
+
                 _icon(Icons.home, _selectedIndex == 0, 0),
-                _icon(Icons.favorite_border, _selectedIndex == 3, 3),
+                _icon(Icons.favorite_border, _selectedIndex == 1, 1),
                 _icon(Icons.shopping_cart, _selectedIndex == 2, 2),
-                _icon(Icons.local_shipping, _selectedIndex == 1, 1),
+                _icon(Icons.local_shipping, _selectedIndex == 3, 3),
+
+
               ],
             ),
           ),

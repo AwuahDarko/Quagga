@@ -139,7 +139,7 @@ class WishListPageState extends State<WishListPage> {
                         fontSize: 12,
                       ),
                       TitleText(
-                        text: model.price.toString(),
+                        text: '${model.price.toStringAsFixed(2)}',
                         fontSize: 14,
                       ),
                     ],

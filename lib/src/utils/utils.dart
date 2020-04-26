@@ -238,3 +238,11 @@ class Utils {
   }
 
 }
+
+/*
+* Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => Login()),
+          ModalRoute.withName('/Home'),
+        );
+* */

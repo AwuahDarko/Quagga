@@ -208,6 +208,14 @@ class ProductUpdateState extends State<ProductUpdate> {
           num = _numStock.text = _product.numberInStock.toString();
           pri = _price.text = _product.price.toString();
           _productId = _product.id;
+
+          // reset stuff
+          _textChange = false;
+          _imageChange = false;
+          _newImage4 = false;
+          _newImage3 = false;
+          _newImage2 = false;
+          _newImage1 = false;
         });
       },
       items: _productList.map((prod) {

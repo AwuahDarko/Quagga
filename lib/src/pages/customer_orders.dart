@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/order_details_model.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/quad_clipper.dart';
-import 'package:quagga/src/wigets/title_text.dart';
+import 'package:http/http.dart' as http;
+
+
+
 
 class CustomerOrderDetailsPage extends StatefulWidget {
   CustomerOrderDetailsPage({Key key}) : super(key: key);
@@ -23,16 +27,19 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
   List<OrderDetailsModel> _list = [];
   bool _loading = true;
 
+  ProgressDialog _progressDialog;
 
   @override
   void initState() {
     super.initState();
+    fetch();
+  }
 
+  void fetch(){
     AppData.fetchCustomerOrderDetails(Utils.customerInfo.userID).then((list) {
       _list = list;
       _loading = false;
-      _list.forEach((oneList) {
-      });
+
       setState(() {});
     });
   }
@@ -57,9 +64,9 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
                     ),
                     name: oneList.productName,
                     qty: oneList.quantity.toString(),
-                    price: oneList.price.toString(),
+                    price: oneList.price.toStringAsFixed(2),
                     status: oneList.status,
-                    pub: oneList.orderKey,
+                    pub: oneList.orderID.toString(),
                     imgPath: "${Utils.url}/api/images?url=${oneList.image}"))
                 .toList()),
       ),
@@ -108,14 +115,14 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
                 Positioned(
                   top: 10,
                   right: 50,
-                  child: _cardInfo(name, qty, price, status, pub,
+                  child: _cardInfo(name, qty, price, status,
                       LightColor.titleTextColor, chipColor,
                       isPrimaryCard: isPrimaryCard),
                 ),
                 Positioned(
                   top: 80,
                   right: 5,
-                  child: _chip(status, primary, height: 5, isPrimaryCard: isPrimaryCard)
+                  child: _chip(status, primary, pub , height: 5, isPrimaryCard: isPrimaryCard)
                 )
               ],
             ),
@@ -124,7 +131,7 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
   }
 
   Widget _cardInfo(String name, String qty, String price, String status,
-      String pub, Color textColor, Color primary,
+      Color textColor, Color primary,
       {bool isPrimaryCard = false}) {
     return Align(
       alignment: Alignment.bottomLeft,
@@ -188,7 +195,7 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
     );
   }
 
-  Widget _chip(String text, Color textColor,
+  Widget _chip(String text, Color textColor, String pub,
       {double height = 0, bool isPrimaryCard = false}) {
     return Container(
       alignment: Alignment.center,
@@ -206,7 +213,21 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
           style: TextStyle(color: Colors.white, fontSize: 14),
         ),
         onTap: () async{
-         await Utils.requestAndWaitForAction(context,'Did you receive this order ?');
+        bool response = await Utils.requestAndWaitForAction(context,'Did you receive this order ?');
+        if(response){
+          _progressDialog.show();
+         bool status = await _confirmOrderReceived(pub);
+          Future.delayed(Duration(seconds: 1)).then((value) {
+            _progressDialog.hide().whenComplete(() {
+              Utils.showStatus(
+                  context, status, "Ok");
+              setState(() {
+                _loading = true;
+                fetch();
+              });
+            });
+          });
+        }
         },
       )
           : Text('pending payment',
@@ -257,6 +278,7 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
+    _progressDialog = Utils.initializeProgressDialog(context);
 
     return Scaffold(
         body: SingleChildScrollView(
@@ -278,4 +300,17 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
           ),
         ));
   }
+
+  Future<bool> _confirmOrderReceived(id) async{
+    String url = Utils.url +  "/api/deliver-order?order_id=$id";
+
+    var res = await http.get(url, headers: {'Authorization': Utils.token});
+
+    if(res.statusCode == 200){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
 }

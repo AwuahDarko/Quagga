@@ -199,8 +199,8 @@ class AppData {
     return mList;
   }
 
-  static Future<List<OrderSummary>> getOrderSummary(int id) async {
-    String url = Utils.url + "/api/store-orders?customer_id=$id";
+  static Future<List<OrderSummary>> getOrderSummary() async {
+    String url = Utils.url + "/api/store-orders";
 
     var res = await http.get(url, headers: {"Authorization": Utils.token});
 
@@ -220,7 +220,7 @@ class AppData {
             image: userInfo['image_url'],
             phone: userInfo['phone'],
             username: userInfo['username'],
-            location: userInfo['location']));
+            location: userInfo['location'] == null ? 'No location': userInfo['location']));
       });
     }
 
@@ -286,7 +286,7 @@ class AppData {
       dataList.forEach((oneData) {
         mList.add(OrderDetailsModel(
             productName: oneData['product_name'],
-            image: oneData['image_url'],
+            image: oneData['image'],
             quantity: oneData['quantity'],
             orderID: oneData['order_id'],
             orderKey: oneData['order_key'],

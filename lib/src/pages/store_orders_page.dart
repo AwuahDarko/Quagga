@@ -28,7 +28,7 @@ class StoreOrdersPageState extends State<StoreOrdersPage> {
   @override
   void initState() {
     super.initState();
-    AppData.getOrderSummary(Utils.customerInfo.userID).then((result) {
+    AppData.getOrderSummary().then((result) {
       orderSummaryList = result;
       _loading = false;
       setState(() {});
@@ -104,8 +104,7 @@ class StoreOrdersPageState extends State<StoreOrdersPage> {
             children: orderSummaryList
                 .map(
                   (oneSum) => _orderInfo(
-                      oneSum,
-                      _decorationContainerB(oneSum.image),
+                      oneSum, _decorationContainerB(oneSum.image),
                       background: LightColor.darkOrange),
                 )
                 .toList()),
@@ -149,105 +148,107 @@ class StoreOrdersPageState extends State<StoreOrdersPage> {
               ),
               Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(height: 15),
-                      Container(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(model.name,
-                                  style: TextStyle(
-                                      color: LightColor.purple,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                            CircleAvatar(
-                              radius: 3,
-                              backgroundColor: background,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Text("",
-                                style: TextStyle(
-                                  color: LightColor.grey,
-                                  fontSize: 14,
-                                )),
-                            SizedBox(width: 10)
-                          ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 15),
+                  Container(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(model.name,
+                              style: TextStyle(
+                                  color: LightColor.purple,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold)),
                         ),
-                      ),
-                      Text(model.username,
-                          style: AppTheme.h6Style.copyWith(
-                            fontSize: 16,
-                            color: LightColor.grey,
-                          )),
-                      SizedBox(height: 15),
-                      Container(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.location_on,
-                                color: Colors.deepOrange,
-                                size: 16.0,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(model.location,
-                                  overflow: TextOverflow.fade,
-                                  style: AppTheme.h6Style.copyWith(
-                                      fontSize: 16,
-                                      color: LightColor.extraDarkPurple))
-                            ],
+                        CircleAvatar(
+                          radius: 3,
+                          backgroundColor: background,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text("",
+                            style: TextStyle(
+                              color: LightColor.grey,
+                              fontSize: 14,
+                            )),
+                        SizedBox(width: 10)
+                      ],
+                    ),
+                  ),
+                  Text(model.username,
+                      style: AppTheme.h6Style.copyWith(
+                        fontSize: 16,
+                        color: LightColor.grey,
+                      )),
+                  SizedBox(height: 15),
+                  Container(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.location_on,
+                            color: Colors.deepOrange,
+                            size: 16.0,
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      Container(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: <Widget>[
-                              _chip(model.email, LightColor.darkOrange, height: 5),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              _chip(model.phone, LightColor.darkBlue, height: 5),
-                            ],
+                          SizedBox(
+                            width: 10,
                           ),
-                        ),
+                          Text(model.location,
+                              overflow: TextOverflow.fade,
+                              style: AppTheme.h6Style.copyWith(
+                                  fontSize: 16,
+                                  color: LightColor.extraDarkPurple))
+                        ],
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: <Widget>[
-                              Text("Order ID:",style: TextStyle(color: Colors.green),),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(model.publicID)
-                            ],
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Container(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: <Widget>[
+                          _chip(model.email, LightColor.darkOrange, height: 5),
+                          SizedBox(
+                            width: 10,
                           ),
-                        ),
+                          _chip(model.phone, LightColor.darkBlue, height: 5),
+                        ],
                       ),
-                    ],
-                  ))
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            "Order ID:",
+                            style: TextStyle(color: Colors.green),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(model.publicID)
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ))
             ],
           )),
-      onTap: (){
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) {
-              return OrderDetailsPage(model.publicID);
-            }));
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return OrderDetailsPage(model.publicID);
+        }));
       },
     );
   }
@@ -300,8 +301,9 @@ class StoreOrdersPageState extends State<StoreOrdersPage> {
             child: CircleAvatar(
               backgroundColor: LightColor.yellow,
               radius: 45,
-              backgroundImage: imageUrl.isEmpty ? Image.asset("assets/avatar.jpeg").image:
-              NetworkImage('${Utils.url}/api/images?url=$imageUrl'),
+              backgroundImage: imageUrl.isEmpty
+                  ? Image.asset("assets/avatar.jpeg").image
+                  : NetworkImage('${Utils.url}/api/images?url=$imageUrl'),
             )),
       ],
     );
@@ -317,12 +319,17 @@ class StoreOrdersPageState extends State<StoreOrdersPage> {
         children: <Widget>[
           _header(context),
           SizedBox(height: 20),
-         _loading ? Center(child: CircularProgressIndicator(),) : _courseList()
+          _loading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : orderSummaryList.length == 0
+                  ? Center(
+                      child: Text('No Orders yet'),
+                    )
+                  : _courseList()
         ],
       ),
     )));
   }
-
 }
-
-

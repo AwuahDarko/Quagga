@@ -62,7 +62,7 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                     name: oneList.productName,
                     qty: oneList.quantity.toString(),
-                    price: oneList.price.toString(),
+                    price: oneList.price.toStringAsFixed(2),
                     status: oneList.status,
                     pub: oneList.orderKey,
                     imgPath: "${Utils.url}/api/images?url=${oneList.image}"))
@@ -190,9 +190,7 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: height),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(15)),
-        color: text == 'paid'
-            ? Colors.green.withAlpha(150)
-            : Colors.orange.withAlpha(150),
+        color: setColor(text),
       ),
       child: Text(
         text,
@@ -258,7 +256,7 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               SizedBox(width: 5,),
               TitleText(
-                text: "$_total",
+                text: "${_total.toStringAsFixed(2)}",
                 color: LightColor.orange,
               ),
               SizedBox(width: 20,),
@@ -275,5 +273,11 @@ class OrderDetailsPageState extends State<OrderDetailsPage> {
             children: <Widget>[SizedBox(height: 0), _featuredRowB(context)],
           ),
         ));
+  }
+
+  setColor(text){
+    if(text == 'delivered') return Colors.green.withAlpha(150);
+    if(text == 'pending') return Colors.red.withAlpha(150);
+    if(text == 'paid') return Colors.orange.withAlpha(150);
   }
 }

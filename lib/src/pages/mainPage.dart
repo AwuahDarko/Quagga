@@ -107,15 +107,15 @@ class _MainPageState extends State<MainPage> {
       });
     } else if (index == 3) {
       setState(() {
-        isWishPageSelected = true;
+        isWishPageSelected = false;
         isShoppingCartSelected = false;
         isHomePageSelected = false;
-        isCustomerOrderPageSelected = false;
+        isCustomerOrderPageSelected = true;
       });
     } else if (index == 1) {
       setState(() {
-        isCustomerOrderPageSelected = true;
-        isWishPageSelected = false;
+        isCustomerOrderPageSelected = false;
+        isWishPageSelected = true;
         isShoppingCartSelected = false;
         isHomePageSelected = false;
       });
@@ -143,8 +143,9 @@ class _MainPageState extends State<MainPage> {
                         : Colors.white,
               ),
             ),
-            _distributorMenu(),
-//            _customerMenu(),
+            Utils.customerInfo.role == 'distributor'
+                ? _distributorMenu()
+                : _customerMenu(),
           ],
         ),
       ),
@@ -278,13 +279,13 @@ class _MainPageState extends State<MainPage> {
             Navigator.of(context).pushNamed('/removeproduct');
           },
         ),
-//        ListTile(
-//          leading: Icon(Icons.update, color: LightColor.orange),
-//          title: Text("Update sub-product"),
-//          onTap: () {
-//            Navigator.of(context).pushNamed('/subproduct');
-//          },
-//        ),
+        ListTile(
+          leading: FaIcon(FontAwesomeIcons.moneyBillAlt,size: 20 ,color: LightColor.orange,),
+          title: Text("Earnings"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/earnings');
+          },
+        ),
         ListTile(
           leading: Icon(
             Icons.person,

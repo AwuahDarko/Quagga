@@ -146,7 +146,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                         fontSize: 12,
                       ),
                       TitleText(
-                        text: model.price.toString(),
+                        text: '${model.price.toStringAsFixed(2)}',
                         fontSize: 14,
                       ),
                     ],
@@ -179,7 +179,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           fontWeight: FontWeight.w500,
         ),
         TitleText(
-          text: 'GH\u20B5  ${getPrice()}',
+          text: 'GH\u20B5  ${getPrice().toStringAsFixed(2)}',
           fontSize: 18,
         ),
       ],
@@ -223,10 +223,10 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                     if(_progressDialog.isShowing()){
                       _progressDialog.hide().then((v){
                         Utils.showStatus(context, status, "Your order was successful");
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                              return CustomerOrderDetailsPage();
-                            }));
+//                        Navigator.push(context,
+//                            MaterialPageRoute(builder: (context) {
+//                              return CustomerOrderDetailsPage();
+//                            }));
                       });
                     }
 
