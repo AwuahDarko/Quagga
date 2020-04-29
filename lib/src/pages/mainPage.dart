@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_launch/flutter_launch.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quagga/src/pages/customer_orders.dart';
 import 'package:quagga/src/pages/shoping_cart_page.dart';
@@ -28,6 +31,18 @@ class _MainPageState extends State<MainPage> {
   bool isCustomerOrderPageSelected = false;
   bool isWishPageSelected = false;
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
+
+  int _backPressedCount = 0;
+
+  var timeout = const Duration(seconds: 5);
+
+  startTimeout() {
+    return new Timer(timeout, handleTimeout);
+  }
+
+  void handleTimeout() {  // callback function
+    _backPressedCount = 0;
+  }
 
   Widget _appBar() {
     return Container(
@@ -121,71 +136,94 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  Future<bool> _monitorBackPress() async{
+    ++_backPressedCount;
+    if(_backPressedCount == 1){
+      Fluttertoast.showToast(
+          msg: 'Press again to exit',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.black,
+          textColor: Colors.white);
+
+      startTimeout();
+    }
+
+    if(_backPressedCount == 2){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _globalKey,
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text(
-                  '${Utils.customerInfo.fName} ${Utils.customerInfo.sName}'),
-              accountEmail: Text(Utils.customerInfo.email),
-              currentAccountPicture: CircleAvatar(
-                backgroundImage: Utils.customerInfo.image == ''
-                    ? Image.asset('assets/avatar.jpeg').image
-                    : NetworkImage(Utils.customerInfo.image),
-                backgroundColor:
-                    Theme.of(context).platform == TargetPlatform.iOS
-                        ? Colors.blue
-                        : Colors.white,
-              ),
-            ),
-            Utils.customerInfo.role == 'distributor'
-                ? _distributorMenu()
-                : _customerMenu(),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Container(
-                height: AppTheme.fullHeight(context) - 100,
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                  colors: [
-                    Color(0xfffbfbfb),
-                    Color(0xfff7f7f7),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    _appBar(),
-                    _title(),
-                    Expanded(
-                        child: AnimatedSwitcher(
-                            duration: Duration(milliseconds: 300),
-                            switchInCurve: Curves.easeInToLinear,
-                            switchOutCurve: Curves.easeOutBack,
-                            child: _screenToShow()))
-                  ],
+    return WillPopScope(
+      onWillPop: _monitorBackPress,
+      child: Scaffold(
+        key: _globalKey,
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: Text(
+                    '${Utils.customerInfo.fName} ${Utils.customerInfo.sName}'),
+                accountEmail: Text(Utils.customerInfo.email),
+                currentAccountPicture: CircleAvatar(
+                  backgroundImage: Utils.customerInfo.image == ''
+                      ? Image.asset('assets/avatar.jpeg').image
+                      : NetworkImage(Utils.customerInfo.image),
+                  backgroundColor:
+                  Theme.of(context).platform == TargetPlatform.iOS
+                      ? Colors.blue
+                      : Colors.white,
                 ),
               ),
-            ),
-            Positioned(
-                bottom: 0,
-                right: 0,
-                child: CustomBottomNavigationBar(
-                  onIconPressedCallback: onBottomIconPressed,
-                ))
-          ],
+              Utils.customerInfo.role == 'distributor'
+                  ? _distributorMenu()
+                  : _customerMenu(),
+            ],
+          ),
+        ),
+        body: SafeArea(
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              SingleChildScrollView(
+                child: Container(
+                  height: AppTheme.fullHeight(context) - 100,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xfffbfbfb),
+                          Color(0xfff7f7f7),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      )),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      _appBar(),
+                      _title(),
+                      Expanded(
+                          child: AnimatedSwitcher(
+                              duration: Duration(milliseconds: 300),
+                              switchInCurve: Curves.easeInToLinear,
+                              switchOutCurve: Curves.easeOutBack,
+                              child: _screenToShow()))
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: CustomBottomNavigationBar(
+                    onIconPressedCallback: onBottomIconPressed,
+                  ))
+            ],
+          ),
         ),
       ),
     );
@@ -313,23 +351,26 @@ class _MainPageState extends State<MainPage> {
         ListTile(
           leading: Icon(Icons.phone_android, color: LightColor.orange),
           title: Text("Call Us"),
-          onTap: () => launch('tel:+233553567136'),
+          onTap: () => launch('tel:+233248900412'),
         ),
         ListTile(
-          leading: Icon(Icons.feedback, color: LightColor.orange),
+          leading: Icon(Icons.email, color: LightColor.orange),
           title: Text("By Email"),
-          onTap: () => launch('mailto:mjadarko@gmail.com'),
+          onTap: () => launch('mailto:gyamfidnl25@gmail.com'),
         ),
         ListTile(
-          leading: Icon(Icons.feedback, color: LightColor.orange),
+          leading: Icon(Icons.message, color: LightColor.orange),
           title: Text("By SMS"),
-          onTap: () => launch('sms:+233553567136'),
+          onTap: () => launch('sms:+233248900412'),
         ),
         ListTile(
-          leading: Icon(Icons.feedback, color: LightColor.orange),
+          leading: FaIcon(
+            FontAwesomeIcons.whatsapp,
+            color: Colors.lightGreen,
+          ),
           title: Text("WhatsApp"),
           onTap: () async => await FlutterLaunch.launchWathsApp(
-              phone: '+233553567136', message: ''),
+              phone: '+233248900412', message: ''),
         ),
         Divider(),
         ListTile(
@@ -394,17 +435,17 @@ class _MainPageState extends State<MainPage> {
         ListTile(
           leading: Icon(Icons.phone_android, color: LightColor.orange),
           title: Text("Call Us"),
-          onTap: () => launch('tel:+233553567136'),
+          onTap: () => launch('tel:+233248900412'),
         ),
         ListTile(
           leading: Icon(Icons.email, color: LightColor.orange),
           title: Text("By Email"),
-          onTap: () => launch('mailto:mjadarko@gmail.com'),
+          onTap: () => launch('mailto:gyamfidnl25@gmail.com'),
         ),
         ListTile(
           leading: Icon(Icons.message, color: LightColor.orange),
           title: Text("By SMS"),
-          onTap: () => launch('sms:+233553567136'),
+          onTap: () => launch('sms:+233248900412'),
         ),
         ListTile(
           leading: FaIcon(
@@ -413,7 +454,7 @@ class _MainPageState extends State<MainPage> {
           ),
           title: Text("WhatsApp"),
           onTap: () async => await FlutterLaunch.launchWathsApp(
-              phone: '+233553567136', message: ''),
+              phone: '+233248900412', message: ''),
         ),
         Divider(),
         ListTile(

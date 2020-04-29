@@ -389,7 +389,7 @@ class ProductUpdateState extends State<ProductUpdate> {
             Navigator.of(context).pop();
           },
         ),
-        title: Text("New Product"),
+        title: Text("Update Product"),
         actions: <Widget>[
           Container(
             width: 80,

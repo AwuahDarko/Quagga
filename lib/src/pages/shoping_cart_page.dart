@@ -197,7 +197,9 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   Widget _submitButton(BuildContext context) {
     return FlatButton(
         onPressed: () async {
-          if (AppData.cartList.length > 0) {}
+          if (AppData.cartList.length > 0) {
+            _performPayment();
+          }
         },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         color: LightColor.orange,
@@ -635,9 +637,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     }
   }
 
-  void performPayment() async {
+  void _performPayment() async {
     bool answer = await placeOrderDialog(context);
-
     if (answer) {
       bool choice = await Utils.requestAndWaitForAction(
           context, 'Use ${Utils.customerInfo.phone} for this transaction ?');
@@ -645,6 +646,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
         bool value = await phoneNumberDialog(context);
         if (value) phoneNumber = phoneController.text;
       }
+
+      _progressDialog.show();
       // continue with MoMo transaction
       // 1. generate api user
       bool one = await _generateAPIUser();
@@ -675,25 +678,43 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                       await _placeOrder();
                     } else {
                       // FATAL ERROR
+                      print('Status pending still...');
                     }
                   }
                 }
               }
             } else {
-              showFailedDialog(context);
-              return;
+              Future.delayed(Duration(seconds: 1)).then((value) {
+                _progressDialog.hide().whenComplete(() {
+                  showFailedDialog(context);
+                });
+              });
+
+//              return;
             }
           } else {
-            showFailedDialog(context);
-            return;
+            Future.delayed(Duration(seconds: 1)).then((value) {
+              _progressDialog.hide().whenComplete(() {
+                showFailedDialog(context);
+              });
+            });
+//            return;
           }
         } else {
-          showFailedDialog(context);
-          return;
+          Future.delayed(Duration(seconds: 1)).then((value) {
+            _progressDialog.hide().whenComplete(() {
+              showFailedDialog(context);
+            });
+          });
+//          return;
         }
       } else {
-        showFailedDialog(context);
-        return;
+        Future.delayed(Duration(seconds: 1)).then((value) {
+          _progressDialog.hide().whenComplete(() {
+            showFailedDialog(context);
+          });
+        });
+//        return;
       }
     }
   }

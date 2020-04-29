@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:quagga/src/model/store_earnings_model.dart';
 import 'package:quagga/src/utils/utils.dart';
-//import 'package:bidirectional_scroll_view/bidirectional_scroll_view.dart';
+import 'package:bidirectional_scroll_view/bidirectional_scroll_view.dart';
 
 class StoreEarnings extends StatefulWidget {
   @override
@@ -66,9 +66,7 @@ class StoreEarningsState extends State<StoreEarnings> {
 
   Widget _drawTable(List<EarningData> data) {
 //    data.sort((a, b) => a.name.compareTo(b.name));
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      //BidirectionalScrollViewPlugin
+    return BidirectionalScrollViewPlugin(
       child: DataTable(
           onSelectAll: (b) {},
           sortColumnIndex: 3,

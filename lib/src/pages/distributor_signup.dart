@@ -191,14 +191,14 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
                 "zamra_licence_number": zamra,
                 "hpcz_certificate_number": hpcz
               };
-              _signUpNewStore(body).then((status) async{
-                if(status == false){
+              _signUpNewStore(body).then((status) async {
+                if (status == false) {
                   Future.delayed(Duration(seconds: 1)).then((value) {
                     _progressDialog.hide().whenComplete(() {
-                      showStatus(context,  _message);
+                      showStatus(context, _message);
                     });
                   });
-                }else{
+                } else {
                   await _uploadImage(status, _image_1, '/api/cert-corp');
                   await _uploadImage(status, _image_2, '/api/zamra');
                   await _uploadImage(status, _image_3, '/api/hpcz-full');
@@ -207,7 +207,9 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
 
                   Future.delayed(Duration(seconds: 1)).then((value) {
                     _progressDialog.hide().whenComplete(() {
-                      Utils.showStatusAndWaitForAction(context, true, _message)
+                      Utils.showStatusAndWaitForAction(context, true,
+                              'Your application is currently being reviewed,'
+                                  ' you will notified of any progress soon')
                           .then((value) {
                         if (value) {
                           // move to login
@@ -216,16 +218,18 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
 
                           Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
-                                  (Route<dynamic> route) => false // removes all routes below
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      LoginPage()),
+                              (Route<dynamic> route) =>
+                                  false // removes all routes below
 //                        ModalRoute.withName('/Home'), // removes all routes until named route
-                          );
+                              );
                         }
                       });
                     });
                   });
                 }
-
               });
             }
           } else {
@@ -254,9 +258,9 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
         headers: {"Content-Type": "application/json"}, body: json);
 
     if (res.statusCode == 200 || res.statusCode == 201) {
-        Map<String, dynamic> map = jsonDecode(res.body);
-        
-        return map['store_id'];
+      Map<String, dynamic> map = jsonDecode(res.body);
+
+      return map['store_id'];
     } else {
       setState(() {
         _message = res.body;
@@ -287,10 +291,10 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
 
   void showStatus(BuildContext context, String message) {
     var alertDialog = AlertDialog(
-      title: Text("Message", style: TextStyle(
-          fontSize: 20,
-          color: Colors.green
-      ),),
+      title: Text(
+        "Message",
+        style: TextStyle(fontSize: 20, color: Colors.green),
+      ),
       content: Text(message),
     );
 
@@ -348,10 +352,11 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
         Container(
           child: Row(
             children: <Widget>[
-              Flexible(
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
                 child: Text(
                   _imageName1,
-                  overflow: TextOverflow.visible,
+                  overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   softWrap: false,
                 ),
@@ -363,7 +368,7 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
                 onPressed: () {
                   Utils.photoOptionDialog(context).then((value) {
                     if (value == 2) {
-                      Utils.getImageFromCamera(context).then((file) {
+                      Utils.getImageFromCamera(context).then((file) async {
                         _image_1 = file;
                         if (_image_1 != null) {
                           _imageName1 = file.path.split('/').last;
@@ -388,10 +393,11 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
         Container(
           child: Row(
             children: <Widget>[
-              Flexible(
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
                 child: Text(
-                  _imageName2 + '                     ',
-                  overflow: TextOverflow.visible,
+                  _imageName2,
+                  overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   softWrap: false,
                 ),
@@ -428,10 +434,11 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
         Container(
           child: Row(
             children: <Widget>[
-              Flexible(
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
                 child: Text(
                   _imageName3,
-                  overflow: TextOverflow.visible,
+                  overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   softWrap: false,
                 ),
@@ -468,10 +475,11 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
         Container(
           child: Row(
             children: <Widget>[
-              Flexible(
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
                 child: Text(
-                  _imageName4 + '                  ',
-                  overflow: TextOverflow.visible,
+                  _imageName4,
+                  overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   softWrap: false,
                 ),
@@ -508,14 +516,15 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
         Container(
           child: Row(
             children: <Widget>[
-              Flexible(
-                child: Text(
-                  _imageName5 + '                  ',
-                  overflow: TextOverflow.visible,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
+//              Flexible(
+//                child:
+              Text(
+                _imageName5 + '                  ',
+                overflow: TextOverflow.visible,
+                maxLines: 1,
+                softWrap: false,
               ),
+//              ),
               Spacer(),
               RaisedButton(
                 color: LightColor.lightOrange,

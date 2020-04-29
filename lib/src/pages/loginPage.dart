@@ -10,7 +10,6 @@ import 'package:quagga/src/wigets/bezierContainer.dart';
 import 'package:http/http.dart' as http;
 import 'mainPage.dart';
 
-
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
 
@@ -113,15 +112,22 @@ class _LoginPageState extends State<LoginPage> {
             _showProgress = true;
           });
           _validateLogin(email.trim(), password.trim()).then((bool status) {
-
             if (status) {
               AppData.fetchAllStores().then((v) {
                 setState(() {
                   _message = "";
                   _showProgress = false;
 
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => MainPage()));
+//                  Navigator.push(
+//                      context, MaterialPageRoute(builder: (context) => MainPage()));
+
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => MainPage()),
+                      (Route<dynamic> route) => false // removes all routes below
+//                        ModalRoute.withName('/Home'), // removes all routes until named route
+                      );
                 });
               });
             }
@@ -271,12 +277,9 @@ class _LoginPageState extends State<LoginPage> {
 
     String json = jsonEncode(body);
 
-
     try {
-      var res =
-          await http.post(url, headers: {
-            "Content-Type": "application/json"
-          }, body: json);
+      var res = await http.post(url,
+          headers: {"Content-Type": "application/json"}, body: json);
 
       print(res.statusCode);
 
@@ -304,7 +307,7 @@ class _LoginPageState extends State<LoginPage> {
             userInfo['location']);
 
         return true;
-      }else{
+      } else {
         setState(() {
           _showProgress = false;
           _message = res.body;
