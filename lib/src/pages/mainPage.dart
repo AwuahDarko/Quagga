@@ -11,7 +11,6 @@ import 'package:quagga/src/wigets/BottomNavigationBar/bottom_navigation_bar.dart
 import 'package:quagga/src/wigets/title_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 import 'home_page.dart';
 
 class MainPage extends StatefulWidget {
@@ -253,9 +252,16 @@ class _MainPageState extends State<MainPage> {
         ),
         ListTile(
           leading: Icon(Icons.local_shipping, color: LightColor.orange),
-          title: Text("Orders"),
+          title: Text("New Orders"),
           onTap: () {
             Navigator.of(context).pushNamed('/ordersummary');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.local_shipping, color: LightColor.orange),
+          title: Text("Old Orders"),
+          onTap: () {
+            Navigator.of(context).pushNamed('/oldordersummary');
           },
         ),
         ListTile(
@@ -280,7 +286,11 @@ class _MainPageState extends State<MainPage> {
           },
         ),
         ListTile(
-          leading: FaIcon(FontAwesomeIcons.moneyBillAlt,size: 20 ,color: LightColor.orange,),
+          leading: FaIcon(
+            FontAwesomeIcons.moneyBillAlt,
+            size: 20,
+            color: LightColor.orange,
+          ),
           title: Text("Earnings"),
           onTap: () {
             Navigator.of(context).pushNamed('/earnings');
@@ -318,7 +328,8 @@ class _MainPageState extends State<MainPage> {
         ListTile(
           leading: Icon(Icons.feedback, color: LightColor.orange),
           title: Text("WhatsApp"),
-          onTap: () async => await FlutterLaunch.launchWathsApp(phone: '+233553567136', message: ''),
+          onTap: () async => await FlutterLaunch.launchWathsApp(
+              phone: '+233553567136', message: ''),
         ),
         Divider(),
         ListTile(
@@ -341,11 +352,10 @@ class _MainPageState extends State<MainPage> {
           },
         ),
         ListTile(
-          leading: Icon(Icons.business, color: LightColor.orange),
-          title: Text("About Us"),
-          onTap: () => Navigator.of(context).pushNamed('/privacy',
-              arguments: {'head': 'About Us', 'file': 'about.pdf'})
-        ),
+            leading: Icon(Icons.business, color: LightColor.orange),
+            title: Text("About Us"),
+            onTap: () => Navigator.of(context).pushNamed('/privacy',
+                arguments: {'head': 'About Us', 'file': 'about.pdf'})),
         Divider(),
         ListTile(
           title: Text("App"),
@@ -397,9 +407,13 @@ class _MainPageState extends State<MainPage> {
           onTap: () => launch('sms:+233553567136'),
         ),
         ListTile(
-          leading: FaIcon(FontAwesomeIcons.whatsapp, color: Colors.lightGreen,),
+          leading: FaIcon(
+            FontAwesomeIcons.whatsapp,
+            color: Colors.lightGreen,
+          ),
           title: Text("WhatsApp"),
-          onTap: () async => await FlutterLaunch.launchWathsApp(phone: '+233553567136', message: ''),
+          onTap: () async => await FlutterLaunch.launchWathsApp(
+              phone: '+233553567136', message: ''),
         ),
         Divider(),
         ListTile(
@@ -408,10 +422,10 @@ class _MainPageState extends State<MainPage> {
         ListTile(
           leading: Icon(Icons.book, color: LightColor.orange),
           title: Text("Terms & Conditions"),
-          onTap: (){
+          onTap: () {
             Navigator.of(context).pushNamed('/privacy',
-              arguments: {'head': 'Terms & Conditions', 'file': 'terms.pdf'});
-            },
+                arguments: {'head': 'Terms & Conditions', 'file': 'terms.pdf'});
+          },
         ),
         ListTile(
           leading: Icon(Icons.poll, color: LightColor.orange),
@@ -422,11 +436,10 @@ class _MainPageState extends State<MainPage> {
           },
         ),
         ListTile(
-          leading: Icon(Icons.business, color: LightColor.orange),
-          title: Text("About Us"),
+            leading: Icon(Icons.business, color: LightColor.orange),
+            title: Text("About Us"),
             onTap: () => Navigator.of(context).pushNamed('/privacy',
-                arguments: {'head': 'About Us', 'file': 'about.pdf'})
-        ),
+                arguments: {'head': 'About Us', 'file': 'about.pdf'})),
         Divider(),
         ListTile(
           title: Text("App"),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quagga/src/pages/customer_orders.dart';
 import 'package:quagga/src/pages/new_category.dart';
 import 'package:quagga/src/pages/new_product.dart';
+import 'package:quagga/src/pages/old_orders.dart';
 import 'package:quagga/src/pages/read_file.dart';
 import 'package:quagga/src/pages/product_detail.dart';
 import 'package:quagga/src/pages/profile_page.dart';
@@ -26,7 +27,8 @@ class Routes {
       '/privacy': (_) => ReadFile(),
       '/updateproduct': (_) => ProductUpdate(),
       '/removeproduct': (_) => RemoveProduct(),
-      '/earnings': (_) => StoreEarnings()
+      '/earnings': (_) => StoreEarnings(),
+      '/oldordersummary': (_) => StoreOldOrdersPage(),
     };
   }
 }

@@ -12,6 +12,10 @@ class Utils {
   //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000' http://api.piuniversal.com:4000
   static String token = '';
   static CustomerInfo customerInfo;
+  static String momoCallbackUrl = 'https://event360-gh.com';
+  static String momoPrimaryKey = '6eeb64c949684cc3a8fe5736d2ef0524';
+  static String momoUrl = 'https://sandbox.momodeveloper.mtn.com';
+
 
   static Future<bool> showStatusAndWaitForAction(
       BuildContext context, bool status, String message) {
@@ -48,7 +52,7 @@ class Utils {
               ),
               FlatButton(
                 child: Text("No", style: TextStyle(color: Colors.red[300]),),
-                onPressed: () => Navigator.pop(context, true),
+                onPressed: () => Navigator.pop(context, false),
               )
             ],
           );

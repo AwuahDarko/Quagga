@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/bezierContainer.dart';
@@ -25,6 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   bool _showProgress = false;
   String _message = "";
+  bool _termsAgreed = false;
 
   Widget _backButton() {
     return InkWell(
@@ -98,43 +100,52 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
       onTap: () {
-        var username = _usernameController.text.trim();
-        var email = _emailController.text.trim();
-        var phone = _phoneController.text.trim();
-        var password = _passwordController.text.trim();
-        var confirm = _confirmController.text.trim();
+        if (_termsAgreed) {
+          var username = _usernameController.text.trim();
+          var email = _emailController.text.trim();
+          var phone = _phoneController.text.trim();
+          var password = _passwordController.text.trim();
+          var confirm = _confirmController.text.trim();
 
-        if (username.isNotEmpty &&
-            email.isNotEmpty &&
-            phone.isNotEmpty &&
-            password.isNotEmpty &&
-            confirm.isNotEmpty) {
-          if (password != confirm) {
-            setState(() {
-              _message = "Passwords do not match";
-            });
+          if (username.isNotEmpty &&
+              email.isNotEmpty &&
+              phone.isNotEmpty &&
+              password.isNotEmpty &&
+              confirm.isNotEmpty) {
+            if (password != confirm) {
+              setState(() {
+                _message = "Passwords do not match";
+              });
+            } else {
+              setState(() {
+                _showProgress = true;
+              });
+              _signUpNewUser(username, email, phone, password).then((status) {
+                Utils.showStatusAndWaitForAction(context, status, _message)
+                    .then((value) {
+                  setState(() {
+                    _showProgress = false;
+                  });
+                  if (status) {
+                    // move to login
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  }
+                });
+              });
+            }
           } else {
             setState(() {
-              _showProgress = true;
-            });
-            _signUpNewUser(username, email, phone, password).then((status) {
-              Utils.showStatusAndWaitForAction(context, status, _message)
-                  .then((value) {
-                setState(() {
-                  _showProgress = false;
-                });
-                if (status) {
-                  // move to login
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => LoginPage()));
-                }
-              });
+              _message = "All fields are required";
             });
           }
         } else {
-          setState(() {
-            _message = "All fields are required";
-          });
+          Fluttertoast.showToast(
+              msg: 'Please read and accept terms & conditions',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              backgroundColor: Colors.black,
+              textColor: Colors.white);
         }
       },
     );
@@ -276,6 +287,34 @@ class _SignUpPageState extends State<SignUpPage> {
                         _emailPasswordWidget(),
                         SizedBox(
                           height: 5,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Checkbox(
+                              value: _termsAgreed,
+                              activeColor: Colors.green,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  _termsAgreed = newValue;
+                                });
+                              },
+                            ),
+                            GestureDetector(
+                              child: Text(
+                                'I agree to the company\'s terms of use',
+                                style: TextStyle(
+                                    color: Colors.green,
+                                    decoration: TextDecoration.underline),
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pushNamed('/privacy',
+                                    arguments: {
+                                      'head': 'Terms & Conditions',
+                                      'file': 'terms.pdf'
+                                    });
+                              },
+                            )
+                          ],
                         ),
                         _submitButton(),
                         Expanded(

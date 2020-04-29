@@ -227,6 +227,34 @@ class AppData {
     return mList;
   }
 
+  static Future<List<OrderSummary>> getOldOrderSummary() async {
+    String url = Utils.url + "/api/order-history";
+
+    var res = await http.get(url, headers: {"Authorization": Utils.token});
+
+    List<OrderSummary> mList = [];
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      List<dynamic> dataList = jsonDecode(res.body);
+
+      dataList.forEach((oneData) {
+        String publicID = oneData['public_id'];
+        Map<String, dynamic> userInfo = oneData['user_info'];
+
+        mList.add(OrderSummary(
+            publicID: publicID,
+            customerID: userInfo['customer_id'],
+            name: '${userInfo['first_name']} ${userInfo['last_name']}',
+            email: userInfo['email'],
+            image: userInfo['image_url'],
+            phone: userInfo['phone'],
+            username: userInfo['username'],
+            location: userInfo['location'] == null ? 'No location': userInfo['location']));
+      });
+    }
+
+    return mList;
+  }
+
   static Future<List<OrderDetailsModel>> fetchOrderDetails(String key) async {
     String url = Utils.url + "/api/store-order-details?public_id=$key";
 

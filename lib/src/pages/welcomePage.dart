@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:quagga/src/pages/distributor_signup.dart';
 import 'package:quagga/src/pages/signup.dart';
 
 import 'loginPage.dart';
@@ -46,7 +47,7 @@ class _WelcomePageState extends State<WelcomePage> {
     return InkWell(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SignUpPage()));
+            context, MaterialPageRoute(builder: (context) => DistributorSignUpPage()));
       },
       child: Container(
         width: MediaQuery.of(context).size.width,

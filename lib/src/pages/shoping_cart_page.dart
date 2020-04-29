@@ -1,17 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/product.dart';
-import 'package:quagga/src/pages/customer_orders.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 import 'package:getflutter/getflutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 class ShoppingCartPage extends StatefulWidget {
   ShoppingCartPage({Key key}) : super(key: key);
@@ -32,8 +33,15 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   ProgressDialog _progressDialog;
   var newFormat = DateFormat('yyyy-MM-dd');
   bool _showBtn = false;
+  var uuid = Uuid();
+  String reference = '';
+  String targetEnvironment = '';
+  String apiKey = '';
+  String accessToken = '';
+  String paymentRef = '';
+  String phoneNumber = Utils.customerInfo.phone;
 
-
+  TextEditingController phoneController = TextEditingController();
 
   @override
   void initState() {
@@ -188,53 +196,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
   Widget _submitButton(BuildContext context) {
     return FlatButton(
-        onPressed: () {
-
-          if(AppData.cartList.length > 0){
-            placeOrderDialog(context).then((bool answer){
-              if(answer){
-                var dt = DateTime.now();
-                var nt = dt.add(Duration(days: 30));
-
-                print(newFormat.format(nt));
-
-                Map<String, dynamic> body = Map();
-                body['customer_id'] = Utils.customerInfo.userID;
-                body['expiry_date'] = nt.toString();
-
-                List<Map<String, dynamic>> productsList = [];
-
-                AppData.cartList.forEach((oneCartItem){
-                  Map<String, dynamic> w  = {
-                    "product_id": oneCartItem.id,
-                    "quantity": oneCartItem.quantity,
-                    "price": oneCartItem.price,
-                    "type": oneCartItem.type
-                  };
-
-                  productsList.add(w);
-                });
-
-                body['products'] = productsList;
-
-                _progressDialog.show().then((v){
-                  AppData.placeOrder(body).then((status){
-
-                    if(_progressDialog.isShowing()){
-                      _progressDialog.hide().then((v){
-                        Utils.showStatus(context, status, "Your order was successful");
-//                        Navigator.push(context,
-//                            MaterialPageRoute(builder: (context) {
-//                              return CustomerOrderDetailsPage();
-//                            }));
-                      });
-                    }
-
-                  });
-                });
-              }
-            });
-          }
+        onPressed: () async {
+          if (AppData.cartList.length > 0) {}
         },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         color: LightColor.orange,
@@ -258,6 +221,22 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     return price;
   }
 
+  void showFailedDialog(BuildContext context) {
+    var alertDialog = AlertDialog(
+      title: Text(
+        "Sorry",
+        style: TextStyle(fontSize: 16, color: Colors.red),
+      ),
+      content: Text("Transaction failed"),
+    );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alertDialog;
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     _progressDialog = Utils.initializeProgressDialog(context);
@@ -272,92 +251,102 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                   top: 0,
                   child: Row(
                     children: <Widget>[
-                     _showBtn ? IconButton(
-                        icon: Icon(
-                          Icons.remove_circle,
-                          color: LightColor.orange,
-                          size: 15.0,
-                        ),
-                        onPressed: () {
-                          if (_currentSelectedItem != null &&
-                              (_currentSelectedItem.quantity >
-                                  _currentSelectedItem.minOrder)) {
-                            _progressDialog.show().then((v) {
-                              _decreaseQuantity(_currentSelectedItem.cartID,
-                                      _currentSelectedItem.quantity)
-                                  .then((status) {
-                                if (_progressDialog.isShowing()) {
-                                  _progressDialog.hide().then((v) {
-                                    if (status) {
-                                      setState(() {
-                                        _currentSelectedItem.quantity -=
-                                            _currentSelectedItem.minOrder;
+                      _showBtn
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.remove_circle,
+                                color: LightColor.orange,
+                                size: 15.0,
+                              ),
+                              onPressed: () {
+                                if (_currentSelectedItem != null &&
+                                    (_currentSelectedItem.quantity >
+                                        _currentSelectedItem.minOrder)) {
+                                  _progressDialog.show().then((v) {
+                                    _decreaseQuantity(
+                                            _currentSelectedItem.cartID,
+                                            _currentSelectedItem.quantity)
+                                        .then((status) {
+                                      if (_progressDialog.isShowing()) {
+                                        _progressDialog.hide().then((v) {
+                                          if (status) {
+                                            setState(() {
+                                              _currentSelectedItem.quantity -=
+                                                  _currentSelectedItem.minOrder;
+                                            });
+                                          }
+                                        });
+                                      }
+                                    });
+                                  });
+                                }
+                              },
+                            )
+                          : Text(""),
+                      SizedBox(width: 10.0),
+                      _showBtn
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.add_circle,
+                                color: LightColor.orange,
+                                size: 15.0,
+                              ),
+                              onPressed: () {
+                                if (_currentSelectedItem != null &&
+                                    (_currentSelectedItem.quantity <
+                                        _currentSelectedItem.numberInStock)) {
+                                  _progressDialog.show().then((v) {
+                                    _increaseQuantity(
+                                            _currentSelectedItem.cartID,
+                                            _currentSelectedItem.quantity)
+                                        .then((status) {
+                                      if (_progressDialog.isShowing()) {
+                                        _progressDialog.hide().then((v) {
+                                          if (status) {
+                                            setState(() {
+                                              _currentSelectedItem.quantity +=
+                                                  _currentSelectedItem.minOrder;
+                                            });
+                                          }
+                                        });
+                                      }
+                                    });
+                                  });
+                                }
+                              })
+                          : Text(""),
+                      SizedBox(width: 10.0),
+                      _showBtn
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: LightColor.orange,
+                                size: 17.0,
+                              ),
+                              onPressed: () {
+                                if (_currentSelectedItem != null) {
+                                  Utils.deleteDialog(
+                                          context, "Delete this item?")
+                                      .then((response) {
+                                    if (response) {
+                                      _progressDialog.show().then((v) {
+                                        _deleteCartItem(
+                                                _currentSelectedItem.cartID)
+                                            .then((status) {
+                                          if (_progressDialog.isShowing()) {
+                                            _progressDialog.hide().then((v) {
+                                              _refreshPage();
+                                              Utils.showStatus(context, status,
+                                                  "Item Deleted");
+                                            });
+                                          }
+                                        });
                                       });
                                     }
                                   });
                                 }
-                              });
-                            });
-                          }
-                        },
-                      ) : Text(""),
-                      SizedBox(width: 10.0),
-                      _showBtn ? IconButton(
-                          icon: Icon(
-                            Icons.add_circle,
-                            color: LightColor.orange,
-                            size: 15.0,
-                          ),
-                          onPressed: () {
-                            if (_currentSelectedItem != null &&
-                                (_currentSelectedItem.quantity <
-                                    _currentSelectedItem.numberInStock)) {
-                              _progressDialog.show().then((v) {
-                                _increaseQuantity(_currentSelectedItem.cartID,
-                                        _currentSelectedItem.quantity)
-                                    .then((status) {
-                                  if (_progressDialog.isShowing()) {
-                                    _progressDialog.hide().then((v) {
-                                      if (status) {
-                                        setState(() {
-                                          _currentSelectedItem.quantity +=
-                                              _currentSelectedItem.minOrder;
-                                        });
-                                      }
-                                    });
-                                  }
-                                });
-                              });
-                            }
-                          }): Text(""),
-                      SizedBox(width: 10.0),
-                     _showBtn ? IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                            color: LightColor.orange,
-                            size: 17.0,
-                          ),
-                          onPressed: () {
-                            if (_currentSelectedItem != null) {
-                              Utils.deleteDialog(context, "Delete this item?")
-                                  .then((response) {
-                                if (response) {
-                                  _progressDialog.show().then((v) {
-                                    _deleteCartItem(_currentSelectedItem.cartID)
-                                        .then((status) {
-                                      if (_progressDialog.isShowing()) {
-                                        _progressDialog.hide().then((v) {
-                                          _refreshPage();
-                                          Utils.showStatus(
-                                              context, status, "Item Deleted");
-                                        });
-                                      }
-                                    });
-                                  });
-                                }
-                              });
-                            }
-                          }) : Text("")
+                              })
+                          : Text("")
                     ],
                   )),
               Positioned(
@@ -384,6 +373,59 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
             ],
           ),
         ));
+  }
+
+  Future<bool> transactionSuccessDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Provide a valid MoMo number"),
+            content:
+                Text('Please approve the transaction and press OK to proceed'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  "Ok",
+                  style: TextStyle(color: Colors.green),
+                ),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+            ],
+          );
+        });
+  }
+
+  Future<bool> phoneNumberDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Provide a valid MoMo number"),
+            content: TextField(
+              keyboardType: TextInputType.phone,
+              controller: phoneController,
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  fillColor: Color(0xfff3f3f4),
+                  filled: true),
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(10),
+              ],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text(
+                  "Ok",
+                  style: TextStyle(color: Colors.green),
+                ),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+            ],
+          );
+        });
   }
 
   Future<bool> _deleteCartItem(int cartId) async {
@@ -446,7 +488,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text("Place order ?"),
+            content: Text("Do you want to place order ?"),
             actions: <Widget>[
               FlatButton(
                 child: Text("Yes"),
@@ -461,5 +503,234 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
             ],
           );
         });
+  }
+
+  Future<bool> _generateAPIUser() async {
+    String url = Utils.momoUrl + '/v1_0/apiuser';
+
+    Map<String, String> map = {"providerCallbackHost": Utils.momoCallbackUrl};
+
+    var json = jsonEncode(map);
+
+    reference = uuid.v4();
+
+    var res = await http.post(url,
+        headers: {
+          'X-Reference-Id': reference,
+          'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+          'Content-Type': 'application/json',
+        },
+        body: json);
+
+    print(res.statusCode);
+    print(res.body);
+    if (res.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> _getCreatedUserInfo() async {
+    String url = Utils.momoUrl + '/v1_0/apiuser/$reference';
+
+    var res = await http.get(
+      url,
+      headers: {'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey},
+    );
+
+    if (res.statusCode == 200) {
+      Map<String, dynamic> response = jsonDecode(res.body);
+      targetEnvironment = response['targetEnvironment'];
+
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> _generateAPIKey() async {
+    String url = Utils.momoUrl + '/v1_0/apiuser/$reference/apikey';
+
+    var res = await http.post(url, headers: {
+      'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+      'Content-Type': 'application/json'
+    });
+
+    if (res.statusCode == 201) {
+      Map<String, dynamic> map = jsonDecode(res.body);
+      apiKey = map['apiKey'];
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> _generateToken() async {
+    String url = Utils.momoUrl + '/collection/token/';
+
+    String basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$reference:$apiKey'));
+
+    var res = await http.post(url, headers: {
+      'Authorization': basicAuth,
+      'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey
+    });
+
+    if (res.statusCode == 200) {
+      Map<String, dynamic> body = jsonDecode(res.body);
+      accessToken = 'access_token';
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> _requestToPay() async {
+    String url = Utils.momoUrl + '/collection/v1_0/requesttopay';
+
+    Map<String, dynamic> body = Map();
+    body['amount'] = '';
+    body['currency'] = 'EUR';
+    body['externalId'] = 'Payment from falcon stores';
+    body['payer'] = {"partyIdType": "MSISDN", "partyId": "02431234568"};
+    body['payerMessage'] = 'Payment for puchase of drugs from falcon stores';
+    body['payeeNote'] = 'Payment for puchase of drugs from falcon stores';
+
+    String json = jsonEncode(body);
+    paymentRef = uuid.v4();
+
+    var res = await http.post(url,
+        headers: {
+          'X-Reference-Id': paymentRef,
+          'X-Target-Environment': targetEnvironment,
+          'Content-Type': 'application/json',
+          'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+          'Authorization': 'Bearer $accessToken'
+        },
+        body: json);
+
+    if (res.statusCode == 202) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<String> _getPaymentStatus() async {
+    String url = Utils.momoUrl + '/collection/v1_0/requesttopay/$paymentRef';
+
+    var res = await http.get(url, headers: {
+      'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+      'X-Target-Environment': targetEnvironment,
+      'Authorization': 'Bearer $accessToken'
+    });
+
+    if (res.statusCode == 200) {
+      Map<String, dynamic> map = jsonDecode(res.body);
+
+      return map['status'];
+    } else {
+      return 'FAILED';
+    }
+  }
+
+  void performPayment() async {
+    bool answer = await placeOrderDialog(context);
+
+    if (answer) {
+      bool choice = await Utils.requestAndWaitForAction(
+          context, 'Use ${Utils.customerInfo.phone} for this transaction ?');
+      if (!choice) {
+        bool value = await phoneNumberDialog(context);
+        if (value) phoneNumber = phoneController.text;
+      }
+      // continue with MoMo transaction
+      // 1. generate api user
+      bool one = await _generateAPIUser();
+      if (one) {
+        // 2. get the created user
+        bool two = await _getCreatedUserInfo();
+        if (two) {
+          // 3. generate API KEY
+          bool three = await _generateAPIKey();
+          if (three) {
+            // 4. get token
+            bool four = await _generateToken();
+            if (four) {
+              // 5. request  to pay
+              bool five = await _requestToPay();
+              if (five) {
+                bool last = await transactionSuccessDialog(context);
+                if (last) {
+                  // 6. get transaction status
+                  var result = await _getPaymentStatus();
+
+                  if (result == 'SUCCESSFUL') {
+                    await _placeOrder();
+                  } else {
+                    // TO DO: REPEAT
+                    var result = await _getPaymentStatus();
+                    if (result == 'SUCCESSFUL') {
+                      await _placeOrder();
+                    } else {
+                      // FATAL ERROR
+                    }
+                  }
+                }
+              }
+            } else {
+              showFailedDialog(context);
+              return;
+            }
+          } else {
+            showFailedDialog(context);
+            return;
+          }
+        } else {
+          showFailedDialog(context);
+          return;
+        }
+      } else {
+        showFailedDialog(context);
+        return;
+      }
+    }
+  }
+
+  Future<void> _placeOrder() async {
+    var dt = DateTime.now();
+    var nt = dt.add(Duration(days: 60));
+
+    print(newFormat.format(nt));
+
+    Map<String, dynamic> body = Map();
+    body['customer_id'] = Utils.customerInfo.userID;
+    body['expiry_date'] = nt.toString();
+
+    List<Map<String, dynamic>> productsList = [];
+
+    AppData.cartList.forEach((oneCartItem) {
+      Map<String, dynamic> w = {
+        "product_id": oneCartItem.id,
+        "quantity": oneCartItem.quantity,
+        "price": oneCartItem.price,
+        "type": oneCartItem.type
+      };
+
+      productsList.add(w);
+    });
+
+    body['products'] = productsList;
+
+    _progressDialog.show().then((v) {
+      AppData.placeOrder(body).then((status) {
+        if (_progressDialog.isShowing()) {
+          _progressDialog.hide().then((v) {
+            Utils.showStatus(context, status, "Your order was successful");
+          });
+        }
+      });
+    });
   }
 }
