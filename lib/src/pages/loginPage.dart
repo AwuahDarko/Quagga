@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/pages/signup.dart';
 import 'package:quagga/src/utils/customer.dart';
+import 'package:quagga/src/utils/database_helper.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/bezierContainer.dart';
 import 'package:http/http.dart' as http;
@@ -24,10 +25,12 @@ class _LoginPageState extends State<LoginPage> {
   String _message = "";
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  DatabaseHelper _databaseHelper = DatabaseHelper();
 
   @override
   void initState() {
     super.initState();
+    _databaseHelper.initializeDatabase();
     _emailController.text = "falcon@gmail.com";
     _passwordController.text = "nature";
   }
@@ -117,9 +120,6 @@ class _LoginPageState extends State<LoginPage> {
                 setState(() {
                   _message = "";
                   _showProgress = false;
-
-//                  Navigator.push(
-//                      context, MaterialPageRoute(builder: (context) => MainPage()));
 
                   Navigator.pushAndRemoveUntil(
                       context,
@@ -305,6 +305,10 @@ class _LoginPageState extends State<LoginPage> {
             userInfo['phone'],
             userInfo['image_url'],
             userInfo['location']);
+
+
+        await _databaseHelper.insertToken(Utils.token);
+        print(await _databaseHelper.getToken());
 
         return true;
       } else {

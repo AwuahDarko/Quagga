@@ -9,11 +9,11 @@ import 'package:quagga/src/wigets/item_quantity.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class Utils {
-  static String url = 'http://192.168.43.111:4000';
+  static String url = 'http://api.piuniversal.com:4000';
   //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000' http://api.piuniversal.com:4000
   static String token = '';
   static CustomerInfo customerInfo;
-  static String momoCallbackUrl = 'https://event360-gh.com';
+  static String momoCallbackUrl = 'https://piuniversal.com';
   static String momoPrimaryKey = '6eeb64c949684cc3a8fe5736d2ef0524';
   static String momoUrl = 'https://sandbox.momodeveloper.mtn.com';
 

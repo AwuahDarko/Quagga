@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:quagga/src/pages/distributor_signup.dart';
 import 'package:quagga/src/pages/signup.dart';
 
+
 import 'loginPage.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -15,6 +16,8 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
+
+
   Widget _submitButton() {
     return InkWell(
       onTap: () {

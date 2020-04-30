@@ -6,9 +6,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quagga/src/pages/customer_orders.dart';
 import 'package:quagga/src/pages/shoping_cart_page.dart';
+import 'package:quagga/src/pages/welcomePage.dart';
 import 'package:quagga/src/pages/wish_list_page.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
+import 'package:quagga/src/utils/database_helper.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/BottomNavigationBar/bottom_navigation_bar.dart';
 import 'package:quagga/src/wigets/title_text.dart';
@@ -32,6 +34,8 @@ class _MainPageState extends State<MainPage> {
   bool isWishPageSelected = false;
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
 
+  DatabaseHelper _databaseHelper = DatabaseHelper();
+
   int _backPressedCount = 0;
 
   var timeout = const Duration(seconds: 5);
@@ -42,6 +46,12 @@ class _MainPageState extends State<MainPage> {
 
   void handleTimeout() {  // callback function
     _backPressedCount = 0;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _databaseHelper.initializeDatabase();
   }
 
   Widget _appBar() {
@@ -407,6 +417,15 @@ class _MainPageState extends State<MainPage> {
             color: LightColor.orange,
           ),
           title: Text("Logout"),
+          onTap: () async {
+            await _databaseHelper.deleteToken();
+
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => WelcomePage()),
+                    (Route<dynamic> route) => false);
+          },
         ),
       ],
     );
@@ -491,6 +510,15 @@ class _MainPageState extends State<MainPage> {
             color: LightColor.orange,
           ),
           title: Text("Logout"),
+          onTap: () async {
+            await _databaseHelper.deleteToken();
+
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => WelcomePage()),
+                    (Route<dynamic> route) => false);
+          },
         ),
       ],
     );
