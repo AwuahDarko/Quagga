@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:quagga/src/model/store_earnings_model.dart';
 import 'package:quagga/src/utils/utils.dart';
-import 'package:bidirectional_scroll_view/bidirectional_scroll_view.dart';
+import 'package:quagga/src/wigets/bidirectional_listview.dart';
+
 
 class StoreEarnings extends StatefulWidget {
   @override
