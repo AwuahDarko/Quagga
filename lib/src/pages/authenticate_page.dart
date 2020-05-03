@@ -24,10 +24,13 @@ class AuthenticatePageState extends State<AuthenticatePage> {
     super.initState();
     _databaseHelper.initializeDatabase().then((v) {
       _databaseHelper.getToken().then((list) {
+
         if (list.length > 0) {
           var map = list[0];
 
-          _authenticate(map['token']).then((bool status) {
+          Utils.token = map['token'];
+
+              _authenticate(map['token']).then((bool status) {
             if (status) {
               AppData.fetchAllStores().then((v) {
                 setState(() {

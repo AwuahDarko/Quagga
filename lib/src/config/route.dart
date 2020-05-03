@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quagga/src/pages/authenticate_page.dart';
 import 'package:quagga/src/pages/customer_orders.dart';
+import 'package:quagga/src/pages/mainPage.dart';
 import 'package:quagga/src/pages/new_category.dart';
 import 'package:quagga/src/pages/new_product.dart';
 import 'package:quagga/src/pages/old_orders.dart';
@@ -18,6 +19,7 @@ class Routes {
   static Map<String, WidgetBuilder> getRoute() {
     return <String, WidgetBuilder>{
       '/': (_) => AuthenticatePage(),
+      '/main': (_) => MainPage(),
       '/welcome': (_) => WelcomePage(),
       '/detail': (_) => ProductDetailPage(),
       '/profile': (_) => ProfilePage(),

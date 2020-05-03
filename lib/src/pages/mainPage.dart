@@ -5,6 +5,7 @@ import 'package:flutter_launch/flutter_launch.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quagga/src/pages/customer_orders.dart';
+import 'package:quagga/src/pages/search_stores.dart';
 import 'package:quagga/src/pages/shoping_cart_page.dart';
 import 'package:quagga/src/pages/welcomePage.dart';
 import 'package:quagga/src/pages/wish_list_page.dart';
@@ -56,9 +57,8 @@ class _MainPageState extends State<MainPage> {
 
   Widget _appBar() {
     return Container(
-      padding: AppTheme.padding,
+      padding: const EdgeInsets.only(left: 10, top: 10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           GestureDetector(
             child: RotatedBox(
@@ -69,10 +69,46 @@ class _MainPageState extends State<MainPage> {
               _globalKey.currentState.openDrawer();
             },
           ),
+          _topOption(),
+//          _search(),
         ],
       ),
     );
   }
+
+  Widget _topOption() {
+//    isHomePageSelected = true;
+//    isShoppingCartSelected = false;
+//    isWishPageSelected = false;
+//    isCustomerOrderPageSelected = false;
+    if(isHomePageSelected){
+      return _search();
+    }
+
+    if(isShoppingCartSelected){
+      return Container(
+        padding: const EdgeInsets.only(left: 20),
+        child: TitleText( text: 'Shopping Cart'),
+      );
+    }
+
+    if(isWishPageSelected){
+      return Container(
+        padding: const EdgeInsets.only(left: 20),
+        child: TitleText( text: 'Wish List'),
+      );;
+    }
+
+    if(isCustomerOrderPageSelected){
+      return Container(
+        padding: const EdgeInsets.only(left: 20),
+        child: TitleText( text: 'My Orders'),
+      );
+    }
+
+    return Text('');
+  }
+
 
   Widget _icon(IconData icon, {Color color = LightColor.iconColor}) {
     return Container(
@@ -99,12 +135,12 @@ class _MainPageState extends State<MainPage> {
               children: <Widget>[
                 TitleText(
                   text: _topHeader(),
-                  fontSize: 27,
+                  fontSize: 15,
                   fontWeight: FontWeight.w400,
                 ),
                 TitleText(
                   text: _subHeader(),
-                  fontSize: 27,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
               ],
@@ -114,8 +150,63 @@ class _MainPageState extends State<MainPage> {
         ));
   }
 
+//  Widget _search() {
+//    return Container(
+//      width: MediaQuery.of(context).size.width * 0.7,
+//      margin: AppTheme.padding,
+//      child: Row(
+//        children: <Widget>[
+//          Expanded(
+//            child: Container(
+//              height: 32,
+//              alignment: Alignment.center,
+//              decoration: BoxDecoration(
+//                  color: LightColor.lightGrey.withAlpha(100),
+//                  borderRadius: BorderRadius.all(Radius.circular(10))),
+//              child: TextField(
+//                decoration: InputDecoration(
+//                    border: InputBorder.none,
+//                    hintText: "Search Distributors",
+//                    hintStyle: TextStyle(fontSize: 12),
+//                    prefixIcon: Icon(Icons.search, size: 18 ,color: Colors.black54)),
+//              ),
+//            ),
+//          ),
+//        ],
+//      ),
+//    );
+//  }
+  Widget _search() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.7,
+      margin: AppTheme.padding,
+      height: 32,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+          color: LightColor.lightGrey.withAlpha(200),
+          borderRadius: BorderRadius.all(Radius.circular(20))),
+      child: RaisedButton(
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SearchStore())),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.search, size: 18, color: Colors.black54),
+              SizedBox(
+                width: 10,
+              ),
+              Text(
+                'Search Distributors',
+                style: TextStyle(color: Colors.grey),
+              )
+            ],
+          )),
+    );
+  }
+
   void onBottomIconPressed(int index) {
-    if (index == 0 /*|| index == 1*/) {
+    if (index == 0) {
       setState(() {
         isHomePageSelected = true;
         isShoppingCartSelected = false;
@@ -201,6 +292,7 @@ class _MainPageState extends State<MainPage> {
             children: <Widget>[
               SingleChildScrollView(
                 child: Container(
+                  width: MediaQuery.of(context).size.width,
                   height: AppTheme.fullHeight(context) - 100,
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -215,7 +307,7 @@ class _MainPageState extends State<MainPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       _appBar(),
-                      _title(),
+//                      _title(),
                       Expanded(
                           child: AnimatedSwitcher(
                               duration: Duration(milliseconds: 300),

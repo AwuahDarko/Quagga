@@ -84,12 +84,14 @@ class AppData {
   }
 
   static Future<List<Product>> fetchAllStoreProducts(storeId) async {
+    print("token ....${Utils.token}");
     List<Product> mList = [];
 
     String url = Utils.url + "/api/products?store_id=$storeId";
 
     var res = await http.get(url, headers: {"Authorization": Utils.token});
 
+//    print(res.body);
     if (res.statusCode == 200) {
       List<dynamic> productData = jsonDecode(res.body);
 

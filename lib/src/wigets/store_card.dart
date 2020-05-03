@@ -38,7 +38,7 @@ class StoreCard extends StatelessWidget {
                   alignment: Alignment.center,
                   children: <Widget>[
                     CircleAvatar(
-                      radius: 50,
+                      radius: 40,
                       backgroundColor: LightColor.orange.withAlpha(40),
                       backgroundImage: model.image.isNotEmpty
                           ? NetworkImage(
@@ -51,12 +51,30 @@ class StoreCard extends StatelessWidget {
                 SizedBox(height: 5),
                 TitleText(
                   text: model.name,
-                  fontSize: 18,
+                  fontSize: 14,
                 ),
-                TitleText(
-                  text: model.streetName,
-                  fontSize: 12,
-                  color: LightColor.grey,
+                Container(
+                  width: 200,
+                  height: 18,
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned(
+                        top: 0,
+                        left: 5,
+                        child:  Icon(Icons.location_on, size: 15, color: LightColor.lightOrange2,),
+                      ),
+                      Positioned(
+                        top: 0,
+                        left: 33,
+                        right: 0,
+                        child: TitleText(
+                          text: model.streetName + '',
+                          fontSize: 12,
+                          color: LightColor.grey,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 SizedBox(height: 5),
               ],

@@ -47,7 +47,7 @@ class DatabaseHelper{
 
   Future<List<Map<String, dynamic>>> getToken() async{
     Database  db = await this.database;
-    var result = await db.rawQuery("SELECT * FROM $table WHERE $colID = 1");
+    var result = await db.rawQuery("SELECT * FROM $table limit 1");
     return result;
   }
 
@@ -58,7 +58,7 @@ class DatabaseHelper{
 
   Future<void> deleteToken() async{
     Database  db = await this.database;
-    await db.rawQuery('DELETE FROM $table where $colID = 1');
+    await db.rawQuery('DELETE FROM $table');
   }
 
   Future<void> dropTable() async{
