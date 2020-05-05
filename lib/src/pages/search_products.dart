@@ -149,7 +149,7 @@ class SearchProductState extends State<SearchProduct>{
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: SearchBar<Product>(
             hintText: "Search Products",
             minimumChars: 2,

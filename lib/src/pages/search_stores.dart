@@ -139,11 +139,8 @@ class SearchStoreState extends State<SearchStore>{
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: SearchBar<Store>(
-//            onCancelled: (){setState(() {
-//              _searching = false;
-//            });},
             minimumChars: 2,
             emptyWidget: ListTile(
               leading: Icon(
@@ -186,11 +183,6 @@ class SearchStoreState extends State<SearchStore>{
 
   Future<List<Store>> _search(String search) async {
     List<Store> list = [];
-
-//    setState(() {
-//      _searching = true;
-//    });
-
 
     AppData.storeList.forEach((oneList) {
       if (oneList.name.toLowerCase().contains(search.toLowerCase())) {

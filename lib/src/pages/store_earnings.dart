@@ -159,30 +159,17 @@ class StoreEarningsState extends State<StoreEarnings> {
 
     var res = await http.get(url, headers: {'Authorization': Utils.token});
 
-    url = Utils.url + '/api/admin/get';
-
-    var res2 = await http.get(url, headers: {'Authorization': Utils.token});
-
-    var discount = 0.00;
-    if (res2.statusCode == 200) {
-      Map<String, dynamic> map = jsonDecode(res2.body);
-      discount = map['discount'];
-    }
-
     List<EarningData> mList = [];
 
     if (res.statusCode == 200) {
 
       List<dynamic> dataList = jsonDecode(res.body);
 
-
       dataList.forEach((oneEarning) {
         List<String> q = oneEarning['created_at'].split('T');
-//        List<String> w = q[0].split('-');
-//        String d = '${w[2]}/${w[1]}/${w[0]}';
         mList.add(EarningData(
             'FAL ${oneEarning['transaction_id'].toString()}',
-            oneEarning['amount'] - (discount * 0.01 * oneEarning['amount']),
+            oneEarning['amount'],
             q[0],
             oneEarning['payment']));
 
