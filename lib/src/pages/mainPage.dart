@@ -183,9 +183,10 @@ class _MainPageState extends State<MainPage> {
       height: 32,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          color: LightColor.lightGrey.withAlpha(200),
+          color: Colors.white70,
           borderRadius: BorderRadius.all(Radius.circular(20))),
-      child: RaisedButton(
+      child: FlatButton(
+        color: Colors.white70,
           onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
