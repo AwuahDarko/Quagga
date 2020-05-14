@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:progress_dialog/progress_dialog.dart';
+import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/bezierContainer.dart';
 import 'package:http/http.dart' as http;
@@ -23,10 +27,18 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmController = TextEditingController();
+  TextEditingController _PharmNumberController = TextEditingController();
 
   bool _showProgress = false;
+  ProgressDialog _progressDialog;
   String _message = "";
   bool _termsAgreed = false;
+
+  File _image_1;
+  File _image_2;
+
+  String _imageName1 = 'Pharmacy Council Licence';
+  String _imageName2 = 'Pharmacy Logo';
 
   Widget _backButton() {
     return InkWell(
@@ -106,32 +118,62 @@ class _SignUpPageState extends State<SignUpPage> {
           var phone = _phoneController.text.trim();
           var password = _passwordController.text.trim();
           var confirm = _confirmController.text.trim();
+          var pharm = _PharmNumberController.text.trim();
 
           if (username.isNotEmpty &&
               email.isNotEmpty &&
               phone.isNotEmpty &&
               password.isNotEmpty &&
-              confirm.isNotEmpty) {
+              confirm.isNotEmpty &&
+              pharm.isNotEmpty) {
             if (password != confirm) {
               setState(() {
                 _message = "Passwords do not match";
               });
-            } else {
+            }else if(password.length < 8){
               setState(() {
-                _showProgress = true;
+                _message = "Passwords mut be at least 8 characters long";
               });
-              _signUpNewUser(username, email, phone, password).then((status) {
-                Utils.showStatusAndWaitForAction(context, status, _message)
-                    .then((value) {
-                  setState(() {
-                    _showProgress = false;
+            } else if(_image_1 == null || _image_2 == null){
+              setState(() {
+                _message = "Upload images";
+              });
+            }else {
+
+              _progressDialog.show();
+              _signUpNewUser(username, email, phone, password, pharm)
+                  .then((status)async {
+
+                if(status == false){
+                  Future.delayed(Duration(seconds: 1)).then((value) {
+                    _progressDialog.hide().whenComplete(() {
+                      showStatus(context, _message);
+                    });
                   });
-                  if (status) {
-                    // move to login
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => LoginPage()));
-                  }
-                });
+                }else{
+                  await _uploadImage(status, _image_1, '/api/profile-licence');
+                  await _uploadImage(status, _image_2, '/api/customer/logo/');
+
+                  Future.delayed(Duration(seconds: 1)).then((value) {
+                    _progressDialog.hide().whenComplete(() {
+                      Utils.showStatusAndWaitForAction(context, true,
+                          'Your application is currently being reviewed,'
+                              ' you will be notified of any progress soon')
+                          .then((value) {
+                        if (value) {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      LoginPage()),
+                                  (Route<dynamic> route) =>
+                              false // removes all routes below
+                          );
+                        }
+                      });
+                    });
+                  });
+                }
               });
             }
           } else {
@@ -151,7 +193,45 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Future<bool> _signUpNewUser(username, email, phone, password) async {
+
+  Future<bool> _uploadImage(int ID, File file, String route) async {
+    String url = Utils.url + '$route';
+
+    var uri = Uri.parse(url);
+    var request = http.MultipartRequest('POST', uri)
+      ..fields['customer_id'] = ID.toString()
+      ..files.add(await http.MultipartFile.fromPath(
+          'image', file.path,
+      ));
+
+    var response = await request.send();
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+
+  void showStatus(BuildContext context, String message) {
+    var alertDialog = AlertDialog(
+      title: Text(
+        "Message",
+        style: TextStyle(fontSize: 20, color: Colors.green),
+      ),
+      content: Text(message),
+    );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alertDialog;
+        });
+  }
+
+  Future<dynamic> _signUpNewUser(username, email, phone, password, pharm) async {
     String url = Utils.url + '/api/sign-up';
     var body = {
       'first_name': username,
@@ -160,25 +240,32 @@ class _SignUpPageState extends State<SignUpPage> {
       'phone': phone,
       'password': password,
       'secret': 'xNlbjAHjAH394BR09kqGuGZXqSoq54mu',
-      'username': ''
+      'username': '',
+      "pharmacy_council_number": pharm
     };
 
     String json = jsonEncode(body);
 
-    var res = await http.post(url,
-        headers: {"Content-Type": "application/json"}, body: json);
+    try{
+      var res = await http.post(url,
+          headers: {"Content-Type": "application/json"}, body: json);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        Map<String, dynamic> map = jsonDecode(res.body);
+        return map['user'];
+      } else {
+        setState(() {
+          _message =  res.body;
+        });
+        return false;
+      }
+    }catch(e){
       setState(() {
-        _message = res.body;
-      });
-      return true;
-    } else {
-      setState(() {
-        _message = res.body;
+        _message = 'Network error, try again';
       });
       return false;
     }
+
   }
 
   Widget _loginAccountLabel() {
@@ -243,6 +330,89 @@ class _SignUpPageState extends State<SignUpPage> {
         _entryField("Username", controller: _usernameController),
         _entryField("Email", controller: _emailController),
         _entryField("Phone Number", controller: _phoneController),
+        _entryField("Pharmacy council no.", controller: _PharmNumberController),
+        Container(
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Text(
+                  _imageName1,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  softWrap: false,
+                ),
+              ),
+              Spacer(),
+              RaisedButton(
+                color: LightColor.lightOrange,
+                child: Text("UPLOAD"),
+                onPressed: () {
+                  Utils.photoOptionDialog(context).then((value) {
+                    if (value == 2) {
+                      Utils.getImageFromCamera(context).then((file) async {
+                        _image_1 = file;
+                        if (_image_1 != null) {
+                          _imageName1 = file.path.split('/').last;
+                        }
+                        setState(() {});
+                      });
+                    } else if (value == 1) {
+                      Utils.getImageFromGallery(context).then((file) {
+                        _image_1 = file;
+                        if (_image_1 != null) {
+                          _imageName1 = file.path.split('/').last;
+                        }
+                        setState(() {});
+                      });
+                    }
+                  });
+                },
+              )
+            ],
+          ),
+        ),
+        Container(
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: Text(
+                  _imageName2,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  softWrap: false,
+                ),
+              ),
+              Spacer(),
+              RaisedButton(
+                color: LightColor.lightOrange,
+                child: Text("UPLOAD"),
+                onPressed: () {
+                  Utils.photoOptionDialog(context).then((value) {
+                    if (value == 2) {
+                      Utils.getImageFromCamera(context).then((file) {
+                        _image_2 = file;
+                        if (_image_2 != null) {
+                          _imageName2 = file.path.split('/').last;
+                        }
+                        setState(() {});
+                      });
+                    } else if (value == 1) {
+                      Utils.getImageFromGallery(context).then((file) {
+                        _image_2 = file;
+                        if (_image_2 != null) {
+                          _imageName2 = file.path.split('/').last;
+                        }
+                        setState(() {});
+                      });
+                    }
+                  });
+                },
+              )
+            ],
+          ),
+        ),
         _entryField("Password",
             isPassword: true, controller: _passwordController),
         _entryField("Confirm Password",
@@ -253,10 +423,12 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    _progressDialog = Utils.initializeProgressDialog(context);
     return Scaffold(
         body: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Container(
+              width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: Stack(
                 children: <Widget>[
@@ -265,28 +437,18 @@ class _SignUpPageState extends State<SignUpPage> {
                       right: -MediaQuery.of(context).size.width * .4,
                       child: BezierContainer()),
                   Container(
+                    margin: EdgeInsets.only(top: 30.0),
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: ListView(
                       children: <Widget>[
-                        Expanded(
-                          flex: 3,
-                          child: SizedBox(
-                            height: 10.0,
-                          ),
-                        ),
-                        _title(),
                         SizedBox(
                           height: 5,
                         ),
-                        _showProgress
-                            ? CircularProgressIndicator()
-                            : Text(_message,
-                                style: TextStyle(color: Colors.red)),
+                        Text(_message,
+                            style: TextStyle(color: Colors.red)),
                         _emailPasswordWidget(),
                         SizedBox(
-                          height: 5,
+                          height: 2,
                         ),
                         Row(
                           children: <Widget>[
@@ -317,18 +479,33 @@ class _SignUpPageState extends State<SignUpPage> {
                           ],
                         ),
                         _submitButton(),
-                        Expanded(
-                          flex: 2,
-                          child: SizedBox(),
-                        )
+                        SizedBox(height: 20,)
                       ],
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: _loginAccountLabel(),
-                  ),
-                  Positioned(top: 30, left: 0, child: _backButton()),
+//                  Align(
+//                    alignment: Alignment.bottomCenter,
+//                    child: _loginAccountLabel(),
+//                  ),
+//                  Positioned(top: 22, left: 0, child: _backButton()),
+                  Positioned(
+                      top: 00,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        color: Colors.transparent,
+                        height: 80,
+                        width: MediaQuery.of(context).size.width,
+                        child: Row(
+                          children: <Widget>[
+                            _backButton(),
+                            Spacer(),
+                            _title(),
+                            Spacer(),
+                            Spacer(),
+                          ],
+                        ),
+                      ))
                 ],
               ),
             )));

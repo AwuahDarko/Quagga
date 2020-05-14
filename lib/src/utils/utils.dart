@@ -9,7 +9,7 @@ import 'package:quagga/src/wigets/item_quantity.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class Utils {
-  static String url = 'http://api.piuniversal.com:4000';
+  static String url = 'http://10.0.2.2:4000';
   //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000' http://api.piuniversal.com:4000
   static String token = '';
   static CustomerInfo customerInfo;

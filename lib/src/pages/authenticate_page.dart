@@ -24,13 +24,12 @@ class AuthenticatePageState extends State<AuthenticatePage> {
     super.initState();
     _databaseHelper.initializeDatabase().then((v) {
       _databaseHelper.getToken().then((list) {
-
         if (list.length > 0) {
           var map = list[0];
 
           Utils.token = map['token'];
 
-              _authenticate(map['token']).then((bool status) {
+          _authenticate(map['token']).then((bool status) {
             if (status) {
               AppData.fetchAllStores().then((v) {
                 setState(() {
@@ -58,28 +57,34 @@ class AuthenticatePageState extends State<AuthenticatePage> {
         }
       });
     });
-
   }
 
   Future<bool> _authenticate(token) async {
     String url = Utils.url + '/api/authenticate-token';
+    try {
+      var res = await http.get(url, headers: {'Authorization': token});
 
-    var res = await http.get(url, headers: {'Authorization': token});
+      if (res.statusCode == 208) {
+        Map<String, dynamic> userInfo = jsonDecode(res.body);
+        Utils.customerInfo = CustomerInfo(
+            userInfo['customer_id'],
+            userInfo['first_name'],
+            userInfo['last_name'],
+            userInfo['email'],
+            userInfo['type'],
+            userInfo['phone'],
+            userInfo['image_url'],
+            userInfo['location']);
 
-    if (res.statusCode == 208) {
-      Map<String, dynamic> userInfo = jsonDecode(res.body);
-      Utils.customerInfo = CustomerInfo(
-          userInfo['customer_id'],
-          userInfo['first_name'],
-          userInfo['last_name'],
-          userInfo['email'],
-          userInfo['type'],
-          userInfo['phone'],
-          userInfo['image_url'],
-          userInfo['location']);
-
-      return true;
-    } else {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => WelcomePage()),
+          (Route<dynamic> route) => false);
       return false;
     }
   }
@@ -99,7 +104,7 @@ class AuthenticatePageState extends State<AuthenticatePage> {
               children: <Widget>[
                 Container(
                     margin: EdgeInsets.only(top: 20.0),
-                    width: MediaQuery.of(context).size.width/2.5,
+                    width: MediaQuery.of(context).size.width / 2.5,
                     height: 120.0,
                     decoration: new BoxDecoration(
                         shape: BoxShape.rectangle,
@@ -107,7 +112,9 @@ class AuthenticatePageState extends State<AuthenticatePage> {
                           fit: BoxFit.fill,
                           image: setImage("assets/falcon.png").image,
                         ))),
-                SizedBox(height: 5,),
+                SizedBox(
+                  height: 5,
+                ),
                 Text("Loading...."),
               ],
             ),

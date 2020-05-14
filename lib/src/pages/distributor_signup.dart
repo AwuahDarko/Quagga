@@ -34,8 +34,8 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
   TextEditingController _areaController = TextEditingController();
   TextEditingController _cityController = TextEditingController();
   TextEditingController _countryController = TextEditingController();
-  TextEditingController _ZAMRANumberController = TextEditingController();
-  TextEditingController _HPCZNumberController = TextEditingController();
+  TextEditingController _PharmNumberController = TextEditingController();
+//  TextEditingController _HPCZNumberController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmController = TextEditingController();
@@ -46,15 +46,15 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
 
   File _image_1;
   File _image_2;
-  File _image_3;
-  File _image_4;
-  File _image_5;
+//  File _image_3;
+//  File _image_4;
+//  File _image_5;
 
-  String _imageName1 = 'Certificate of Incorporation';
-  String _imageName2 = 'ZAMRA certificate';
-  String _imageName3 = 'HPCZ Full registration';
-  String _imageName4 = 'HPCZ annual';
-  String _imageName5 = 'Pharmacy Logo';
+  String _imageName1 = 'Pharmacy Council Licence';
+  String _imageName2 = 'Pharmacy Logo';
+//  String _imageName3 = 'HPCZ Full registration';
+//  String _imageName4 = 'HPCZ annual';
+//  String _imageName5 = 'Pharmacy Logo';
 
   ProgressDialog _progressDialog;
 
@@ -149,8 +149,8 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
           var area = _areaController.text.trim();
           var city = _cityController.text.trim();
           var country = _countryController.text.trim();
-          var zamra = _ZAMRANumberController.text.trim();
-          var hpcz = _HPCZNumberController.text.trim();
+          var pharm = _PharmNumberController.text.trim();
+//          var hpcz = _HPCZNumberController.text.trim();
 
           if (firstName.isNotEmpty &&
               email.isNotEmpty &&
@@ -163,14 +163,22 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
               street.isNotEmpty &&
               area.isNotEmpty &&
               city.isNotEmpty &&
-              zamra.isNotEmpty &&
+              pharm.isNotEmpty &&
               country.isNotEmpty &&
-              hpcz.isNotEmpty) {
+              pharm.isNotEmpty) {
             if (password != confirm) {
               setState(() {
                 _message = "Passwords do not match";
               });
-            } else {
+            } else if(password.length < 8){
+              setState(() {
+                _message = "Passwords mut be at least 8 characters long";
+              });
+            }else if(_image_1 == null || _image_2 == null){
+              setState(() {
+                _message = "Upload images";
+              });
+            }else {
               _progressDialog.show();
 
               Map<String, dynamic> body = {
@@ -188,8 +196,9 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
                 "area": area,
                 "city": city,
                 "country": country,
-                "zamra_licence_number": zamra,
-                "hpcz_certificate_number": hpcz
+                "pharmacy_council_number":pharm
+//                "zamra_licence_number": zamra,
+//                "hpcz_certificate_number": hpcz
               };
               _signUpNewStore(body).then((status) async {
                 if (status == false) {
@@ -199,17 +208,16 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
                     });
                   });
                 } else {
-                  await _uploadImage(status, _image_1, '/api/cert-corp');
-                  await _uploadImage(status, _image_2, '/api/zamra');
-                  await _uploadImage(status, _image_3, '/api/hpcz-full');
-                  await _uploadImage(status, _image_4, '/api/hpcz-annual');
-                  await _uploadImage(status, _image_5, '/api/store-logo');
-
+                  await _uploadImage(status, _image_1, '/api/pharm-licence');
+                  await _uploadImage(status, _image_2, '/api/store-logo');
+//                  await _uploadImage(status, _image_3, '/api/hpcz-full');
+//                  await _uploadImage(status, _image_4, '/api/hpcz-annual');
+//                  await _uploadImage(status, _image_5, '/api/store-logo');
                   Future.delayed(Duration(seconds: 1)).then((value) {
                     _progressDialog.hide().whenComplete(() {
                       Utils.showStatusAndWaitForAction(context, true,
                               'Your application is currently being reviewed,'
-                                  ' you will notified of any progress soon')
+                                  ' you will be notified of any progress soon')
                           .then((value) {
                         if (value) {
                           // move to login
@@ -347,8 +355,8 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
         _entryField("Area", controller: _areaController),
         _entryField("City", controller: _cityController),
         _entryField("Country", controller: _countryController),
-        _entryField("ZAMRA LINCENCE NO.", controller: _ZAMRANumberController),
-        _entryField("HPCZ CERTIFICATE NO.", controller: _HPCZNumberController),
+        _entryField("Pharmacy council no.", controller: _PharmNumberController),
+//        _entryField("HPCZ CERTIFICATE NO.", controller: _HPCZNumberController),
         Container(
           child: Row(
             children: <Widget>[
@@ -431,129 +439,129 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
             ],
           ),
         ),
-        Container(
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Text(
-                  _imageName3,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-              ),
-              Spacer(),
-              RaisedButton(
-                color: LightColor.lightOrange,
-                child: Text("UPLOAD"),
-                onPressed: () {
-                  Utils.photoOptionDialog(context).then((value) {
-                    if (value == 2) {
-                      Utils.getImageFromCamera(context).then((file) {
-                        _image_3 = file;
-                        if (_image_3 != null) {
-                          _imageName3 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    } else if (value == 1) {
-                      Utils.getImageFromGallery(context).then((file) {
-                        _image_3 = file;
-                        if (_image_3 != null) {
-                          _imageName3 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    }
-                  });
-                },
-              )
-            ],
-          ),
-        ),
-        Container(
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Text(
-                  _imageName4,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-              ),
-              Spacer(),
-              RaisedButton(
-                color: LightColor.lightOrange,
-                child: Text("UPLOAD"),
-                onPressed: () {
-                  Utils.photoOptionDialog(context).then((value) {
-                    if (value == 2) {
-                      Utils.getImageFromCamera(context).then((file) {
-                        _image_4 = file;
-                        if (_image_4 != null) {
-                          _imageName4 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    } else if (value == 1) {
-                      Utils.getImageFromGallery(context).then((file) {
-                        _image_4 = file;
-                        if (_image_4 != null) {
-                          _imageName4 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    }
-                  });
-                },
-              )
-            ],
-          ),
-        ),
-        Container(
-          child: Row(
-            children: <Widget>[
-//              Flexible(
-//                child:
-              Text(
-                _imageName5 + '                  ',
-                overflow: TextOverflow.visible,
-                maxLines: 1,
-                softWrap: false,
-              ),
+//        Container(
+//          child: Row(
+//            children: <Widget>[
+//              Container(
+//                width: MediaQuery.of(context).size.width * 0.5,
+//                child: Text(
+//                  _imageName3,
+//                  overflow: TextOverflow.ellipsis,
+//                  maxLines: 1,
+//                  softWrap: false,
+//                ),
 //              ),
-              Spacer(),
-              RaisedButton(
-                color: LightColor.lightOrange,
-                child: Text("UPLOAD"),
-                onPressed: () {
-                  Utils.photoOptionDialog(context).then((value) {
-                    if (value == 2) {
-                      Utils.getImageFromCamera(context).then((file) {
-                        _image_5 = file;
-                        if (_image_5 != null) {
-                          _imageName5 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    } else if (value == 1) {
-                      Utils.getImageFromGallery(context).then((file) {
-                        _image_5 = file;
-                        if (_image_5 != null) {
-                          _imageName5 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    }
-                  });
-                },
-              )
-            ],
-          ),
-        ),
+//              Spacer(),
+//              RaisedButton(
+//                color: LightColor.lightOrange,
+//                child: Text("UPLOAD"),
+//                onPressed: () {
+//                  Utils.photoOptionDialog(context).then((value) {
+//                    if (value == 2) {
+//                      Utils.getImageFromCamera(context).then((file) {
+//                        _image_3 = file;
+//                        if (_image_3 != null) {
+//                          _imageName3 = file.path.split('/').last;
+//                        }
+//                        setState(() {});
+//                      });
+//                    } else if (value == 1) {
+//                      Utils.getImageFromGallery(context).then((file) {
+//                        _image_3 = file;
+//                        if (_image_3 != null) {
+//                          _imageName3 = file.path.split('/').last;
+//                        }
+//                        setState(() {});
+//                      });
+//                    }
+//                  });
+//                },
+//              )
+//            ],
+//          ),
+//        ),
+//        Container(
+//          child: Row(
+//            children: <Widget>[
+//              Container(
+//                width: MediaQuery.of(context).size.width * 0.5,
+//                child: Text(
+//                  _imageName4,
+//                  overflow: TextOverflow.ellipsis,
+//                  maxLines: 1,
+//                  softWrap: false,
+//                ),
+//              ),
+//              Spacer(),
+//              RaisedButton(
+//                color: LightColor.lightOrange,
+//                child: Text("UPLOAD"),
+//                onPressed: () {
+//                  Utils.photoOptionDialog(context).then((value) {
+//                    if (value == 2) {
+//                      Utils.getImageFromCamera(context).then((file) {
+//                        _image_4 = file;
+//                        if (_image_4 != null) {
+//                          _imageName4 = file.path.split('/').last;
+//                        }
+//                        setState(() {});
+//                      });
+//                    } else if (value == 1) {
+//                      Utils.getImageFromGallery(context).then((file) {
+//                        _image_4 = file;
+//                        if (_image_4 != null) {
+//                          _imageName4 = file.path.split('/').last;
+//                        }
+//                        setState(() {});
+//                      });
+//                    }
+//                  });
+//                },
+//              )
+//            ],
+//          ),
+//        ),
+//        Container(
+//          child: Row(
+//            children: <Widget>[
+////              Flexible(
+////                child:
+//              Text(
+//                _imageName5 + '                  ',
+//                overflow: TextOverflow.visible,
+//                maxLines: 1,
+//                softWrap: false,
+//              ),
+////              ),
+//              Spacer(),
+//              RaisedButton(
+//                color: LightColor.lightOrange,
+//                child: Text("UPLOAD"),
+//                onPressed: () {
+//                  Utils.photoOptionDialog(context).then((value) {
+//                    if (value == 2) {
+//                      Utils.getImageFromCamera(context).then((file) {
+//                        _image_5 = file;
+//                        if (_image_5 != null) {
+//                          _imageName5 = file.path.split('/').last;
+//                        }
+//                        setState(() {});
+//                      });
+//                    } else if (value == 1) {
+//                      Utils.getImageFromGallery(context).then((file) {
+//                        _image_5 = file;
+//                        if (_image_5 != null) {
+//                          _imageName5 = file.path.split('/').last;
+//                        }
+//                        setState(() {});
+//                      });
+//                    }
+//                  });
+//                },
+//              )
+//            ],
+//          ),
+//        ),
         _entryField("Email", controller: _emailController),
         _entryField("Password",
             isPassword: true, controller: _passwordController),
@@ -588,6 +596,8 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
                         SizedBox(
                           height: 5,
                         ),
+                    Text(_message,
+                                style: TextStyle(color: Colors.red)),
 //                        _showProgress
 //                            ? CircularProgressIndicator()
 //                            : Text(_message,
