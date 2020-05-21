@@ -149,11 +149,15 @@ class RemoveProductState extends State<RemoveProduct> {
   Future<bool> _deleteProduct(id) async{
     String url = Utils.url + '/api/products?id=$id';
 
-    var res = await http.delete(url, headers: {'Authorization': Utils.token});
+    try{
+      var res = await http.delete(url, headers: {'Authorization': Utils.token});
 
-    if(res.statusCode == 200){
-      return true;
-    }else{
+      if(res.statusCode == 200){
+        return true;
+      }else{
+        return false;
+      }
+    } catch(e){
       return false;
     }
   }

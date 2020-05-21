@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,8 +12,8 @@ import 'package:quagga/src/utils/utils.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:async/async.dart';
 
 class ProductUpdate extends StatefulWidget {
   @override
@@ -471,17 +472,21 @@ class ProductUpdateState extends State<ProductUpdate> {
 
     String json = jsonEncode(body);
 
-    var res = await http.put(url,
-        headers: {
-          "Authorization": Utils.token,
-          "Content-Type": "application/json"
-        },
-        body: json);
+    try{
+      var res = await http.put(url,
+          headers: {
+            "Authorization": Utils.token,
+            "Content-Type": "application/json"
+          },
+          body: json);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
+      if (res.statusCode == 200 || res.statusCode == 201) {
 
-      return true;
-    } else {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -507,21 +512,56 @@ class ProductUpdateState extends State<ProductUpdate> {
       return true;
     }
 
-    FormData formData = FormData.fromMap({
-      "product_image": allFiles
-          .map((oneFile) => MultipartFile.fromFileSync(oneFile.path,
-              filename: oneFile.path.split("/").last))
-          .toList(),
-      "product_id": productID
-    });
+//    FormData formData = FormData.fromMap({
+//      "product_image": allFiles
+//          .map((oneFile) => MultipartFile.fromFileSync(oneFile.path,
+//              filename: oneFile.path.split("/").last))
+//          .toList(),
+//      "product_id": productID
+//    });
+//
+//    Dio dio = Dio();
+//    dio.options.headers["Authorization"] = Utils.token;
+//    var res = await dio.post(url, data: formData);
+//
+//    if (res.statusCode == 200 || res.statusCode == 201) {
+//      return true;
+//    } else {
+//      return false;
+//    }
 
-    Dio dio = Dio();
-    dio.options.headers["Authorization"] = Utils.token;
-    var res = await dio.post(url, data: formData);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      return true;
-    } else {
+    var uri = Uri.parse(url);
+    try {
+      var request = http.MultipartRequest('POST', uri);
+
+      request.fields['product_id'] = productID.toString();
+      request.headers['Authorization'] = Utils.token;
+
+      for (var file in allFiles) {
+        String fileName = file.path.split("/").last;
+        var stream =
+        new http.ByteStream(DelegatingStream.typed(file.openRead()));
+
+        // get file length
+
+        var length = await file.length(); // imageFile is your image file
+
+        // multipart that takes file
+        var multipartFileSign =
+        new http.MultipartFile('image', stream, length, filename: fileName);
+
+        request.files.add(multipartFileSign);
+      }
+
+      var response = await request.send();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
       return false;
     }
   }

@@ -31,8 +31,8 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _databaseHelper.initializeDatabase();
-    _emailController.text = "falcon@gmail.com";
-    _passwordController.text = "nature";
+    _emailController.text = "info@taylorswift.com";
+    _passwordController.text = "12345678";
   }
 
   Widget _backButton() {
@@ -179,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
       text: TextSpan(
           text: 'F',
           style: GoogleFonts.portLligatSans(
-            textStyle: Theme.of(context).textTheme.display1,
+            textStyle: Theme.of(context).textTheme.headline4,
             fontSize: 30,
             fontWeight: FontWeight.w700,
             color: Color(0xffe46b10),
@@ -247,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.centerRight,
-                  child: Text('Forgot Password?',
+                  child: Text('Forgot Password ?',
                       style:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                 ),
@@ -320,8 +320,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       setState(() {
         _showProgress = false;
-        _message = "Network error!";
-        print(e);
+        _message = "Error: Please make sure you have internet connection";
       });
       return false;
     }

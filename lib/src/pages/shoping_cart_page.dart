@@ -433,12 +433,16 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   Future<bool> _deleteCartItem(int cartId) async {
     String url = Utils.url + "/api/cart?cart_id=$cartId";
 
-    var res = await http.delete(url, headers: {"Authorization": Utils.token});
+    try{
+      var res = await http.delete(url, headers: {"Authorization": Utils.token});
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      return true;
-    } else {
-      return false;
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
+     return false;
     }
   }
 
@@ -449,16 +453,20 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
     String url = Utils.url + "/api/cart";
 
-    var res = await http.patch(url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": Utils.token
-        },
-        body: json);
+    try{
+      var res = await http.patch(url,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": Utils.token
+          },
+          body: json);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      return true;
-    } else {
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -470,16 +478,20 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
     String url = Utils.url + "/api/cart";
 
-    var res = await http.patch(url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": Utils.token
-        },
-        body: json);
+    try{
+      var res = await http.patch(url,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": Utils.token
+          },
+          body: json);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      return true;
-    } else {
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -516,19 +528,23 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
     reference = uuid.v4();
 
-    var res = await http.post(url,
-        headers: {
-          'X-Reference-Id': reference,
-          'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
-          'Content-Type': 'application/json',
-        },
-        body: json);
+    try{
+      var res = await http.post(url,
+          headers: {
+            'X-Reference-Id': reference,
+            'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+            'Content-Type': 'application/json',
+          },
+          body: json);
 
-    print(res.statusCode);
-    print(res.body);
-    if (res.statusCode == 201) {
-      return true;
-    } else {
+      print(res.statusCode);
+      print(res.body);
+      if (res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -536,17 +552,21 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   Future<bool> _getCreatedUserInfo() async {
     String url = Utils.momoUrl + '/v1_0/apiuser/$reference';
 
-    var res = await http.get(
-      url,
-      headers: {'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey},
-    );
+    try{
+      var res = await http.get(
+        url,
+        headers: {'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey},
+      );
 
-    if (res.statusCode == 200) {
-      Map<String, dynamic> response = jsonDecode(res.body);
-      targetEnvironment = response['targetEnvironment'];
+      if (res.statusCode == 200) {
+        Map<String, dynamic> response = jsonDecode(res.body);
+        targetEnvironment = response['targetEnvironment'];
 
-      return true;
-    } else {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -554,16 +574,20 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   Future<bool> _generateAPIKey() async {
     String url = Utils.momoUrl + '/v1_0/apiuser/$reference/apikey';
 
-    var res = await http.post(url, headers: {
-      'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
-      'Content-Type': 'application/json'
-    });
+    try{
+      var res = await http.post(url, headers: {
+        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+        'Content-Type': 'application/json'
+      });
 
-    if (res.statusCode == 201) {
-      Map<String, dynamic> map = jsonDecode(res.body);
-      apiKey = map['apiKey'];
-      return true;
-    } else {
+      if (res.statusCode == 201) {
+        Map<String, dynamic> map = jsonDecode(res.body);
+        apiKey = map['apiKey'];
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -574,16 +598,21 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     String basicAuth =
         'Basic ' + base64Encode(utf8.encode('$reference:$apiKey'));
 
-    var res = await http.post(url, headers: {
-      'Authorization': basicAuth,
-      'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey
-    });
+    try{
+      var res = await http.post(url, headers: {
+        'Authorization': basicAuth,
+        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey
+      });
 
-    if (res.statusCode == 200) {
-      Map<String, dynamic> body = jsonDecode(res.body);
-      accessToken = 'access_token';
-      return true;
-    } else {
+      if (res.statusCode == 200) {
+        Map<String, dynamic> body = jsonDecode(res.body);
+        print('access_token $body');
+        accessToken = 'access_token';
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -602,19 +631,23 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     String json = jsonEncode(body);
     paymentRef = uuid.v4();
 
-    var res = await http.post(url,
-        headers: {
-          'X-Reference-Id': paymentRef,
-          'X-Target-Environment': targetEnvironment,
-          'Content-Type': 'application/json',
-          'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
-          'Authorization': 'Bearer $accessToken'
-        },
-        body: json);
+    try{
+      var res = await http.post(url,
+          headers: {
+            'X-Reference-Id': paymentRef,
+            'X-Target-Environment': targetEnvironment,
+            'Content-Type': 'application/json',
+            'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+            'Authorization': 'Bearer $accessToken'
+          },
+          body: json);
 
-    if (res.statusCode == 202) {
-      return true;
-    } else {
+      if (res.statusCode == 202) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -622,17 +655,21 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   Future<String> _getPaymentStatus() async {
     String url = Utils.momoUrl + '/collection/v1_0/requesttopay/$paymentRef';
 
-    var res = await http.get(url, headers: {
-      'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
-      'X-Target-Environment': targetEnvironment,
-      'Authorization': 'Bearer $accessToken'
-    });
+    try{
+      var res = await http.get(url, headers: {
+        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+        'X-Target-Environment': targetEnvironment,
+        'Authorization': 'Bearer $accessToken'
+      });
 
-    if (res.statusCode == 200) {
-      Map<String, dynamic> map = jsonDecode(res.body);
+      if (res.statusCode == 200) {
+        Map<String, dynamic> map = jsonDecode(res.body);
 
-      return map['status'];
-    } else {
+        return map['status'];
+      } else {
+        return 'FAILED';
+      }
+    }catch(e){
       return 'FAILED';
     }
   }

@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class BidirectionalScrollViewPlugin extends StatefulWidget {
-  BidirectionalScrollViewPlugin({@required this.child,
+  BidirectionalScrollViewPlugin({
+    @required this.child,
     this.childWidth,
     this.childHeight,
     this.velocityFactor,
@@ -27,14 +28,8 @@ class BidirectionalScrollViewPlugin extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     if (_state == null) {
-      _state = new _BidirectionalScrollViewState(
-          child,
-          childWidth,
-          childHeight,
-          velocityFactor,
-          initialOffset,
-          scrollDirection,
-          scrollListener);
+      _state = new _BidirectionalScrollViewState(child, childWidth, childHeight,
+          velocityFactor, initialOffset, scrollDirection, scrollListener);
     }
     return _state;
   }
@@ -103,9 +98,13 @@ class _BidirectionalScrollViewState extends State<BidirectionalScrollViewPlugin>
 
   bool _enableFling = false;
 
-  _BidirectionalScrollViewState(Widget child, double childWidth,
-      double childHeight, double velocityFactor,
-      Offset initialOffset, ScrollDirection scrollDirection,
+  _BidirectionalScrollViewState(
+      Widget child,
+      double childWidth,
+      double childHeight,
+      double velocityFactor,
+      Offset initialOffset,
+      ScrollDirection scrollDirection,
       ValueChanged<Offset> scrollListener) {
     _child = child;
     _childWidth = childWidth;
@@ -187,7 +186,8 @@ class _BidirectionalScrollViewState extends State<BidirectionalScrollViewPlugin>
   }
 
   void _handleFlingAnimation() {
-    if (!_enableFling || _flingAnimation.value.dx.isNaN ||
+    if (!_enableFling ||
+        _flingAnimation.value.dx.isNaN ||
         _flingAnimation.value.dy.isNaN) {
       return;
     }
@@ -225,7 +225,6 @@ class _BidirectionalScrollViewState extends State<BidirectionalScrollViewPlugin>
     RenderBox containerBox = _containerKey.currentContext.findRenderObject();
     double containerWidth = containerBox.size.width;
     double containerHeight = containerBox.size.height;
-
 
     if (newXPosition > _initialOffset.dx || width < containerWidth) {
       newXPosition = _initialOffset.dx;
@@ -271,9 +270,9 @@ class _BidirectionalScrollViewState extends State<BidirectionalScrollViewPlugin>
 
     _enableFling = true;
     _flingAnimation = new Tween<Offset>(
-        begin: new Offset(0.0, 0.0),
-        end: direction * distance * _velocityFactor
-    ).animate(_controller);
+            begin: new Offset(0.0, 0.0),
+            end: direction * distance * _velocityFactor)
+        .animate(_controller);
     _controller
       ..value = 0.0
       ..fling(velocity: velocity);
@@ -306,8 +305,7 @@ class _BidirectionalScrollViewState extends State<BidirectionalScrollViewPlugin>
               child: new Container(
                 key: _childKey,
                 child: _child,
-              )
-          )
+              ))
         ],
       );
     }
@@ -336,18 +334,12 @@ class _BidirectionalScrollViewState extends State<BidirectionalScrollViewPlugin>
                           child: _child,
                         ),
                       )
-                    ]
-                ),
+                    ]),
               ),
             ],
-          )
-      ),
+          )),
     );
   }
 }
 
-enum ScrollDirection {
-  horizontal,
-  vertical,
-  both
-}
+enum ScrollDirection { horizontal, vertical, both }

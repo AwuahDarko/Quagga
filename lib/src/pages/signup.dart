@@ -11,6 +11,7 @@ import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/bezierContainer.dart';
 import 'package:http/http.dart' as http;
 import 'loginPage.dart';
+import 'package:email_validator/email_validator.dart';
 
 class SignUpPage extends StatefulWidget {
   SignUpPage({Key key, this.title}) : super(key: key);
@@ -27,7 +28,7 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmController = TextEditingController();
-  TextEditingController _PharmNumberController = TextEditingController();
+//  TextEditingController _PharmNumberController = TextEditingController();
 
   bool _showProgress = false;
   ProgressDialog _progressDialog;
@@ -91,7 +92,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return GestureDetector(
       child: Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.symmetric(vertical: 15),
+        padding: EdgeInsets.symmetric(vertical: 10),
         alignment: Alignment.center,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -118,30 +119,38 @@ class _SignUpPageState extends State<SignUpPage> {
           var phone = _phoneController.text.trim();
           var password = _passwordController.text.trim();
           var confirm = _confirmController.text.trim();
-          var pharm = _PharmNumberController.text.trim();
+//          var pharm = _PharmNumberController.text.trim();
 
           if (username.isNotEmpty &&
               email.isNotEmpty &&
               phone.isNotEmpty &&
               password.isNotEmpty &&
-              confirm.isNotEmpty &&
-              pharm.isNotEmpty) {
-            if (password != confirm) {
-              setState(() {
-                _message = "Passwords do not match";
-              });
-            }else if(password.length < 8){
-              setState(() {
-                _message = "Passwords mut be at least 8 characters long";
-              });
-            } else if(_image_1 == null || _image_2 == null){
-              setState(() {
-                _message = "Upload images";
-              });
-            }else {
+              confirm.isNotEmpty ) {
 
+            if(!EmailValidator.validate(email)){
+              Fluttertoast.showToast(
+                  msg: 'Invalid email',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white);
+            }else if (password != confirm) {
+              Fluttertoast.showToast(
+                  msg: 'Passwords do not match',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white);
+            }else if(password.length < 8){
+              Fluttertoast.showToast(
+                  msg: 'Passwords mut be at least 8 characters long',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white);
+            } else {
               _progressDialog.show();
-              _signUpNewUser(username, email, phone, password, pharm)
+              _signUpNewUser(username, email, phone, password)
                   .then((status)async {
 
                 if(status == false){
@@ -151,9 +160,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     });
                   });
                 }else{
-                  await _uploadImage(status, _image_1, '/api/profile-licence');
-                  await _uploadImage(status, _image_2, '/api/customer/logo/');
-
                   Future.delayed(Duration(seconds: 1)).then((value) {
                     _progressDialog.hide().whenComplete(() {
                       Utils.showStatusAndWaitForAction(context, true,
@@ -177,9 +183,12 @@ class _SignUpPageState extends State<SignUpPage> {
               });
             }
           } else {
-            setState(() {
-              _message = "All fields are required";
-            });
+            Fluttertoast.showToast(
+                msg: 'All fields are required',
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                backgroundColor: Colors.black,
+                textColor: Colors.white);
           }
         } else {
           Fluttertoast.showToast(
@@ -197,18 +206,23 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<bool> _uploadImage(int ID, File file, String route) async {
     String url = Utils.url + '$route';
 
-    var uri = Uri.parse(url);
-    var request = http.MultipartRequest('POST', uri)
-      ..fields['customer_id'] = ID.toString()
-      ..files.add(await http.MultipartFile.fromPath(
+    try{
+      var uri = Uri.parse(url);
+      var request = http.MultipartRequest('POST', uri)
+        ..fields['customer_id'] = ID.toString()
+        ..files.add(await http.MultipartFile.fromPath(
           'image', file.path,
-      ));
+        ));
 
-    var response = await request.send();
+      var response = await request.send();
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return true;
-    } else {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch (e) {
+      Utils.showStatus(context, false, '');
       return false;
     }
   }
@@ -217,10 +231,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void showStatus(BuildContext context, String message) {
     var alertDialog = AlertDialog(
-      title: Text(
-        "Message",
-        style: TextStyle(fontSize: 20, color: Colors.green),
-      ),
+//      title: Text(
+//        "Message",
+//        style: TextStyle(fontSize: 20, color: Colors.green),
+//      ),
       content: Text(message),
     );
 
@@ -231,7 +245,7 @@ class _SignUpPageState extends State<SignUpPage> {
         });
   }
 
-  Future<dynamic> _signUpNewUser(username, email, phone, password, pharm) async {
+  Future<dynamic> _signUpNewUser(username, email, phone, password) async {
     String url = Utils.url + '/api/sign-up';
     var body = {
       'first_name': username,
@@ -241,7 +255,6 @@ class _SignUpPageState extends State<SignUpPage> {
       'password': password,
       'secret': 'xNlbjAHjAH394BR09kqGuGZXqSoq54mu',
       'username': '',
-      "pharmacy_council_number": pharm
     };
 
     String json = jsonEncode(body);
@@ -306,7 +319,7 @@ class _SignUpPageState extends State<SignUpPage> {
       text: TextSpan(
           text: 'F',
           style: GoogleFonts.portLligatSans(
-            textStyle: Theme.of(context).textTheme.display1,
+            textStyle: Theme.of(context).textTheme.headline4,
             fontSize: 30,
             fontWeight: FontWeight.w700,
             color: Color(0xffe46b10),
@@ -330,89 +343,6 @@ class _SignUpPageState extends State<SignUpPage> {
         _entryField("Username", controller: _usernameController),
         _entryField("Email", controller: _emailController),
         _entryField("Phone Number", controller: _phoneController),
-        _entryField("Pharmacy council no.", controller: _PharmNumberController),
-        Container(
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Text(
-                  _imageName1,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-              ),
-              Spacer(),
-              RaisedButton(
-                color: LightColor.lightOrange,
-                child: Text("UPLOAD"),
-                onPressed: () {
-                  Utils.photoOptionDialog(context).then((value) {
-                    if (value == 2) {
-                      Utils.getImageFromCamera(context).then((file) async {
-                        _image_1 = file;
-                        if (_image_1 != null) {
-                          _imageName1 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    } else if (value == 1) {
-                      Utils.getImageFromGallery(context).then((file) {
-                        _image_1 = file;
-                        if (_image_1 != null) {
-                          _imageName1 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    }
-                  });
-                },
-              )
-            ],
-          ),
-        ),
-        Container(
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: Text(
-                  _imageName2,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-              ),
-              Spacer(),
-              RaisedButton(
-                color: LightColor.lightOrange,
-                child: Text("UPLOAD"),
-                onPressed: () {
-                  Utils.photoOptionDialog(context).then((value) {
-                    if (value == 2) {
-                      Utils.getImageFromCamera(context).then((file) {
-                        _image_2 = file;
-                        if (_image_2 != null) {
-                          _imageName2 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    } else if (value == 1) {
-                      Utils.getImageFromGallery(context).then((file) {
-                        _image_2 = file;
-                        if (_image_2 != null) {
-                          _imageName2 = file.path.split('/').last;
-                        }
-                        setState(() {});
-                      });
-                    }
-                  });
-                },
-              )
-            ],
-          ),
-        ),
         _entryField("Password",
             isPassword: true, controller: _passwordController),
         _entryField("Confirm Password",
@@ -442,10 +372,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: ListView(
                       children: <Widget>[
                         SizedBox(
-                          height: 5,
+                          height: 20,
                         ),
-                        Text(_message,
-                            style: TextStyle(color: Colors.red)),
+//                        Text(_message,
+//                            style: TextStyle(color: Colors.red)),
                         _emailPasswordWidget(),
                         SizedBox(
                           height: 2,

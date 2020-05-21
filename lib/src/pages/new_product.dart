@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -11,8 +12,7 @@ import 'package:quagga/src/utils/utils.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
-
+import 'package:async/async.dart';
 
 class NewProduct extends StatefulWidget {
   @override
@@ -49,8 +49,7 @@ class NewProductState extends State<NewProduct> {
         LengthLimitingTextInputFormatter(45),
       ],
       decoration: InputDecoration(
-          labelText: 'Product Name',
-          labelStyle: TextStyle(color: Colors.grey)),
+          labelText: 'Product Name', labelStyle: TextStyle(color: Colors.grey)),
       validator: (value) {
         if (value.isEmpty) {
           return 'Product must have a name';
@@ -88,9 +87,7 @@ class NewProductState extends State<NewProduct> {
       ],
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
-          hintText: 'Min. Order',
-          labelStyle: TextStyle(color: Colors.grey)
-      ),
+          hintText: 'Min. Order', labelStyle: TextStyle(color: Colors.grey)),
       validator: (value) {
         if (value.isEmpty) {
           return 'Please enter a minimum order';
@@ -125,9 +122,7 @@ class NewProductState extends State<NewProduct> {
       ],
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
-          hintText: 'Price',
-          labelStyle: TextStyle(color: Colors.grey)
-      ),
+          hintText: 'Price', labelStyle: TextStyle(color: Colors.grey)),
       validator: (value) {
         if (value.isEmpty) {
           return 'What is the price?';
@@ -151,7 +146,6 @@ class NewProductState extends State<NewProduct> {
         );
       }).toList(),
     );
-
 
     StaggeredGridView content = StaggeredGridView.count(
       crossAxisCount: 2,
@@ -178,9 +172,7 @@ class NewProductState extends State<NewProduct> {
           child: GFAvatar(
               child: Icon(Icons.camera),
               backgroundImage:
-              _image_1 != null ? Image
-                  .file(_image_1)
-                  .image : null,
+                  _image_1 != null ? Image.file(_image_1).image : null,
               shape: GFAvatarShape.standard),
           onTap: () {
             Utils.photoOptionDialog(context).then((value) {
@@ -190,9 +182,7 @@ class NewProductState extends State<NewProduct> {
                   if (_image_1 != null) {
                     _loadedImages.add(1);
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 });
               } else if (value == 1) {
                 Utils.getImageFromGallery(context).then((file) {
@@ -200,9 +190,7 @@ class NewProductState extends State<NewProduct> {
                   if (_image_1 != null) {
                     _loadedImages.add(1);
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 });
               }
             });
@@ -212,9 +200,7 @@ class NewProductState extends State<NewProduct> {
           child: GFAvatar(
               child: Icon(Icons.camera),
               backgroundImage:
-              _image_2 != null ? Image
-                  .file(_image_2)
-                  .image : null,
+                  _image_2 != null ? Image.file(_image_2).image : null,
               shape: GFAvatarShape.standard),
           onTap: () {
             Utils.photoOptionDialog(context).then((value) {
@@ -224,9 +210,7 @@ class NewProductState extends State<NewProduct> {
                   if (_image_2 != null) {
                     _loadedImages.add(1);
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 });
               } else if (value == 1) {
                 Utils.getImageFromGallery(context).then((file) {
@@ -234,9 +218,7 @@ class NewProductState extends State<NewProduct> {
                   if (_image_2 != null) {
                     _loadedImages.add(1);
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 });
               }
             });
@@ -246,9 +228,7 @@ class NewProductState extends State<NewProduct> {
           child: GFAvatar(
               child: Icon(Icons.camera),
               backgroundImage:
-              _image_3 != null ? Image
-                  .file(_image_3)
-                  .image : null,
+                  _image_3 != null ? Image.file(_image_3).image : null,
               shape: GFAvatarShape.standard),
           onTap: () {
             Utils.photoOptionDialog(context).then((value) {
@@ -258,9 +238,7 @@ class NewProductState extends State<NewProduct> {
                   if (_image_3 != null) {
                     _loadedImages.add(1);
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 });
               } else if (value == 1) {
                 Utils.getImageFromGallery(context).then((file) {
@@ -268,9 +246,7 @@ class NewProductState extends State<NewProduct> {
                   if (_image_3 != null) {
                     _loadedImages.add(1);
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 });
               }
             });
@@ -280,9 +256,7 @@ class NewProductState extends State<NewProduct> {
           child: GFAvatar(
               child: Icon(Icons.camera),
               backgroundImage:
-              _image_4 != null ? Image
-                  .file(_image_4)
-                  .image : null,
+                  _image_4 != null ? Image.file(_image_4).image : null,
               shape: GFAvatarShape.standard),
           onTap: () {
             Utils.photoOptionDialog(context).then((value) {
@@ -292,9 +266,7 @@ class NewProductState extends State<NewProduct> {
                   if (_image_4 != null) {
                     _loadedImages.add(1);
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 });
               } else if (value == 1) {
                 Utils.getImageFromGallery(context).then((file) {
@@ -302,9 +274,7 @@ class NewProductState extends State<NewProduct> {
                   if (_image_4 != null) {
                     _loadedImages.add(1);
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 });
               }
             });
@@ -360,19 +330,20 @@ class NewProductState extends State<NewProduct> {
                     "discount": 0.0
                   };
 
-                  _progressDialog.show().then((v){
-                    _addNewProduct(body).then((result){
-                      if(result == false){
-                        if(_progressDialog.isShowing()){
-                          _progressDialog.hide().then((v){
+                  _progressDialog.show().then((v) {
+                    _addNewProduct(body).then((result) {
+                      if (result == false) {
+                        if (_progressDialog.isShowing()) {
+                          _progressDialog.hide().then((v) {
                             Utils.showStatus(context, result, "");
                           });
                         }
-                      }else{
-                        _uploadImages(result).then((status){
-                          if(_progressDialog.isShowing()){
-                            _progressDialog.hide().then((v){
-                              Utils.showStatus(context, status, "New product added");
+                      } else {
+                        _uploadImages(result).then((status) {
+                          if (_progressDialog.isShowing()) {
+                            _progressDialog.hide().then((v) {
+                              Utils.showStatus(
+                                  context, status, "New product added");
                             });
                           }
                         });
@@ -389,15 +360,13 @@ class NewProductState extends State<NewProduct> {
     );
   }
 
-
   void showInvalid(BuildContext context, String message) {
     var alertDialog = AlertDialog(
-        title: Text("Invalid", style: TextStyle(
-            fontSize: 20,
-            color: Colors.green
-        ),),
-        content: Text(message)
-    );
+        title: Text(
+          "Invalid",
+          style: TextStyle(fontSize: 20, color: Colors.green),
+        ),
+        content: Text(message));
 
     showDialog(
         context: context,
@@ -411,19 +380,21 @@ class NewProductState extends State<NewProduct> {
 
     String json = jsonEncode(body);
 
-    var res = await http.post(
-        url,
-        headers: {
-          "Authorization": Utils.token,
-          "Content-Type": "application/json"
-        },
-        body: json
-    );
+    try {
+      var res = await http.post(url,
+          headers: {
+            "Authorization": Utils.token,
+            "Content-Type": "application/json"
+          },
+          body: json);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      Map<String, dynamic> result = jsonDecode(res.body);
-      return result['product_id'];
-    } else {
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        Map<String, dynamic> result = jsonDecode(res.body);
+        return result['product_id'];
+      } else {
+        return false;
+      }
+    } catch (e) {
       return false;
     }
   }
@@ -444,19 +415,38 @@ class NewProductState extends State<NewProduct> {
     if (_image_4 != null) {
       allFiles.add(_image_4);
     }
-    
-    FormData formData = FormData.fromMap({
-      "product_image": allFiles.map((oneFile)  => MultipartFile.fromFileSync(oneFile.path, filename: oneFile.path.split("/").last)).toList(),
-      "product_id": productID
-    });
 
-    Dio dio = Dio();
-    dio.options.headers["Authorization"] = Utils.token;
-    var res = await dio.post(url, data: formData);
+    var uri = Uri.parse(url);
+    try {
+      var request = http.MultipartRequest('POST', uri);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      return true;
-    } else {
+      request.fields['product_id'] = productID.toString();
+      request.headers['Authorization'] = Utils.token;
+
+      for (var file in allFiles) {
+        String fileName = file.path.split("/").last;
+        var stream =
+            new http.ByteStream(DelegatingStream.typed(file.openRead()));
+
+        // get file length
+
+        var length = await file.length(); //imageFile is your image file
+
+        // multipart that takes file
+        var multipartFileSign =
+            new http.MultipartFile('image', stream, length, filename: fileName);
+
+        request.files.add(multipartFileSign);
+      }
+
+      var response = await request.send();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
       return false;
     }
   }

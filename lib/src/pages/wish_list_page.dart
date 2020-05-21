@@ -254,11 +254,16 @@ class WishListPageState extends State<WishListPage> {
 
   Future<bool> _deleteWishItem(int favoriteID) async {
     String url = Utils.url + "/api/favorites?favorite_id=$favoriteID";
-    var res = await http.delete(url, headers: {"Authorization": Utils.token});
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      return true;
-    } else {
+    try{
+      var res = await http.delete(url, headers: {"Authorization": Utils.token});
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
