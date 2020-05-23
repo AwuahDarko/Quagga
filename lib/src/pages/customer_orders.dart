@@ -309,11 +309,16 @@ class CustomerOrderDetailsPageState extends State<CustomerOrderDetailsPage> {
   Future<bool> _confirmOrderReceived(id) async{
     String url = Utils.url +  "/api/deliver-order?order_id=$id";
 
-    var res = await http.get(url, headers: {'Authorization': Utils.token});
+    try{
+      var res = await http.get(url, headers: {'Authorization': Utils.token});
 
-    if(res.statusCode == 200){
-      return true;
-    }else{
+      if(res.statusCode == 200){
+        return true;
+      }else{
+        return false;
+      }
+    }catch (e){
+//      Utils.networkErrorDialog(context, Utils.networkErrorMessage);
       return false;
     }
   }

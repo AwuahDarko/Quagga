@@ -449,18 +449,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             });
           });
         }
-
-//        _progressDialog.show().then((v) {
-//          Utils.addToCart(
-//                  model.id, Utils.customerInfo.userID, 'main', model.minOrder)
-//              .then((status) {
-//            if (_progressDialog.isShowing()) {
-//              _progressDialog.hide().then((bool value) {
-//                Utils.showStatus(context, status, "Added to cart");
-//              });
-//            }
-//          });
-//        });
       },
       backgroundColor: LightColor.orange,
       child: Icon(Icons.shopping_cart,

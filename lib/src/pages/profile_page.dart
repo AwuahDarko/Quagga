@@ -317,18 +317,22 @@ class _ProfilePageState extends State<ProfilePage> {
 
     String json = jsonEncode(body);
 
-    var res = await http.put(url,
-        headers: {
-          "Authorization": Utils.token,
-          "Content-Type": "application/json"
-        },
-        body: json);
+    try{
+      var res = await http.put(url,
+          headers: {
+            "Authorization": Utils.token,
+            "Content-Type": "application/json"
+          },
+          body: json);
 
-    print(res.statusCode);
+      print(res.statusCode);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      return true;
-    } else {
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
@@ -336,36 +340,24 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<bool> _updateProfileImage(File file, int customerID) async {
     String url = Utils.url + "/api/profile";
 
-    if (file == null) {
-      return true;
-    }
+    if (file == null) return true;
 
-    FormData formData = FormData.fromMap({
-      "image": await MultipartFile.fromFile(file.path,
-          filename: file.path.split("/").last),
-      "customer_id": customerID
-    });
+    var uri = Uri.parse(url);
+    try {
+      var request = http.MultipartRequest('POST', uri)
+        ..fields['customer_id'] = customerID.toString()
+        ..files.add(await http.MultipartFile.fromPath(
+          'image',
+          file.path,
+        ));
+      var response = await request.send();
 
-    Dio dio = Dio();
-    dio.options.headers["Authorization"] = Utils.token;
-    var res = await dio.post(url, data: formData);
-
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      List<dynamic> data = jsonDecode(res.data);
-
-      Map<String, dynamic> userInfo = data[0];
-
-      Utils.customerInfo = CustomerInfo(
-          userInfo['customer_id'],
-          userInfo['first_name'],
-          userInfo['last_name'],
-          userInfo['email'],
-          userInfo['type'],
-          userInfo['phone'],
-          userInfo['image_url'],
-          userInfo['location']);
-      return true;
-    } else {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
       return false;
     }
   }

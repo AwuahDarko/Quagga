@@ -35,13 +35,6 @@ class _MyHomePageState extends State<MyHomePage> {
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: <Widget>[
-//            Positioned(
-//                top: 0,
-//                bottom: 0,
-//                right: 0,
-//                left: 0,
-//                child: _search()
-//            ),
             !_searching ? Positioned(
                 top: 0,
                 right: 0,

@@ -325,7 +325,7 @@ class StoreOldOrdersPageState extends State<StoreOldOrdersPage> {
                   )
                       : orderSummaryList.length == 0
                       ? Center(
-                    child: Text('No Orders yet'),
+                    child: Text('No orders yet'),
                   )
                       : _courseList()
                 ],

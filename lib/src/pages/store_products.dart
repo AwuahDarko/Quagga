@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -35,7 +34,6 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   var _searchList = [];
-  bool _searching = false;
   bool _loading = true;
   final Store store;
 
@@ -313,129 +311,3 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
         ));
   }
 }
-
-//SingleChildScrollView(
-//primary: false,
-//child: Container(
-//height: height,
-//child: Stack(
-//children: <Widget>[
-//Container(
-//width: double.infinity,
-//height: height * 0.334, //300,
-//color: Colors.white,
-//),
-//Positioned(
-//top: 0,
-//left: 0,
-//right: 0,
-//child: Container(
-//width: double.infinity,
-//height: height * 0.28, //250,
-//decoration: BoxDecoration(
-//color: LightColor.lightOrange, //Colors.indigo[400],
-//)),
-//),
-//Positioned(
-//top: width * 0.18, //70
-//left: width * 0.07, //30,
-//child: Text(
-//store.name,
-//style: TextStyle(
-//color: Colors.white, fontSize: width * 0.074 //30
-//),
-//),
-//),
-//Positioned(
-//top: 130,
-//left: width * 0.05, // 30,
-//right: width * 0.05, // 30,
-//child: Container(
-//height: height * 0.15,
-////150,
-//width: width * 0.1,
-//// 70,
-//padding: const EdgeInsets.all(10.0),
-//decoration: BoxDecoration(
-//color: Colors.white,
-//borderRadius: BorderRadius.circular(20),
-//boxShadow: [
-//BoxShadow(
-//color: Colors.blue[100],
-//blurRadius: 5,
-//offset: Offset(0, 2)),
-//BoxShadow(
-//color: Colors.blueAccent,
-//blurRadius: 5,
-//offset: Offset(0, 2))
-//]),
-//child: ListView(
-//scrollDirection: Axis.horizontal,
-//children: AppData.storeList
-//    .map((store) => StoreCardMini(
-//model: store,
-//))
-//.toList())),
-//),
-//Positioned(
-//top: 255,
-//bottom: 0,
-//child: Container(
-//width: MediaQuery.of(context).size.width,
-//height: 90,
-//padding: const EdgeInsets.only(left: 20, right: 20),
-//child: SearchBar<Product>(
-//minimumChars: 2,
-//emptyWidget: ListTile(
-//leading: Icon(
-//Icons.help,
-//color: LightColor.orange,
-//),
-//title: Text(
-//"No product found",
-//style: TextStyle(color: Colors.deepOrange),
-//),
-//),
-//hintText: "Search products",
-//onSearch: search,
-//onCancelled: () {
-//setState(() {
-//_searching = false;
-//});
-//},
-//onItemFound: (Product product, int index) {
-//return _item(product);
-//},
-//),
-//),
-//),
-//!_searching
-//? Positioned(
-//top: 320,
-//bottom: 0,
-//left: 0,
-//right: 0,
-//child: Padding(
-//padding: EdgeInsets.only(
-//left: width * 0.04, right: width * 0.04, top: 0),
-//child: Container(
-//width: width,
-//height: height * 0.9,
-//child: _loading
-//? Center(
-////child: CircularProgressIndicator(),
-////)
-////: ListView(
-////children: <Widget>[_storeItems()],
-////),
-////),
-////),
-////)
-////: SizedBox(
-////width: 1,
-////height: 1,
-////),
-////],
-////),
-////),
-////),

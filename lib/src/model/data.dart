@@ -285,20 +285,22 @@ class AppData {
   static Future<bool> placeOrder(Map<dynamic, dynamic> body) async {
     String json = jsonEncode(body);
 
-    print(json);
-
     String url = Utils.url + '/api/orders';
 
-    var res = await http.post(url,
-        headers: {
-          "Authorization": Utils.token,
-          "Content-Type": "application/json"
-        },
-        body: json);
+    try{
+      var res = await http.post(url,
+          headers: {
+            "Authorization": Utils.token,
+            "Content-Type": "application/json"
+          },
+          body: json);
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      return true;
-    } else {
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return true;
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }

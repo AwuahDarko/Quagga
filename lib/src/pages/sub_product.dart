@@ -327,19 +327,23 @@ class AddSubProductState extends State<AddSubProduct> {
 
     String json = jsonEncode(body);
 
-    var res = await http.post(
-        url,
-        headers: {
-          "Authorization": Utils.token,
-          "Content-Type": "application/json"
-        },
-        body: json
-    );
+    try{
+      var res = await http.post(
+          url,
+          headers: {
+            "Authorization": Utils.token,
+            "Content-Type": "application/json"
+          },
+          body: json
+      );
 
-    if (res.statusCode == 200 || res.statusCode == 201) {
-      Map<String, dynamic> result = jsonDecode(res.body);
-      return result['type_id'];
-    } else {
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        Map<String, dynamic> result = jsonDecode(res.body);
+        return result['type_id'];
+      } else {
+        return false;
+      }
+    }catch(e){
       return false;
     }
   }
