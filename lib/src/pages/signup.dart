@@ -248,13 +248,13 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<dynamic> _signUpNewUser(username, email, phone, password) async {
     String url = Utils.url + '/api/sign-up';
     var body = {
-      'first_name': username,
+      'first_name': '',
       'last_name': '',
       'email': email,
       'phone': phone,
       'password': password,
       'secret': 'xNlbjAHjAH394BR09kqGuGZXqSoq54mu',
-      'username': '',
+      'username': username,
     };
 
     String json = jsonEncode(body);
@@ -262,7 +262,7 @@ class _SignUpPageState extends State<SignUpPage> {
     try{
       var res = await http.post(url,
           headers: {"Content-Type": "application/json"}, body: json);
-
+print(res.statusCode);
       if (res.statusCode == 200 || res.statusCode == 201) {
         Map<String, dynamic> map = jsonDecode(res.body);
         return map['user'];

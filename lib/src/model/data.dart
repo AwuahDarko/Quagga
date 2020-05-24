@@ -54,33 +54,41 @@ class AppData {
     String url =
         Utils.url + "/api/cart?customer_id=${Utils.customerInfo.userID}";
 
-    var res = await http.get(url, headers: {"Authorization": Utils.token});
+    try{
+      var res = await http.get(url, headers: {"Authorization": Utils.token});
 
-    if (res.statusCode == 200) {
-      List<dynamic> cartData = jsonDecode(res.body);
+      if (res.statusCode == 200) {
+        List<dynamic> cartData = jsonDecode(res.body);
 
-      int i = 0;
-      cartData.forEach((oneCart) {
-        List<dynamic> img = [];
-        img.add(oneCart['image_url']);
+        int i = 0;
+        cartData.forEach((oneCart) {
+          List<dynamic> img = [];
+          img.add(oneCart['image_url']);
 
-        Product prod = Product(
-            id: oneCart['product_id'],
-            cartID: oneCart['cart_id'],
-            name: oneCart['product_name'],
-            price: oneCart['price'].toDouble(),
-            image: img,
-            category: "",
-            quantity: oneCart['quantity'],
-            index: i,
-            numberInStock: oneCart['number_in_stock'],
-            minOrder: oneCart['min_order'],
-            type: oneCart['type']);
+          Product prod = Product(
+              id: oneCart['product_id'],
+              cartID: oneCart['cart_id'],
+              name: oneCart['product_name'],
+              price: oneCart['price'].toDouble(),
+              image: img,
+              category: "",
+              quantity: oneCart['quantity'],
+              index: i,
+              numberInStock: oneCart['number_in_stock'],
+              minOrder: oneCart['min_order'],
+              type: oneCart['type']);
 
-        AppData.cartList.add(prod);
-        ++i;
-      });
+          AppData.cartList.add(prod);
+          ++i;
+        });
+      }else{
+        return ;
+      }
+    }catch(e){
+//      Utils.networkErrorDialog(context, );
+      return ;
     }
+
   }
 
   static Future<List<Product>> fetchAllStoreProducts(storeId) async {

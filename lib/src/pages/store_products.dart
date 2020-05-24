@@ -13,7 +13,9 @@ import 'package:quagga/src/pages/search_products.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
+import 'package:quagga/src/wigets/product_card.dart';
 import 'package:quagga/src/wigets/store_card_mini.dart';
+import 'package:quagga/src/wigets/store_header.dart';
 import 'package:quagga/src/wigets/title_text.dart';
 
 class StoreProductsPage extends StatefulWidget {
@@ -36,6 +38,7 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
   var _searchList = [];
   bool _loading = true;
   final Store store;
+  var _scrollViewController = ScrollController();
 
   @override
   void initState() {
@@ -50,7 +53,13 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
 
   Widget _storeItems() {
 //    print(_searchList.length);
-    return Column(children: _searchList.map((x) => _item(x)).toList());
+    return GridView.count(
+        crossAxisCount: 2,
+        children: _searchList
+            .map((x) => ProductCard(
+                  product: x,
+                ))
+            .toList());
   }
 
   Widget _item(Product model) {
@@ -192,122 +201,72 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
     height = MediaQuery.of(context).size.height;
     _progressDialog = Utils.initializeProgressDialog(context);
 
-    return Scaffold(
-        key: _scaffoldKey,
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: <Widget>[
-              Container(
+    return new Scaffold(
+      body: new NestedScrollView(
+        controller: _scrollViewController,
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            new SliverAppBar(
+              title: ListTile(
+                title: Text(
+                  store.name,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                ),
+                trailing: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SearchProduct(_searchList))),
+                ),
+              ),
+              //Text(store.name),
+              pinned: true,
+              floating: false,
+              forceElevated: innerBoxIsScrolled,
+              bottom: StoreHeader(
+                height: height,
+                width: width,
+                store: store,
+              ),
+              elevation: 10,
+              leading: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircleAvatar(
+                  radius: 10,
+                  backgroundImage: store.image.isNotEmpty
+                      ? NetworkImage('${Utils.url}/api/images?url=${store.image}')
+                      : Image.asset('assets.white.jpg').image,
+                ),
+              ),
+              automaticallyImplyLeading: true,
+            ),
+          ];
+        },
+        body: _loading
+            ? Container(
+                width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
-                child: ListView(
-                  children: <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            width: double.infinity,
-                            height: height * 0.34, //250,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                image: DecorationImage(
-                                    fit: BoxFit.fitWidth,
-                                    image: store.image.isNotEmpty
-                                        ? NetworkImage(
-                                            '${Utils.url}/api/images?url=${store.image}')
-                                        : Image.asset('assets.white.jpg')
-                                            .image) //Colors.indigo[400],
-                                ),
-                            child: Stack(
-                              children: <Widget>[
-                                Positioned(
-                                  top: 60,
-                                  left: 10,
-                                  child: Container(
-//                                    color: Colors.white,
-                                    decoration: BoxDecoration(
-                                        color: Colors.white70,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))),
-                                    child: Text(
-                                      store.name,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: width * 0.06 //30
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 120,
-                                  left: width * 0.05, // 30,
-                                  right: width * 0.05, // 30,
-                                  child: Container(
-                                      height: height * 0.15,
-                                      width: width * 0.1,
-                                      padding: const EdgeInsets.all(10.0),
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: Colors.blue[100],
-                                                blurRadius: 5,
-                                                offset: Offset(0, 2)),
-                                            BoxShadow(
-                                                color: Colors.blueAccent,
-                                                blurRadius: 5,
-                                                offset: Offset(0, 2))
-                                          ]),
-                                      child: ListView(
-                                          scrollDirection: Axis.horizontal,
-                                          children: AppData.storeList
-                                              .map((store) => StoreCardMini(
-                                                    model: store,
-                                                  ))
-                                              .toList())),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : _searchList.length > 0
+                ? Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    padding: const EdgeInsets.only(left: 10, right: 10, top: 0),
+                    child: _storeItems())
+                : Container(
+                    margin: EdgeInsets.only(top: 20),
+                    child: Center(
+                      child: Text(
+                        'Sorry, no products available',
+                        style: TextStyle(fontSize: 18, color: Colors.orange),
                       ),
                     ),
-                    _loading
-                        ? Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-                        : Container(
-                            padding: const EdgeInsets.only(
-                                left: 10, right: 10, top: 10),
-                            child: _storeItems())
-                  ],
-                ),
-              ),
-              Positioned(
-                top: 20,
-                child: Row(
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        size: 20,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    _search()
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ));
+                  ),
+      ),
+    );
   }
 }

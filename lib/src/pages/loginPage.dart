@@ -31,8 +31,8 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _databaseHelper.initializeDatabase();
-    _emailController.text = "info@taylorswift.com";
-    _passwordController.text = "12345678";
+    _emailController.text = "falcon@gmail.com";
+    _passwordController.text = "nature";
   }
 
   Widget _backButton() {
