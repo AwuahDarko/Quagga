@@ -210,7 +210,7 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
               title: ListTile(
                 title: Text(
                   store.name,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 trailing: IconButton(
                   icon: Icon(Icons.search),

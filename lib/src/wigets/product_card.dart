@@ -33,28 +33,11 @@ class _ProductCardState extends State<ProductCard> {
     return InkWell(
       onTap: () {
         Navigator.of(context).pushNamed('/detail', arguments: model);
-//        setState(() {
-
-        // model.isSelected = !model.isSelected;
-        //   AppData.productList.forEach((x) {
-        //     if (x.id == model.id && x.name == model.name) {
-        //       return;
-        //     }
-        //     x.isSelected = false;
-        //   });
-        //   var m = AppData.productList
-        //       .firstWhere((x) => x.id == model.id && x.name == model.name);
-        //   m.isSelected = !m.isSelected;
-//        });
       },
       child: Container(
         decoration: BoxDecoration(
           color: LightColor.background,
           borderRadius: BorderRadius.all(Radius.circular(5)),
-//          boxShadow: <BoxShadow>[
-//            BoxShadow(
-//                color: Color(0xfff8f8f8), blurRadius: 15, spreadRadius: 10),
-//          ],
         ),
         margin: EdgeInsets.symmetric(vertical: 2, horizontal: 2),
         padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
@@ -128,41 +111,27 @@ class _ProductCardState extends State<ProductCard> {
                   children: <Widget>[
                     Container(
                       child: model.image.length > 0 ?
-                      Image.network(Utils.url + '/api/images?url=' + model.image[0], width: 100, height: 100,)
+                      Image.network(Utils.url + '/api/images?url=' + model.image[0], width: 50, height: 50,)
                           : Container(
                         width: 100,
                         height: 100,
                       ),
                     ),
-//                    CircleAvatar(
-//                      radius: 50,
-//                      backgroundColor: LightColor.orange.withAlpha(40),
-//                      backgroundImage: model.image.length > 0
-//                          ? NetworkImage(
-//                              Utils.url + '/api/images?url=' + model.image[0],
-//                              scale: 0.5)
-//                          : null,
-//                    ),
                   ],
                 ),
                 SizedBox(height: 5),
                 TitleText(
                   text: model.name,
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
-//                TitleText(
-//                  text: model.category,
-//                  fontSize: 14,
-//                  color: LightColor.skyBlue,
-//                ),
                 TitleText(
                   text: "Min. Order ${model.minOrder}",
-                  fontSize: 12,
+                  fontSize: 10,
                   color: LightColor.orange,
                 ),
                 TitleText(
                   text: "GH\u20B5 ${model.price.toStringAsFixed(2)}",
-                  fontSize: 16,
+                  fontSize: 13,
                 ),
               ],
             ),

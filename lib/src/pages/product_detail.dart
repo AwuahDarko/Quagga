@@ -280,7 +280,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                                 color: LightColor.red,
                               ),
                               TitleText(
-                                text: model.price.toString(),
+                                text: model.price.toStringAsFixed(2),
                                 fontSize: 25,
                               ),
                             ],

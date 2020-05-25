@@ -49,9 +49,12 @@ class StoreCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 5),
-                TitleText(
-                  text: model.name,
-                  fontSize: 14,
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: TitleText(
+                    text: model.name,
+                    fontSize: 12,
+                  ),
                 ),
                 Container(
                   width: 200,
