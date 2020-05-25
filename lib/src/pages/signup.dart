@@ -30,16 +30,11 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _confirmController = TextEditingController();
 //  TextEditingController _PharmNumberController = TextEditingController();
 
-  bool _showProgress = false;
   ProgressDialog _progressDialog;
   String _message = "";
   bool _termsAgreed = false;
 
-  File _image_1;
-  File _image_2;
 
-  String _imageName1 = 'Pharmacy Council Licence';
-  String _imageName2 = 'Pharmacy Logo';
 
   Widget _backButton() {
     return InkWell(
@@ -163,8 +158,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   Future.delayed(Duration(seconds: 1)).then((value) {
                     _progressDialog.hide().whenComplete(() {
                       Utils.showStatusAndWaitForAction(context, true,
-                          'Your application is currently being reviewed,'
-                              ' you will be notified of any progress soon')
+                          'A link to activate your account has been sent to $email. '
+                              'Please follow the link to activate your account')
                           .then((value) {
                         if (value) {
                           Navigator.pushAndRemoveUntil(
@@ -289,7 +284,7 @@ print(res.statusCode);
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            'Already have an account ?',
+            'Already have an account?',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
           ),
           SizedBox(
@@ -317,7 +312,7 @@ print(res.statusCode);
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-          text: 'F',
+          text: 'U',
           style: GoogleFonts.portLligatSans(
             textStyle: Theme.of(context).textTheme.headline4,
             fontSize: 30,
@@ -326,11 +321,11 @@ print(res.statusCode);
           ),
           children: [
             TextSpan(
-              text: 'al',
+              text: 'lso',
               style: TextStyle(color: Colors.black, fontSize: 30),
             ),
             TextSpan(
-              text: 'con',
+              text: 'rb',
               style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
             ),
           ]),

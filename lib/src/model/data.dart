@@ -177,8 +177,10 @@ class AppData {
     if (res.statusCode == 200) {
       List<dynamic> favData = jsonDecode(res.body);
 
+
       int i = 0;
       favData.forEach((oneFav) {
+        print(oneFav);
         List<dynamic> img = [];
         img.add(oneFav['image_url']);
 
@@ -190,7 +192,9 @@ class AppData {
             image: img,
             index: i,
             type: oneFav['type'],
-            minOrder: oneFav['min_order']);
+            minOrder: oneFav['min_order'],
+            description: oneFav['description'],
+            subProducts: []);
 
         AppData.wishList.add(prod);
         ++i;

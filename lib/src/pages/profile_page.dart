@@ -7,9 +7,8 @@ import 'package:quagga/src/themes/light_color.dart';
 import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:quagga/src/utils/utils.dart';
-import 'package:dio/dio.dart';
 import 'package:quagga/src/utils/customer.dart';
+import 'package:quagga/src/utils/utils.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -145,11 +144,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 _image == null ? _loadProfileImage() : Image.file(_image).image,
           ),
           onTap: () {
-            _photoOptionDialog(context).then((int value) {
+            Utils.photoOptionDialog(context).then((int value) {
               if (value == 2) {
-                _getImageFromCamera();
+                Utils.getImageFromCamera(context).then((image) {
+                    setState(() {
+                    _image = image;
+                    });
+                });
               } else if (value == 1) {
-                _getImageFromGallery();
+                Utils.getImageFromGallery(context).then((image) {
+                  setState(() {
+                    _image = image;
+                  });
+                });
               }
             });
           },
@@ -223,15 +230,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         // show dialog here
 
                         Future.delayed(Duration(seconds: 1)).then((value){
-                          _progressDialog.hide().whenComplete((){
+                          _progressDialog.hide().whenComplete(() async{
                             Utils.showStatus(context, state, "Profile updated");
+                            _image = null;
+                            await Utils.getUserProfile();
                           });
                         });
                       });
                     } else {
                       // show error dialog
                       if (_progressDialog.isShowing()) {
-                        _progressDialog.hide().then((v) {
+                        _progressDialog.hide().then((v)  {
                           Utils.showStatus(context, status, "");
                         });
                       }
@@ -325,7 +334,7 @@ class _ProfilePageState extends State<ProfilePage> {
           },
           body: json);
 
-      print(res.statusCode);
+
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         return true;
@@ -342,6 +351,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (file == null) return true;
 
+    print(file.path);
+
     var uri = Uri.parse(url);
     try {
       var request = http.MultipartRequest('POST', uri)
@@ -350,6 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
           'image',
           file.path,
         ));
+      request.headers['Authorization'] = Utils.token;
       var response = await request.send();
 
       if (response.statusCode == 200 || response.statusCode == 201) {

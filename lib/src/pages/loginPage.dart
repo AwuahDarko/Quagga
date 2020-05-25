@@ -9,6 +9,7 @@ import 'package:quagga/src/utils/database_helper.dart';
 import 'package:quagga/src/utils/utils.dart';
 import 'package:quagga/src/wigets/bezierContainer.dart';
 import 'package:http/http.dart' as http;
+import 'package:quagga/src/wigets/reset_password.dart';
 import 'mainPage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -31,8 +32,8 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _databaseHelper.initializeDatabase();
-    _emailController.text = "falcon@gmail.com";
-    _passwordController.text = "nature";
+//    _emailController.text = "falcon@gmail.com";
+//    _passwordController.text = "nature";
   }
 
   Widget _backButton() {
@@ -63,12 +64,8 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
           SizedBox(
-            height: 10,
+            height: 5,
           ),
           TextField(
               controller: controller,
@@ -76,7 +73,8 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(
                   border: InputBorder.none,
                   fillColor: Color(0xfff3f3f4),
-                  filled: true))
+                  filled: true,
+                  hintText: title))
         ],
       ),
     );
@@ -125,7 +123,8 @@ class _LoginPageState extends State<LoginPage> {
                       context,
                       MaterialPageRoute(
                           builder: (BuildContext context) => MainPage()),
-                      (Route<dynamic> route) => false // removes all routes below
+                      (Route<dynamic> route) =>
+                          false // removes all routes below
 //                        ModalRoute.withName('/Home'), // removes all routes until named route
                       );
                 });
@@ -177,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-          text: 'F',
+          text: 'U',
           style: GoogleFonts.portLligatSans(
             textStyle: Theme.of(context).textTheme.headline4,
             fontSize: 30,
@@ -186,11 +185,11 @@ class _LoginPageState extends State<LoginPage> {
           ),
           children: [
             TextSpan(
-              text: 'al',
+              text: 'lso',
               style: TextStyle(color: Colors.black, fontSize: 30),
             ),
             TextSpan(
-              text: 'con',
+              text: 'rb',
               style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
             ),
           ]),
@@ -245,11 +244,16 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 _submitButton(),
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 10),
+                  padding: EdgeInsets.symmetric(vertical: 20),
                   alignment: Alignment.centerRight,
-                  child: Text('Forgot Password ?',
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                  child: GestureDetector(
+                    child: Text('Forgot Password?',
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w500)),
+                    onTap: () async {
+                      bool waitValue = await passwordDialog(context);
+                    },
+                  ),
                 ),
                 Expanded(
                   flex: 2,
@@ -306,7 +310,6 @@ class _LoginPageState extends State<LoginPage> {
             userInfo['image_url'],
             userInfo['location']);
 
-
         await _databaseHelper.insertToken(Utils.token);
         print(await _databaseHelper.getToken());
 
@@ -320,10 +323,19 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       setState(() {
         _showProgress = false;
-        _message = "Error: Please make sure you have internet connection";
+        _message = "Please make sure you have internet connection";
       });
       return false;
     }
     return false;
+  }
+
+  Future<bool> passwordDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return ResetPassword();
+        });
   }
 }

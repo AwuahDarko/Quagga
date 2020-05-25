@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/utils/customer.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,11 @@ import 'package:image_picker_gallery_camera/image_picker_gallery_camera.dart';
 import 'package:quagga/src/wigets/get_photo_options.dart';
 import 'package:quagga/src/wigets/item_quantity.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:uuid/uuid.dart';
 
 class Utils {
-  static String url = 'http://api.piuniversal.com:4000';
+  static String url = 'http://192.168.43.111:4000';
+
   //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000' http://api.piuniversal.com:4000
   static String token = '';
   static CustomerInfo customerInfo;
@@ -18,10 +21,12 @@ class Utils {
   static String momoPrimaryKey = '6eeb64c949684cc3a8fe5736d2ef0524';
   static String momoUrl = 'https://sandbox.momodeveloper.mtn.com';
 
-  static String networkErrorMessage = 'ERROR: Please make sure you have internet connection';
+  static String networkErrorMessage = 'Please make sure you have internet connection';
 
-  static Future<bool> showStatusAndWaitForAction(
-      BuildContext context, bool status, String message) {
+  static var uuid = Uuid();
+
+  static Future<bool> showStatusAndWaitForAction(BuildContext context,
+      bool status, String message) {
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -39,8 +44,8 @@ class Utils {
         });
   }
 
-  static Future<bool> requestAndWaitForAction(
-      BuildContext context, String message) {
+  static Future<bool> requestAndWaitForAction(BuildContext context,
+      String message) {
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -74,7 +79,7 @@ class Utils {
 
     String url = Utils.url + '/api/cart';
 
-    try{
+    try {
       var res = await http.post(url,
           headers: {
             "Content-Type": "application/json",
@@ -87,7 +92,7 @@ class Utils {
       } else {
         return false;
       }
-    }catch (e){
+    } catch (e) {
       return false;
     }
   }
@@ -149,7 +154,7 @@ class Utils {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Are you sure?"),
+//            title: Text("Are you sure?"),
             content: Text(message),
             actions: <Widget>[
               FlatButton(
@@ -159,7 +164,7 @@ class Utils {
               ),
               FlatButton(
                 child: Text("No"),
-                color: Color(0xFF000080),
+                color: Colors.green,
                 onPressed: () => Navigator.pop(context, false),
               )
             ],
@@ -167,7 +172,7 @@ class Utils {
         });
   }
 
-  static Future<bool> addToFavorites(productID, customerID, type) async{
+  static Future<bool> addToFavorites(productID, customerID, type) async {
     Map<String, dynamic> body = {
       "product_id": productID,
       "customer_id": customerID,
@@ -178,7 +183,7 @@ class Utils {
 
     String url = Utils.url + '/api/favorites';
 
-    try{
+    try {
       var res = await http.post(url,
           headers: {
             "Content-Type": "application/json",
@@ -192,7 +197,7 @@ class Utils {
       } else {
         return false;
       }
-    }catch(e) {
+    } catch (e) {
       return false;
     }
   }
@@ -210,11 +215,15 @@ class Utils {
         color: Colors.red,
       ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
     );
-    return image;
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    var unique = uuid.v4().toString();
+    var compressedImage = await compressImageAndGetFile(
+        image, '${appDocDir.path}/$unique.jpg');
+    return compressedImage;
   }
 
   static Future<File> getImageFromGallery(context) async {
-    var image = await ImagePickerGC.pickImage(
+    File image = await ImagePickerGC.pickImage(
       context: context,
       source: ImgSource.Gallery,
       cameraIcon: Icon(
@@ -222,9 +231,12 @@ class Utils {
         color: Colors.red,
       ), //cameraIcon and galleryIcon can change. If no icon provided default icon will be present
     );
-  return image;
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    var unique = uuid.v4().toString();
+    var compressedImage = await compressImageAndGetFile(
+        image, '${appDocDir.path}/$unique.jpg');
+    return compressedImage;
   }
-
 
 
   static Future<int> photoOptionDialog(BuildContext context) {
@@ -236,7 +248,8 @@ class Utils {
         });
   }
 
-  static Future<Map<String, dynamic>> setCartQuantity(BuildContext context, int min, int num){
+  static Future<Map<String, dynamic>> setCartQuantity(BuildContext context,
+      int min, int num) {
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -246,16 +259,46 @@ class Utils {
   }
 
 
- static Future<File> compressImageAndGetFile(File file, String targetPath) async {
+  static Future<File> compressImageAndGetFile(File file,
+      String targetPath) async {
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path, targetPath,
-      quality: 80,
+      quality: 70,
     );
 
     print(file.lengthSync());
     print(result.lengthSync());
 
     return result;
+  }
+
+
+  static Future<bool> getUserProfile() async {
+    String url = Utils.url + "/api/profile";
+
+    try{
+      var res = await http.get(url, headers: {'Authorization': Utils.token});
+
+      if (res.statusCode == 200) {
+        Map<String, dynamic> map = jsonDecode(res.body);
+
+        Utils.customerInfo = new
+        CustomerInfo(
+            map['customer_id'],
+            map['first_name'],
+            map['last_name'],
+            map['email'],
+            map['type'],
+            map['phone'],
+            map['image_url'],
+            map['location']);
+        return true;
+      }else{
+        return false;
+      }
+    }catch(e){
+      return false;
+    }
   }
 
 }

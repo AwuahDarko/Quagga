@@ -246,7 +246,7 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
             }
           } else {
             Fluttertoast.showToast(
-                msg: 'All fields are required',
+                msg: 'Some mandatory fields are empty',
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.BOTTOM,
                 backgroundColor: Colors.black,
@@ -315,25 +315,6 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
     }
   }
 
-//  Future<bool> _uploadImage(int storeID, File file, String route) async {
-//    String url = Utils.url + '$route';
-//
-//    FormData formData = FormData.fromMap({
-//      "image": await MultipartFile.fromFile(file.path,
-//          filename: file.path.split("/").last),
-//      "store_id": storeID
-//    });
-//
-//    Dio dio = Dio();
-//    dio.options.headers["Authorization"] = Utils.token;
-//    var res = await dio.post(url, data: formData);
-//
-//    if (res.statusCode == 200 || res.statusCode == 201) {
-//      return true;
-//    } else {
-//      return false;
-//    }
-//  }
 
   void showStatus(BuildContext context, String message) {
     var alertDialog = AlertDialog(
@@ -355,20 +336,20 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-          text: 'F',
+          text: 'U',
           style: GoogleFonts.portLligatSans(
-            textStyle: Theme.of(context).textTheme.display1,
+            textStyle: Theme.of(context).textTheme.headline4,
             fontSize: 30,
             fontWeight: FontWeight.w700,
             color: Color(0xffe46b10),
           ),
           children: [
             TextSpan(
-              text: 'al',
+              text: 'lso',
               style: TextStyle(color: Colors.black, fontSize: 30),
             ),
             TextSpan(
-              text: 'con',
+              text: 'rb',
               style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
             ),
           ]),

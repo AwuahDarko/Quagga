@@ -322,7 +322,7 @@ class NewProductState extends State<NewProduct> {
 
                   Map<String, dynamic> body = {
                     "product_name": _pName.text,
-                    "category_id": _category.id,
+                    "category_id": 0,
                     "description": _description.text,
                     "price": _price.text,
                     "min_order": _minOrder.text,
@@ -344,6 +344,7 @@ class NewProductState extends State<NewProduct> {
                             _progressDialog.hide().then((v) {
                               Utils.showStatus(
                                   context, status, "New product added");
+                              reset();
                             });
                           }
                         });
@@ -449,5 +450,24 @@ class NewProductState extends State<NewProduct> {
     } catch (e) {
       return false;
     }
+  }
+
+  void reset(){
+    _pName.text = '';
+    _description.text = '';
+    _minOrder.text = '';
+    _numStock.text = '';
+     _price.text = '';
+
+  _image_1 = null;
+    _image_2 = null;
+    _image_3 = null;
+    _image_4 = null;
+
+    _loadedImages = [];
+
+    setState(() {
+
+    });
   }
 }

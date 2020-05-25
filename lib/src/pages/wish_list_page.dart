@@ -101,6 +101,7 @@ class WishListPageState extends State<WishListPage> {
           Expanded(
               child: ListTile(
                   selected: isSelected[model.index],
+                  onTap: (){ Navigator.of(context).pushNamed('/detail', arguments: model);},
                   onLongPress: () {
                     setState(() {
                       if (isSelected[model.index]) {
