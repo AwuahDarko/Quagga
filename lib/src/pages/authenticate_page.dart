@@ -95,7 +95,7 @@ class AuthenticatePageState extends State<AuthenticatePage> {
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        color: Colors.orange[300],
+        color: Colors.white,
         child: Container(
           padding:
               EdgeInsets.only(top: MediaQuery.of(context).size.width * 0.7),

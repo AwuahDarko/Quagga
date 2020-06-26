@@ -414,7 +414,7 @@ class ProductUpdateState extends State<ProductUpdate> {
 
                   Map<String, dynamic> body = {
                     "product_name": _pName.text,
-                    "category_id": _product.id,
+                    "category_id": 2,
                     "description": _description.text,
                     "price": _price.text,
                     "min_order": _minOrder.text,
@@ -511,25 +511,6 @@ class ProductUpdateState extends State<ProductUpdate> {
     if(allFiles.length == 0){
       return true;
     }
-
-//    FormData formData = FormData.fromMap({
-//      "product_image": allFiles
-//          .map((oneFile) => MultipartFile.fromFileSync(oneFile.path,
-//              filename: oneFile.path.split("/").last))
-//          .toList(),
-//      "product_id": productID
-//    });
-//
-//    Dio dio = Dio();
-//    dio.options.headers["Authorization"] = Utils.token;
-//    var res = await dio.post(url, data: formData);
-//
-//    if (res.statusCode == 200 || res.statusCode == 201) {
-//      return true;
-//    } else {
-//      return false;
-//    }
-
 
     var uri = Uri.parse(url);
     try {

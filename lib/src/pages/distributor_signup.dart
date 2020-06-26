@@ -120,7 +120,7 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
             gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+                colors: [Colors.green[300], Colors.green[400]])),
         child: Text(
           'Register Now',
           style: TextStyle(fontSize: 20, color: Colors.white),
@@ -341,16 +341,20 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
             textStyle: Theme.of(context).textTheme.headline4,
             fontSize: 30,
             fontWeight: FontWeight.w700,
-            color: Color(0xffe46b10),
+            color: Colors.red,
           ),
           children: [
             TextSpan(
-              text: 'lso',
-              style: TextStyle(color: Colors.black, fontSize: 30),
+              text: 'ls',
+              style: TextStyle(color: Colors.amber, fontSize: 30),
             ),
             TextSpan(
-              text: 'rb',
-              style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
+              text: 'or',
+              style: TextStyle(color: Colors.green, fontSize: 30),
+            ),
+            TextSpan(
+              text: 'b',
+              style: TextStyle(color: Colors.blue, fontSize: 30),
             ),
           ]),
     );
@@ -390,7 +394,7 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
               ),
               Spacer(),
               RaisedButton(
-                color: LightColor.lightOrange,
+                color: Colors.green,
                 child: Text("UPLOAD"),
                 onPressed: () {
                   Utils.photoOptionDialog(context).then((value) {
@@ -431,7 +435,7 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
               ),
               Spacer(),
               RaisedButton(
-                color: LightColor.lightOrange,
+                color: Colors.green,
                 child: Text("UPLOAD"),
                 onPressed: () {
                   Utils.photoOptionDialog(context).then((value) {
@@ -478,10 +482,10 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
               width: MediaQuery.of(context).size.width,
               child: Stack(
                 children: <Widget>[
-                  Positioned(
-                      top: -MediaQuery.of(context).size.height * .15,
-                      right: -MediaQuery.of(context).size.width * .4,
-                      child: BezierContainer()),
+//                  Positioned(
+//                      top: -MediaQuery.of(context).size.height * .15,
+//                      right: -MediaQuery.of(context).size.width * .4,
+//                      child: BezierContainer()),
                   Container(
                     margin: EdgeInsets.only(top: 30.0),
                     padding: EdgeInsets.symmetric(horizontal: 20),
@@ -530,12 +534,8 @@ class _DistributorSignUpPageState extends State<DistributorSignUpPage> {
                       ],
                     ),
                   ),
-//                  Align(
-//                    alignment: Alignment.bottomCenter,
-//                    child: _loginAccountLabel(),
-//                  ),
                   Positioned(
-                      top: 00,
+                      top: 5,
                       left: 0,
                       right: 0,
                       child: Container(

@@ -322,7 +322,7 @@ class NewProductState extends State<NewProduct> {
 
                   Map<String, dynamic> body = {
                     "product_name": _pName.text,
-                    "category_id": 0,
+                    "category_id": 2,
                     "description": _description.text,
                     "price": _price.text,
                     "min_order": _minOrder.text,

@@ -28,13 +28,12 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmController = TextEditingController();
+
 //  TextEditingController _PharmNumberController = TextEditingController();
 
   ProgressDialog _progressDialog;
   String _message = "";
   bool _termsAgreed = false;
-
-
 
   Widget _backButton() {
     return InkWell(
@@ -101,7 +100,7 @@ class _SignUpPageState extends State<SignUpPage> {
             gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+                colors: [Colors.blue[200], Colors.blue[300]])),
         child: Text(
           'Register Now',
           style: TextStyle(fontSize: 20, color: Colors.white),
@@ -120,23 +119,22 @@ class _SignUpPageState extends State<SignUpPage> {
               email.isNotEmpty &&
               phone.isNotEmpty &&
               password.isNotEmpty &&
-              confirm.isNotEmpty ) {
-
-            if(!EmailValidator.validate(email)){
+              confirm.isNotEmpty) {
+            if (!EmailValidator.validate(email)) {
               Fluttertoast.showToast(
                   msg: 'Invalid email',
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.BOTTOM,
                   backgroundColor: Colors.black,
                   textColor: Colors.white);
-            }else if (password != confirm) {
+            } else if (password != confirm) {
               Fluttertoast.showToast(
                   msg: 'Passwords do not match',
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.BOTTOM,
                   backgroundColor: Colors.black,
                   textColor: Colors.white);
-            }else if(password.length < 8){
+            } else if (password.length < 8) {
               Fluttertoast.showToast(
                   msg: 'Passwords mut be at least 8 characters long',
                   toastLength: Toast.LENGTH_SHORT,
@@ -146,19 +144,20 @@ class _SignUpPageState extends State<SignUpPage> {
             } else {
               _progressDialog.show();
               _signUpNewUser(username, email, phone, password)
-                  .then((status)async {
-
-                if(status == false){
+                  .then((status) async {
+                if (status == false) {
                   Future.delayed(Duration(seconds: 1)).then((value) {
                     _progressDialog.hide().whenComplete(() {
                       showStatus(context, _message);
                     });
                   });
-                }else{
+                } else {
                   Future.delayed(Duration(seconds: 1)).then((value) {
                     _progressDialog.hide().whenComplete(() {
-                      Utils.showStatusAndWaitForAction(context, true,
-                          'A link to activate your account has been sent to $email. '
+                      Utils.showStatusAndWaitForAction(
+                              context,
+                              true,
+                              'A link to activate your account has been sent to $email. '
                               'Please follow the link to activate your account')
                           .then((value) {
                         if (value) {
@@ -167,9 +166,9 @@ class _SignUpPageState extends State<SignUpPage> {
                               MaterialPageRoute(
                                   builder: (BuildContext context) =>
                                       LoginPage()),
-                                  (Route<dynamic> route) =>
-                              false // removes all routes below
-                          );
+                              (Route<dynamic> route) =>
+                                  false // removes all routes below
+                              );
                         }
                       });
                     });
@@ -197,16 +196,16 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-
   Future<bool> _uploadImage(int ID, File file, String route) async {
     String url = Utils.url + '$route';
 
-    try{
+    try {
       var uri = Uri.parse(url);
       var request = http.MultipartRequest('POST', uri)
         ..fields['customer_id'] = ID.toString()
         ..files.add(await http.MultipartFile.fromPath(
-          'image', file.path,
+          'image',
+          file.path,
         ));
 
       var response = await request.send();
@@ -216,13 +215,11 @@ class _SignUpPageState extends State<SignUpPage> {
       } else {
         return false;
       }
-    }catch (e) {
+    } catch (e) {
       Utils.showStatus(context, false, '');
       return false;
     }
   }
-
-
 
   void showStatus(BuildContext context, String message) {
     var alertDialog = AlertDialog(
@@ -254,26 +251,25 @@ class _SignUpPageState extends State<SignUpPage> {
 
     String json = jsonEncode(body);
 
-    try{
+    try {
       var res = await http.post(url,
           headers: {"Content-Type": "application/json"}, body: json);
-print(res.statusCode);
+      print(res.statusCode);
       if (res.statusCode == 200 || res.statusCode == 201) {
         Map<String, dynamic> map = jsonDecode(res.body);
         return map['user'];
       } else {
         setState(() {
-          _message =  res.body;
+          _message = res.body;
         });
         return false;
       }
-    }catch(e){
+    } catch (e) {
       setState(() {
         _message = 'Network error, try again';
       });
       return false;
     }
-
   }
 
   Widget _loginAccountLabel() {
@@ -317,16 +313,20 @@ print(res.statusCode);
             textStyle: Theme.of(context).textTheme.headline4,
             fontSize: 30,
             fontWeight: FontWeight.w700,
-            color: Color(0xffe46b10),
+            color: Colors.red,
           ),
           children: [
             TextSpan(
-              text: 'lso',
-              style: TextStyle(color: Colors.black, fontSize: 30),
+              text: 'ls',
+              style: TextStyle(color: Colors.amber, fontSize: 30),
             ),
             TextSpan(
-              text: 'rb',
-              style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
+              text: 'or',
+              style: TextStyle(color: Colors.green, fontSize: 30),
+            ),
+            TextSpan(
+              text: 'b',
+              style: TextStyle(color: Colors.blue, fontSize: 30),
             ),
           ]),
     );
@@ -346,6 +346,35 @@ print(res.statusCode);
     );
   }
 
+
+  Widget bottomText(){
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+          text: 'Save',
+          style: GoogleFonts.portLligatSans(
+            textStyle: Theme.of(context).textTheme.display1,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Colors.red,
+          ),
+          children: [
+            TextSpan(
+              text: ' Time',
+              style: TextStyle(color: Colors.amber, fontSize: 16),
+            ),
+            TextSpan(
+              text: ' Save',
+              style: TextStyle(color: Colors.green, fontSize: 16),
+            ),
+            TextSpan(
+              text: ' Money',
+              style: TextStyle(color: Colors.blue, fontSize: 16),
+            ),
+          ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _progressDialog = Utils.initializeProgressDialog(context);
@@ -357,10 +386,10 @@ print(res.statusCode);
               height: MediaQuery.of(context).size.height,
               child: Stack(
                 children: <Widget>[
-                  Positioned(
-                      top: -MediaQuery.of(context).size.height * .15,
-                      right: -MediaQuery.of(context).size.width * .4,
-                      child: BezierContainer()),
+//                  Positioned(
+//                      top: -MediaQuery.of(context).size.height * .15,
+//                      right: -MediaQuery.of(context).size.width * .4,
+//                      child: BezierContainer()),
                   Container(
                     margin: EdgeInsets.only(top: 30.0),
                     padding: EdgeInsets.symmetric(horizontal: 20),
@@ -369,8 +398,6 @@ print(res.statusCode);
                         SizedBox(
                           height: 20,
                         ),
-//                        Text(_message,
-//                            style: TextStyle(color: Colors.red)),
                         _emailPasswordWidget(),
                         SizedBox(
                           height: 2,
@@ -404,17 +431,14 @@ print(res.statusCode);
                           ],
                         ),
                         _submitButton(),
-                        SizedBox(height: 20,)
+                        SizedBox(
+                          height: 20,
+                        )
                       ],
                     ),
                   ),
-//                  Align(
-//                    alignment: Alignment.bottomCenter,
-//                    child: _loginAccountLabel(),
-//                  ),
-//                  Positioned(top: 22, left: 0, child: _backButton()),
                   Positioned(
-                      top: 00,
+                      top: 5,
                       left: 0,
                       right: 0,
                       child: Container(
@@ -430,7 +454,13 @@ print(res.statusCode);
                             Spacer(),
                           ],
                         ),
-                      ))
+                      )),
+                  Positioned(
+                    bottom: 5,
+                    right: 10,
+                    left: 10,
+                    child: bottomText(),
+                  )
                 ],
               ),
             )));

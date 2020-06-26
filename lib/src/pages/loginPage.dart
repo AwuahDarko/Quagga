@@ -98,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
             gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+                colors: [Colors.blue[300], Colors.blue[400]])),
         child: Text(
           'Login',
           style: TextStyle(fontSize: 20, color: Colors.white),
@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            'Don\'t have an account ?',
+            'Don\'t have an account?',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
           ),
           SizedBox(
@@ -162,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Text(
               'Register',
               style: TextStyle(
-                  color: Color(0xfff79c4f),
+                  color: Colors.red,
                   fontSize: 13,
                   fontWeight: FontWeight.w600),
             ),
@@ -173,26 +173,31 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _title() {
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-          text: 'U',
-          style: GoogleFonts.portLligatSans(
-            textStyle: Theme.of(context).textTheme.headline4,
-            fontSize: 30,
-            fontWeight: FontWeight.w700,
-            color: Color(0xffe46b10),
-          ),
-          children: [
-            TextSpan(
-              text: 'lso',
-              style: TextStyle(color: Colors.black, fontSize: 30),
-            ),
-            TextSpan(
-              text: 'rb',
-              style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
-            ),
-          ]),
+//    return RichText(
+//      textAlign: TextAlign.center,
+//      text: TextSpan(
+//          text: 'U',
+//          style: GoogleFonts.portLligatSans(
+//            textStyle: Theme.of(context).textTheme.headline4,
+//            fontSize: 30,
+//            fontWeight: FontWeight.w700,
+//            color: Color(0xffe46b10),
+//          ),
+//          children: [
+//            TextSpan(
+//              text: 'lso',
+//              style: TextStyle(color: Colors.black, fontSize: 30),
+//            ),
+//            TextSpan(
+//              text: 'rb',
+//              style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
+//            ),
+//          ]),
+//    );
+    return Container(
+      width: MediaQuery.of(context).size.width < 600 ?100 : 200,
+      height: MediaQuery.of(context).size.width < 600 ?100 : 200,
+      child: Image.asset('assets/falcon.png'),
     );
   }
 
@@ -214,10 +219,10 @@ class _LoginPageState extends State<LoginPage> {
       height: MediaQuery.of(context).size.height,
       child: Stack(
         children: <Widget>[
-          Positioned(
-              top: -MediaQuery.of(context).size.height * .15,
-              right: -MediaQuery.of(context).size.width * .4,
-              child: BezierContainer()),
+//          Positioned(
+//              top: -MediaQuery.of(context).size.height * .15,
+//              right: -MediaQuery.of(context).size.width * .4,
+//              child: BezierContainer()),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Column(
