@@ -452,22 +452,20 @@ class NewProductState extends State<NewProduct> {
     }
   }
 
-  void reset(){
+  void reset() {
     _pName.text = '';
     _description.text = '';
     _minOrder.text = '';
     _numStock.text = '';
-     _price.text = '';
+    _price.text = '';
 
-  _image_1 = null;
+    _image_1 = null;
     _image_2 = null;
     _image_3 = null;
     _image_4 = null;
 
     _loadedImages = [];
 
-    setState(() {
-
-    });
+    setState(() {});
   }
 }

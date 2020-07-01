@@ -162,9 +162,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Text(
               'Register',
               style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600),
+                  color: Colors.red, fontSize: 13, fontWeight: FontWeight.w600),
             ),
           )
         ],
@@ -195,8 +193,8 @@ class _LoginPageState extends State<LoginPage> {
 //          ]),
 //    );
     return Container(
-      width: MediaQuery.of(context).size.width < 600 ?100 : 200,
-      height: MediaQuery.of(context).size.width < 600 ?100 : 200,
+      width: MediaQuery.of(context).size.width < 600 ? 100 : 200,
+      height: MediaQuery.of(context).size.width < 600 ? 100 : 200,
       child: Image.asset('assets/falcon.png'),
     );
   }
@@ -290,8 +288,6 @@ class _LoginPageState extends State<LoginPage> {
       var res = await http.post(url,
           headers: {"Content-Type": "application/json"}, body: json);
 
-      print(res.statusCode);
-
       if (res.statusCode == 403) {
         setState(() {
           _showProgress = false;
@@ -313,7 +309,8 @@ class _LoginPageState extends State<LoginPage> {
             userInfo['type'],
             userInfo['phone'],
             userInfo['image_url'],
-            userInfo['location']);
+            userInfo['location'],
+            userInfo['chat_id']);
 
         await _databaseHelper.insertToken(Utils.token);
         print(await _databaseHelper.getToken());

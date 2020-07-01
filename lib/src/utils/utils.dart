@@ -12,7 +12,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:uuid/uuid.dart';
 
 class Utils {
-  static String url = 'https://ulsorb.com';
+  static String url = 'http://10.0.2.2:3000'; //'https://ulsorb.com';
 
   //'http://192.168.43.111:4000'; //'http://10.0.2.2:4000' http://api.piuniversal.com:4000
   static String token = '';
@@ -291,7 +291,9 @@ class Utils {
             map['type'],
             map['phone'],
             map['image_url'],
-            map['location']);
+            map['location'],
+          map['chat_id']
+        );
         return true;
       }else{
         return false;

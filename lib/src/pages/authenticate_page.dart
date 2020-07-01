@@ -74,7 +74,8 @@ class AuthenticatePageState extends State<AuthenticatePage> {
             userInfo['type'],
             userInfo['phone'],
             userInfo['image_url'],
-            userInfo['location']);
+            userInfo['location'],
+            userInfo['chat_id']);
 
         return true;
       } else {

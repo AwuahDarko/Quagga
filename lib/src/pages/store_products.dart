@@ -236,7 +236,7 @@ class _StoreProductsPageState extends State<StoreProductsPage> {
                   radius: 10,
                   backgroundImage: store.image.isNotEmpty
                       ? NetworkImage('${Utils.url}/api/images?url=${store.image}')
-                      : Image.asset('assets.white.jpg').image,
+                      : Image.asset('assets/white.jpg').image,
                 ),
               ),
               automaticallyImplyLeading: true,

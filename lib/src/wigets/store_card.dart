@@ -11,6 +11,7 @@ class StoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double radius = MediaQuery.of(context).size.width * 0.14;
     return InkWell(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) => StoreProductsPage(model)));
@@ -38,7 +39,7 @@ class StoreCard extends StatelessWidget {
                   alignment: Alignment.center,
                   children: <Widget>[
                     CircleAvatar(
-                      radius: 40,
+                      radius: radius,
                       backgroundColor: LightColor.orange.withAlpha(40),
                       backgroundImage: model.image.isNotEmpty
                           ? NetworkImage(

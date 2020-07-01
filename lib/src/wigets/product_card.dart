@@ -21,6 +21,7 @@ class _ProductCardState extends State<ProductCard> {
   ProgressDialog _progressDialog;
   bool isLiked = false;
 
+
   @override
   void initState() {
     model = widget.product;
@@ -30,6 +31,8 @@ class _ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
     _progressDialog = Utils.initializeProgressDialog(context);
+     double width = MediaQuery.of(context).size.width * 0.17;
+     double height = MediaQuery.of(context).size.width * 0.17;
     return InkWell(
       onTap: () {
         Navigator.of(context).pushNamed('/detail', arguments: model);
@@ -111,7 +114,7 @@ class _ProductCardState extends State<ProductCard> {
                   children: <Widget>[
                     Container(
                       child: model.image.length > 0 ?
-                      Image.network(Utils.url + '/api/images?url=' + model.image[0], width: 50, height: 50,)
+                      Image.network(Utils.url + '/api/images?url=' + model.image[0], width: width, height: height,)
                           : Container(
                         width: 100,
                         height: 100,

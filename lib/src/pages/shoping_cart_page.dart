@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quagga/src/model/data.dart';
 import 'package:quagga/src/model/product.dart';
+import 'package:quagga/src/pages/pay_options.dart';
 import 'package:quagga/src/themes/light_color.dart';
 import 'package:quagga/src/themes/theme.dart';
 import 'package:quagga/src/utils/utils.dart';
@@ -198,7 +199,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     return FlatButton(
         onPressed: () async {
           if (AppData.cartList.length > 0) {
-            _performPayment();
+//            _performPayment();
+            Navigator.push(context, MaterialPageRoute(builder: (context) => PayOptions(getPrice())));
           }
         },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -220,6 +222,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     AppData.cartList.forEach((x) {
       price += x.price * x.quantity;
     });
+
     return price;
   }
 
@@ -433,7 +436,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   Future<bool> _deleteCartItem(int cartId) async {
     String url = Utils.url + "/api/cart?cart_id=$cartId";
 
-    try{
+    try {
       var res = await http.delete(url, headers: {"Authorization": Utils.token});
 
       if (res.statusCode == 200 || res.statusCode == 201) {
@@ -441,8 +444,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
       } else {
         return false;
       }
-    }catch(e){
-     return false;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -453,7 +456,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
     String url = Utils.url + "/api/cart";
 
-    try{
+    try {
       var res = await http.patch(url,
           headers: {
             "Content-Type": "application/json",
@@ -466,7 +469,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
       } else {
         return false;
       }
-    }catch(e){
+    } catch (e) {
       return false;
     }
   }
@@ -478,7 +481,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
     String url = Utils.url + "/api/cart";
 
-    try{
+    try {
       var res = await http.patch(url,
           headers: {
             "Content-Type": "application/json",
@@ -491,7 +494,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
       } else {
         return false;
       }
-    }catch(e){
+    } catch (e) {
       return false;
     }
   }
@@ -502,7 +505,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text("Do you want to place order ?"),
+            content: Text("Do you want to place order?"),
             actions: <Widget>[
               FlatButton(
                 child: Text("Yes"),
@@ -519,276 +522,276 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
         });
   }
 
-  Future<bool> _generateAPIUser() async {
-    String url = Utils.momoUrl + '/v1_0/apiuser';
+//  Future<bool> _generateAPIUser() async {
+//    String url = Utils.momoUrl + '/v1_0/apiuser';
+//
+//    Map<String, String> map = {"providerCallbackHost": Utils.momoCallbackUrl};
+//
+//    var json = jsonEncode(map);
+//
+//    reference = uuid.v4();
+//
+//    try {
+//      var res = await http.post(url,
+//          headers: {
+//            'X-Reference-Id': reference,
+//            'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+//            'Content-Type': 'application/json',
+//          },
+//          body: json);
+//
+//      print(res.statusCode);
+//      print(res.body);
+//      if (res.statusCode == 201) {
+//        return true;
+//      } else {
+//        return false;
+//      }
+//    } catch (e) {
+//      return false;
+//    }
+//  }
 
-    Map<String, String> map = {"providerCallbackHost": Utils.momoCallbackUrl};
+//  Future<bool> _getCreatedUserInfo() async {
+//    String url = Utils.momoUrl + '/v1_0/apiuser/$reference';
+//
+//    try {
+//      var res = await http.get(
+//        url,
+//        headers: {'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey},
+//      );
+//
+//      if (res.statusCode == 200) {
+//        Map<String, dynamic> response = jsonDecode(res.body);
+//        targetEnvironment = response['targetEnvironment'];
+//
+//        return true;
+//      } else {
+//        return false;
+//      }
+//    } catch (e) {
+//      return false;
+//    }
+//  }
 
-    var json = jsonEncode(map);
+//  Future<bool> _generateAPIKey() async {
+//    String url = Utils.momoUrl + '/v1_0/apiuser/$reference/apikey';
+//
+//    try {
+//      var res = await http.post(url, headers: {
+//        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+//        'Content-Type': 'application/json'
+//      });
+//
+//      if (res.statusCode == 201) {
+//        Map<String, dynamic> map = jsonDecode(res.body);
+//        apiKey = map['apiKey'];
+//        return true;
+//      } else {
+//        return false;
+//      }
+//    } catch (e) {
+//      return false;
+//    }
+//  }
 
-    reference = uuid.v4();
+//  Future<bool> _generateToken() async {
+//    String url = Utils.momoUrl + '/collection/token/';
+//
+//    String basicAuth =
+//        'Basic ' + base64Encode(utf8.encode('$reference:$apiKey'));
+//
+//    try {
+//      var res = await http.post(url, headers: {
+//        'Authorization': basicAuth,
+//        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey
+//      });
+//
+//      if (res.statusCode == 200) {
+//        Map<String, dynamic> body = jsonDecode(res.body);
+//        print('access_token $body');
+//        accessToken = 'access_token';
+//        return true;
+//      } else {
+//        return false;
+//      }
+//    } catch (e) {
+//      return false;
+//    }
+//  }
 
-    try{
-      var res = await http.post(url,
-          headers: {
-            'X-Reference-Id': reference,
-            'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
-            'Content-Type': 'application/json',
-          },
-          body: json);
+//  Future<bool> _requestToPay() async {
+//    String url = Utils.momoUrl + '/collection/v1_0/requesttopay';
+//
+//    Map<String, dynamic> body = Map();
+//    body['amount'] = '';
+//    body['currency'] = 'EUR';
+//    body['externalId'] = 'Payment from falcon stores';
+//    body['payer'] = {"partyIdType": "MSISDN", "partyId": "02431234568"};
+//    body['payerMessage'] = 'Payment for puchase of drugs from falcon stores';
+//    body['payeeNote'] = 'Payment for puchase of drugs from falcon stores';
+//
+//    String json = jsonEncode(body);
+//    paymentRef = uuid.v4();
+//
+//    try {
+//      var res = await http.post(url,
+//          headers: {
+//            'X-Reference-Id': paymentRef,
+//            'X-Target-Environment': targetEnvironment,
+//            'Content-Type': 'application/json',
+//            'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+//            'Authorization': 'Bearer $accessToken'
+//          },
+//          body: json);
+//
+//      if (res.statusCode == 202) {
+//        return true;
+//      } else {
+//        return false;
+//      }
+//    } catch (e) {
+//      return false;
+//    }
+//  }
 
-      print(res.statusCode);
-      print(res.body);
-      if (res.statusCode == 201) {
-        return true;
-      } else {
-        return false;
-      }
-    }catch(e){
-      return false;
-    }
-  }
+//  Future<String> _getPaymentStatus() async {
+//    String url = Utils.momoUrl + '/collection/v1_0/requesttopay/$paymentRef';
+//
+//    try {
+//      var res = await http.get(url, headers: {
+//        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
+//        'X-Target-Environment': targetEnvironment,
+//        'Authorization': 'Bearer $accessToken'
+//      });
+//
+//      if (res.statusCode == 200) {
+//        Map<String, dynamic> map = jsonDecode(res.body);
+//
+//        return map['status'];
+//      } else {
+//        return 'FAILED';
+//      }
+//    } catch (e) {
+//      return 'FAILED';
+//    }
+//  }
 
-  Future<bool> _getCreatedUserInfo() async {
-    String url = Utils.momoUrl + '/v1_0/apiuser/$reference';
+//  void _performPayment() async {
+//    bool answer = await placeOrderDialog(context);
+//    if (answer) {
+//      bool choice = await Utils.requestAndWaitForAction(
+//          context, 'Use ${Utils.customerInfo.phone} for this transaction ?');
+//      if (!choice) {
+//        bool value = await phoneNumberDialog(context);
+//        if (value) phoneNumber = phoneController.text;
+//      }
+//
+//      _progressDialog.show();
+//      // continue with MoMo transaction
+//      // 1. generate api user
+//      bool one = await _generateAPIUser();
+//      if (one) {
+//        // 2. get the created user
+//        bool two = await _getCreatedUserInfo();
+//        if (two) {
+//          // 3. generate API KEY
+//          bool three = await _generateAPIKey();
+//          if (three) {
+//            // 4. get token
+//            bool four = await _generateToken();
+//            if (four) {
+//              // 5. request  to pay
+//              bool five = await _requestToPay();
+//              if (five) {
+//                bool last = await transactionSuccessDialog(context);
+//                if (last) {
+//                  // 6. get transaction status
+//                  var result = await _getPaymentStatus();
+//
+//                  if (result == 'SUCCESSFUL') {
+//                    await _placeOrder();
+//                  } else {
+//                    // TO DO: REPEAT
+//                    var result = await _getPaymentStatus();
+//                    if (result == 'SUCCESSFUL') {
+//                      await _placeOrder();
+//                    } else {
+//                      // FATAL ERROR
+//                      print('Status pending still...');
+//                    }
+//                  }
+//                }
+//              }
+//            } else {
+//              Future.delayed(Duration(seconds: 1)).then((value) {
+//                _progressDialog.hide().whenComplete(() {
+//                  showFailedDialog(context);
+//                });
+//              });
+//
+////              return;
+//            }
+//          } else {
+//            Future.delayed(Duration(seconds: 1)).then((value) {
+//              _progressDialog.hide().whenComplete(() {
+//                showFailedDialog(context);
+//              });
+//            });
+////            return;
+//          }
+//        } else {
+//          Future.delayed(Duration(seconds: 1)).then((value) {
+//            _progressDialog.hide().whenComplete(() {
+//              showFailedDialog(context);
+//            });
+//          });
+////          return;
+//        }
+//      } else {
+//        Future.delayed(Duration(seconds: 1)).then((value) {
+//          _progressDialog.hide().whenComplete(() {
+//            showFailedDialog(context);
+//          });
+//        });
+////        return;
+//      }
+//    }
+//  }
 
-    try{
-      var res = await http.get(
-        url,
-        headers: {'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey},
-      );
-
-      if (res.statusCode == 200) {
-        Map<String, dynamic> response = jsonDecode(res.body);
-        targetEnvironment = response['targetEnvironment'];
-
-        return true;
-      } else {
-        return false;
-      }
-    }catch(e){
-      return false;
-    }
-  }
-
-  Future<bool> _generateAPIKey() async {
-    String url = Utils.momoUrl + '/v1_0/apiuser/$reference/apikey';
-
-    try{
-      var res = await http.post(url, headers: {
-        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
-        'Content-Type': 'application/json'
-      });
-
-      if (res.statusCode == 201) {
-        Map<String, dynamic> map = jsonDecode(res.body);
-        apiKey = map['apiKey'];
-        return true;
-      } else {
-        return false;
-      }
-    }catch(e){
-      return false;
-    }
-  }
-
-  Future<bool> _generateToken() async {
-    String url = Utils.momoUrl + '/collection/token/';
-
-    String basicAuth =
-        'Basic ' + base64Encode(utf8.encode('$reference:$apiKey'));
-
-    try{
-      var res = await http.post(url, headers: {
-        'Authorization': basicAuth,
-        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey
-      });
-
-      if (res.statusCode == 200) {
-        Map<String, dynamic> body = jsonDecode(res.body);
-        print('access_token $body');
-        accessToken = 'access_token';
-        return true;
-      } else {
-        return false;
-      }
-    }catch(e){
-      return false;
-    }
-  }
-
-  Future<bool> _requestToPay() async {
-    String url = Utils.momoUrl + '/collection/v1_0/requesttopay';
-
-    Map<String, dynamic> body = Map();
-    body['amount'] = '';
-    body['currency'] = 'EUR';
-    body['externalId'] = 'Payment from falcon stores';
-    body['payer'] = {"partyIdType": "MSISDN", "partyId": "02431234568"};
-    body['payerMessage'] = 'Payment for puchase of drugs from falcon stores';
-    body['payeeNote'] = 'Payment for puchase of drugs from falcon stores';
-
-    String json = jsonEncode(body);
-    paymentRef = uuid.v4();
-
-    try{
-      var res = await http.post(url,
-          headers: {
-            'X-Reference-Id': paymentRef,
-            'X-Target-Environment': targetEnvironment,
-            'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
-            'Authorization': 'Bearer $accessToken'
-          },
-          body: json);
-
-      if (res.statusCode == 202) {
-        return true;
-      } else {
-        return false;
-      }
-    }catch(e){
-      return false;
-    }
-  }
-
-  Future<String> _getPaymentStatus() async {
-    String url = Utils.momoUrl + '/collection/v1_0/requesttopay/$paymentRef';
-
-    try{
-      var res = await http.get(url, headers: {
-        'Ocp-Apim-Subscription-Key': Utils.momoPrimaryKey,
-        'X-Target-Environment': targetEnvironment,
-        'Authorization': 'Bearer $accessToken'
-      });
-
-      if (res.statusCode == 200) {
-        Map<String, dynamic> map = jsonDecode(res.body);
-
-        return map['status'];
-      } else {
-        return 'FAILED';
-      }
-    }catch(e){
-      return 'FAILED';
-    }
-  }
-
-  void _performPayment() async {
-    bool answer = await placeOrderDialog(context);
-    if (answer) {
-      bool choice = await Utils.requestAndWaitForAction(
-          context, 'Use ${Utils.customerInfo.phone} for this transaction ?');
-      if (!choice) {
-        bool value = await phoneNumberDialog(context);
-        if (value) phoneNumber = phoneController.text;
-      }
-
-      _progressDialog.show();
-      // continue with MoMo transaction
-      // 1. generate api user
-      bool one = await _generateAPIUser();
-      if (one) {
-        // 2. get the created user
-        bool two = await _getCreatedUserInfo();
-        if (two) {
-          // 3. generate API KEY
-          bool three = await _generateAPIKey();
-          if (three) {
-            // 4. get token
-            bool four = await _generateToken();
-            if (four) {
-              // 5. request  to pay
-              bool five = await _requestToPay();
-              if (five) {
-                bool last = await transactionSuccessDialog(context);
-                if (last) {
-                  // 6. get transaction status
-                  var result = await _getPaymentStatus();
-
-                  if (result == 'SUCCESSFUL') {
-                    await _placeOrder();
-                  } else {
-                    // TO DO: REPEAT
-                    var result = await _getPaymentStatus();
-                    if (result == 'SUCCESSFUL') {
-                      await _placeOrder();
-                    } else {
-                      // FATAL ERROR
-                      print('Status pending still...');
-                    }
-                  }
-                }
-              }
-            } else {
-              Future.delayed(Duration(seconds: 1)).then((value) {
-                _progressDialog.hide().whenComplete(() {
-                  showFailedDialog(context);
-                });
-              });
-
-//              return;
-            }
-          } else {
-            Future.delayed(Duration(seconds: 1)).then((value) {
-              _progressDialog.hide().whenComplete(() {
-                showFailedDialog(context);
-              });
-            });
-//            return;
-          }
-        } else {
-          Future.delayed(Duration(seconds: 1)).then((value) {
-            _progressDialog.hide().whenComplete(() {
-              showFailedDialog(context);
-            });
-          });
-//          return;
-        }
-      } else {
-        Future.delayed(Duration(seconds: 1)).then((value) {
-          _progressDialog.hide().whenComplete(() {
-            showFailedDialog(context);
-          });
-        });
-//        return;
-      }
-    }
-  }
-
-  Future<void> _placeOrder() async {
-    var dt = DateTime.now();
-    var nt = dt.add(Duration(days: 60));
-
-    print(newFormat.format(nt));
-
-    Map<String, dynamic> body = Map();
-    body['customer_id'] = Utils.customerInfo.userID;
-    body['expiry_date'] = nt.toString();
-
-    List<Map<String, dynamic>> productsList = [];
-
-    AppData.cartList.forEach((oneCartItem) {
-      Map<String, dynamic> w = {
-        "product_id": oneCartItem.id,
-        "quantity": oneCartItem.quantity,
-        "price": oneCartItem.price,
-        "type": oneCartItem.type
-      };
-
-      productsList.add(w);
-    });
-
-    body['products'] = productsList;
-
-    _progressDialog.show().then((v) {
-      AppData.placeOrder(body).then((status) {
-        if (_progressDialog.isShowing()) {
-          _progressDialog.hide().then((v) {
-            Utils.showStatus(context, status, "Your order was successful");
-          });
-        }
-      });
-    });
-  }
+//  Future<void> _placeOrder() async {
+//    var dt = DateTime.now();
+//    var nt = dt.add(Duration(days: 60));
+//
+//    print(newFormat.format(nt));
+//
+//    Map<String, dynamic> body = Map();
+//    body['customer_id'] = Utils.customerInfo.userID;
+//    body['expiry_date'] = nt.toString();
+//
+//    List<Map<String, dynamic>> productsList = [];
+//
+//    AppData.cartList.forEach((oneCartItem) {
+//      Map<String, dynamic> w = {
+//        "product_id": oneCartItem.id,
+//        "quantity": oneCartItem.quantity,
+//        "price": oneCartItem.price,
+//        "type": oneCartItem.type
+//      };
+//
+//      productsList.add(w);
+//    });
+//
+//    body['products'] = productsList;
+//
+//    _progressDialog.show().then((v) {
+//      AppData.placeOrder(body).then((status) {
+//        if (_progressDialog.isShowing()) {
+//          _progressDialog.hide().then((v) {
+//            Utils.showStatus(context, status, "Your order was successful");
+//          });
+//        }
+//      });
+//    });
+//  }
 }
